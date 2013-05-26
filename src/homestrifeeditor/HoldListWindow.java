@@ -1,0 +1,1482 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package homestrifeeditor;
+
+import java.awt.Dimension;
+import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JSeparator;
+import javax.swing.JSplitPane;
+import javax.swing.KeyStroke;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
+/**
+ * This is pretty much the main window of the editor. It not only contains the hold list,
+ * but also displays the textures, hitboxes, and attributes of the currently selected hold.
+ * @author Darlos9D
+ */
+public class HoldListWindow extends JFrame implements ActionListener {
+    public static String BaseWindowTitle = "Homestrife Editor - ";
+    public static int windowWidth = 800;
+    public static int windowHeight = 600;
+    
+    public static int newObjectTerrainBoxSize = 200;
+    
+    public HoldListPane holdListPane;
+    public TextureHitboxPane textureHitboxPane;
+    
+    public HSObject currentlyLoadedObject;
+    
+    public String workingDirectory;
+    
+    public HoldListWindow()
+    {
+        currentlyLoadedObject = null;
+        
+        workingDirectory = "";
+        
+        setTitle(BaseWindowTitle + "No Object Loaded");
+        setSize(windowWidth, windowHeight);
+        setMinimumSize(new Dimension(windowWidth, windowHeight));
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        
+        createMenuBar();
+        createWindowContents();
+    }
+    
+    private void createMenuBar()
+    {
+        JMenuBar menuBar;
+        JMenu file;
+        JMenu newObject;
+        JMenuItem newGraphic;
+        JMenuItem newTerrain;
+        JMenuItem newPhysicsObject;
+        JMenuItem newFighter;
+        JMenuItem generate;
+        JMenuItem open;
+        JMenuItem save;
+        JMenuItem saveAs;
+        JMenu edit;
+        JMenuItem undo;
+        JMenuItem redo;
+        JMenuItem cut;
+        JMenuItem copy;
+        JMenuItem paste;
+        JMenuItem delete;
+        JMenuItem selectAll;
+        JMenu object;
+        JMenuItem objectAttributes;
+        JMenuItem eventHolds;
+        JMenuItem palettes;
+        JMenu help;
+        JMenuItem helpContent;
+        JMenuItem about;
+        
+        menuBar = new JMenuBar();
+        
+        file = new JMenu("File");
+        newObject = new JMenu("New");
+        newGraphic = new JMenuItem("Graphic");
+        newTerrain = new JMenuItem("Terrain");
+        newPhysicsObject = new JMenuItem("Physics Object");
+        newFighter = new JMenuItem("Fighter");
+        newGraphic.setActionCommand("newGraphic");
+        newGraphic.addActionListener(this);
+        newTerrain.setActionCommand("newTerrain");
+        newTerrain.addActionListener(this);
+        newPhysicsObject.setActionCommand("newPhysicsObject");
+        newPhysicsObject.addActionListener(this);
+        newFighter.setActionCommand("newFighter");
+        newFighter.addActionListener(this);
+        generate = new JMenuItem("Generate...");
+        generate.setActionCommand("generate");
+        generate.addActionListener(this);
+        open = new JMenuItem("Open...");
+        open.setActionCommand("open");
+        open.addActionListener(this);
+        save = new JMenuItem("Save");
+        save.setActionCommand("save");
+        save.addActionListener(this);
+        save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
+        saveAs = new JMenuItem("Save As...");
+        newObject.add(newGraphic);
+        newObject.add(newTerrain);
+        newObject.add(newPhysicsObject);
+        newObject.add(newFighter);
+        file.add(newObject);
+        file.add(generate);
+        file.add(open);
+        file.add(save);
+        file.add(saveAs);
+        menuBar.add(file);
+        
+        edit = new JMenu("Edit");
+        undo = new JMenuItem("Undo");
+        redo = new JMenuItem("Redo");
+        cut = new JMenuItem("Cut");
+        copy = new JMenuItem("Copy");
+        paste = new JMenuItem("Paste");
+        delete = new JMenuItem("Delete");
+        selectAll = new JMenuItem("Select All");
+        delete.addActionListener(this);
+        delete.setActionCommand("delete");
+        delete.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
+        selectAll.addActionListener(this);
+        selectAll.setActionCommand("selectAll");
+        selectAll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK));
+        edit.add(undo);
+        edit.add(redo);
+        edit.add(new JSeparator());
+        edit.add(cut);
+        edit.add(copy);
+        edit.add(paste);
+        edit.add(delete);
+        edit.add(selectAll);
+        menuBar.add(edit);
+        
+        object = new JMenu("Object");
+        objectAttributes = new JMenuItem("Attributes");
+        eventHolds = new JMenuItem("Event Holds");
+        palettes = new JMenuItem("Palettes");
+        objectAttributes.addActionListener(this);
+        eventHolds.addActionListener(this);
+        palettes.addActionListener(this);
+        objectAttributes.setActionCommand("objectAttributes");
+        eventHolds.setActionCommand("eventHolds");
+        palettes.setActionCommand("palettes");
+        object.add(objectAttributes);
+        object.add(eventHolds);
+        object.add(palettes);
+        menuBar.add(object);
+        
+        help = new JMenu("Help");
+        helpContent = new JMenuItem("Help Content");
+        about = new JMenuItem("About");
+        help.add(helpContent);
+        help.add(about);
+        menuBar.add(help);
+        
+        setJMenuBar(menuBar);
+    }
+    
+    private JComponent createHoldListPane()
+    {
+        holdListPane = new HoldListPane(this);
+        return holdListPane;
+    }
+    
+    private JComponent createHoldDataPane()
+    {
+        textureHitboxPane = new TextureHitboxPane(this);
+        return textureHitboxPane;
+    }
+    
+    private void createWindowContents()
+    {
+        this.setContentPane(new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, createHoldListPane(), createHoldDataPane()));
+    }
+    
+    public void setCurrentlyLoadedObject(HSObject newObject)
+    {
+        currentlyLoadedObject = newObject;
+        setTitle(BaseWindowTitle + newObject.name);
+    }
+    
+    public HSObjectHold[] getAllHolds()
+    {
+        return holdListPane.getAllHolds();
+    }
+    
+    public void applyHoldChanges(HSObjectHold hold, int index)
+    {
+        holdListPane.applyHoldChanges(hold, index);
+    }
+    
+    public void newObject()
+    {
+        if(currentlyLoadedObject.IsTerrainObject())
+        {
+            HSBox terrainBox = new HSBox();
+            terrainBox.width = newObjectTerrainBoxSize;
+            terrainBox.height = newObjectTerrainBoxSize;
+            terrainBox.offset.x = -terrainBox.width / 2;
+            terrainBox.offset.y = -terrainBox.height / 2;
+            terrainBox.depth = 1;
+            ((TerrainObject)currentlyLoadedObject).terrainBoxes.add(terrainBox);
+        }
+        
+        if(currentlyLoadedObject.IsFighter())
+        {
+            HSBox uprightBox = new HSBox();
+            uprightBox.width = newObjectTerrainBoxSize;
+            uprightBox.height = newObjectTerrainBoxSize * 2;
+            uprightBox.offset.x = -uprightBox.width / 2;
+            uprightBox.offset.y = -uprightBox.height;
+            uprightBox.depth = 1;
+            ((Fighter)currentlyLoadedObject).uprightTerrainBoxes.add(uprightBox);
+
+            HSBox crouchingBox = new HSBox();
+            crouchingBox.width = newObjectTerrainBoxSize;
+            crouchingBox.height = newObjectTerrainBoxSize;
+            crouchingBox.offset.x = -crouchingBox.width / 2;
+            crouchingBox.offset.y = -crouchingBox.height;
+            crouchingBox.depth = 1;
+            ((Fighter)currentlyLoadedObject).crouchingTerrainBoxes.add(crouchingBox);
+
+            HSBox proneBox = new HSBox();
+            proneBox.width = newObjectTerrainBoxSize * 2;
+            proneBox.height = newObjectTerrainBoxSize;
+            proneBox.offset.x = -proneBox.width / 2;
+            proneBox.offset.y = -proneBox.height;
+            proneBox.depth = 1;
+            ((Fighter)currentlyLoadedObject).proneTerrainBoxes.add(proneBox);
+
+            HSBox compactBox = new HSBox();
+            compactBox.width = newObjectTerrainBoxSize;
+            compactBox.height = newObjectTerrainBoxSize;
+            compactBox.offset.x = -compactBox.width / 2;
+            compactBox.offset.y = -compactBox.height * (float)1.5;
+            compactBox.depth = 1;
+            ((Fighter)currentlyLoadedObject).compactTerrainBoxes.add(compactBox);
+        }
+        
+        holdListPane.loadObjectHolds(currentlyLoadedObject);
+        textureHitboxPane.resetScrollBars();
+        textureHitboxPane.setCorrectTerrainBox();
+    }
+    
+    public void newGraphic()
+    {
+        setCurrentlyLoadedObject(new HSObject());
+        HSObjectHold newHold = new HSObjectHold();
+        currentlyLoadedObject.holds.add(newHold);
+        newObject();
+    }
+    
+    public void newTerrain()
+    {
+        setCurrentlyLoadedObject(new TerrainObject());
+        TerrainObjectHold newHold = new TerrainObjectHold();
+        currentlyLoadedObject.holds.add(newHold);
+        newObject();
+    }
+    
+    public void newPhysicsObject()
+    {
+        setCurrentlyLoadedObject(new PhysicsObject());
+        PhysicsObjectHold newHold = new PhysicsObjectHold();
+        currentlyLoadedObject.holds.add(newHold);
+        newObject();
+    }
+    
+    public void newFighter()
+    {
+        setCurrentlyLoadedObject(new Fighter());
+        FighterHold newHold = new FighterHold();
+        currentlyLoadedObject.holds.add(newHold);
+        
+        newObject();
+    }
+    
+    private void generate()
+    {
+        JFileChooser fc = new JFileChooser();
+        int returnVal = fc.showOpenDialog(null);
+        File file;
+        
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            file = fc.getSelectedFile();
+        } else {
+            return;
+        }
+        
+        try
+        {
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(file);
+            doc.getDocumentElement().normalize();
+            
+            if(doc.getDocumentElement().getNodeName().compareTo("HSAutoGenerateDefinition") != 0)
+            {
+                return;
+            }
+            
+            String objectType = doc.getElementsByTagName("ObjectType").item(0).getTextContent();
+            
+            HSObject newObject;
+            
+            if(objectType.compareTo("Graphic") == 0)
+            {
+                newObject = new HSObject();
+            }
+            else if(objectType.compareTo("Terrain") == 0)
+            {
+                newObject = new TerrainObject();
+            }
+            else if(objectType.compareTo("PhysicsObject") == 0)
+            {
+                newObject = new PhysicsObject();
+            }
+            else if(objectType.compareTo("Fighter") == 0)
+            {
+                newObject = new Fighter();
+            }
+            else
+            {
+                return;
+            }
+            
+            //Now, start loading all the textures in all the directories located in the same directory as the auto generate definition.
+            //Each individual texture will become its own hold. Holds from the same folder will be linked together as animations.
+            //Also, the first hold of specially named folders will be marked as event holds
+            File[] animDirectories = file.getParentFile().listFiles();
+            
+            //first get the palette folder and load any available palettes.
+            //there needs to be at least one, or else indexed textures won't load
+            for(File f : animDirectories)
+            {
+                if(!f.isDirectory() || f.getName().compareTo("palettes") != 0)  { continue; }
+                
+                File[] palettes = f.listFiles();
+                
+                int paletteIndex = 0;
+                
+                for(File p : palettes)
+                {
+                    String type = Files.probeContentType(p.toPath());
+                    if(type != null || !p.getName().endsWith(".hsp")) { continue; }
+                    //if the type is null but the file ends with .hsp then it's PROBABLY a homestrife palette
+                    
+                    newObject.palettes[paletteIndex].palFilePath = p.getAbsolutePath();
+                    
+                    paletteIndex++;
+                    
+                    if(paletteIndex >= palettes.length) { break; }
+                }
+                
+                if(paletteIndex >= palettes.length) { break; }
+            }
+            
+            for(File f : animDirectories)
+            {
+                if(!f.isDirectory() || f.getName().compareTo("palettes") == 0)  { continue; }
+                
+                File[] holds = f.listFiles();
+                
+                HSObjectHold prevHold = null;
+                
+                for(File h : holds)
+                {
+                    if(!h.isFile()) { continue; }
+                    
+                    String type = Files.probeContentType(h.toPath());
+                    if(type != null || !h.getName().endsWith(".tga")) { continue; }
+                    //if the type is null but the file ends with .tga then it's PROBABLY a targa
+                    
+                    HSObjectHold newHold;
+                    
+                    if(newObject.IsFighter()) { newHold = new FighterHold(); }
+                    else if(newObject.IsPhysicsObject()) { newHold = new PhysicsObjectHold(); }
+                    else if(newObject.IsTerrainObject()) { newHold = new TerrainObjectHold(); }
+                    else { newHold = new HSObjectHold(); }
+                    
+                    //see if we can actually load the file as a texture
+                    ImageIcon icon = TGAReader.loadTGA(h.getAbsolutePath(), newObject.palettes[0].palFilePath);
+                    
+                    if(icon == null) { continue; } //whoops
+                    
+                    HSTexture newTex = new HSTexture(h.getAbsolutePath());
+                    newTex.depth = 0;
+                    newTex.offset.x = -icon.getIconWidth() / 2;
+                    
+                    if(newObject.IsFighter())
+                    {
+                        //Center the texture on the vertical axis, but
+                        //move it completely above the horizontal axis
+                        newTex.offset.y = -icon.getIconHeight();
+                    }
+                    else
+                    {
+                        //center the texture completely on both axes
+                        newTex.offset.y = -icon.getIconHeight() / 2;
+                    }
+                    
+                    newHold.duration = 4;
+                    newHold.name = h.getName().replace(".tga", "");
+                    newHold.textures.add(newTex);
+                    
+                    newObject.holds.add(newHold);
+                    
+                    if(prevHold == null)
+                    {
+                        //Check if the current directory represents an event animation. If so, make this the event hold
+                        String directoryName = f.getName();
+                        if(directoryName.compareTo("lifetime_death") == 0) { newObject.hsObjectEventHolds.lifetimeDeath = newHold; }
+                        
+                        if(newObject.IsTerrainObject())
+                        {
+                            if(directoryName.compareTo("health_death") == 0) { ((TerrainObject)newObject).terrainEventHolds.healthDeath = (TerrainObjectHold)newHold; }
+                        }
+                        
+                        if(newObject.IsPhysicsObject())
+                        {
+                            
+                        }
+                        
+                        if(newObject.IsFighter())
+                        {
+                            if(directoryName.compareTo("idle") == 0) { ((Fighter)newObject).fighterEventHolds.standing = (FighterHold)newHold; }
+                            if(directoryName.compareTo("idleturn") == 0) { ((Fighter)newObject).fighterEventHolds.turn = (FighterHold)newHold; }
+                            if(directoryName.compareTo("walkstart") == 0) { ((Fighter)newObject).fighterEventHolds.walk = (FighterHold)newHold; }
+                            if(directoryName.compareTo("walk") == 0) { ((Fighter)newObject).fighterEventHolds.walking = (FighterHold)newHold; }
+                            if(directoryName.compareTo("walkturn") == 0) { ((Fighter)newObject).fighterEventHolds.walkingTurn = (FighterHold)newHold; }
+                            if(directoryName.compareTo("crouchstart") == 0) { ((Fighter)newObject).fighterEventHolds.crouch = (FighterHold)newHold; }
+                            if(directoryName.compareTo("crouch") == 0) { ((Fighter)newObject).fighterEventHolds.crouching = (FighterHold)newHold; }
+                            if(directoryName.compareTo("crouchturn") == 0) { ((Fighter)newObject).fighterEventHolds.crouchingTurn = (FighterHold)newHold; }
+                            if(directoryName.compareTo("crouchend") == 0) { ((Fighter)newObject).fighterEventHolds.stand = (FighterHold)newHold; }
+                            if(directoryName.compareTo("dashstart") == 0) { ((Fighter)newObject).fighterEventHolds.run = (FighterHold)newHold; }
+                            if(directoryName.compareTo("dash") == 0) { ((Fighter)newObject).fighterEventHolds.running = (FighterHold)newHold; }
+                            if(directoryName.compareTo("dashstop") == 0) { ((Fighter)newObject).fighterEventHolds.runningStop = (FighterHold)newHold; }
+                            if(directoryName.compareTo("dashturn") == 0) { ((Fighter)newObject).fighterEventHolds.runningTurn = (FighterHold)newHold; }
+                            if(directoryName.compareTo("jumpstart") == 0) { ((Fighter)newObject).fighterEventHolds.jumpNeutralStart = (FighterHold)newHold; }
+                            if(directoryName.compareTo("jumpstart_air") == 0) { ((Fighter)newObject).fighterEventHolds.jumpNeutralStartAir = (FighterHold)newHold; }
+                            if(directoryName.compareTo("jumprise_back") == 0) { ((Fighter)newObject).fighterEventHolds.jumpBackwardRising = (FighterHold)newHold; }
+                            if(directoryName.compareTo("jumprise_fwdneu") == 0) { ((Fighter)newObject).fighterEventHolds.jumpNeutralRising = (FighterHold)newHold; }
+                            if(directoryName.compareTo("jumppeak_back") == 0) { ((Fighter)newObject).fighterEventHolds.jumpBackwardFall = (FighterHold)newHold; }
+                            if(directoryName.compareTo("jumppeak_fwdneu") == 0) { ((Fighter)newObject).fighterEventHolds.jumpNeutralFall = (FighterHold)newHold; }
+                            if(directoryName.compareTo("jumpfall") == 0) { ((Fighter)newObject).fighterEventHolds.jumpNeutralFalling = (FighterHold)newHold; }
+                            if(directoryName.compareTo("landsoft") == 0) { ((Fighter)newObject).fighterEventHolds.jumpNeutralLand = (FighterHold)newHold; }
+                            if(directoryName.compareTo("airdash_back") == 0) { ((Fighter)newObject).fighterEventHolds.airDashBackward = (FighterHold)newHold; }
+                            if(directoryName.compareTo("airdash_fwd") == 0) { ((Fighter)newObject).fighterEventHolds.airDashForward = (FighterHold)newHold; }
+                            if(directoryName.compareTo("block_stand") == 0) { ((Fighter)newObject).fighterEventHolds.blockHigh = (FighterHold)newHold; }
+                            if(directoryName.compareTo("block_crouch") == 0) { ((Fighter)newObject).fighterEventHolds.blockLow = (FighterHold)newHold; }
+                            if(directoryName.compareTo("block_aerial") == 0) { ((Fighter)newObject).fighterEventHolds.blockAir = (FighterHold)newHold; }
+                            if(directoryName.compareTo("hitstand_highlt") == 0) { ((Fighter)newObject).fighterEventHolds.hitstunLightHighStanding = (FighterHold)newHold; }
+                            if(directoryName.compareTo("hitstand_midlt") == 0) { ((Fighter)newObject).fighterEventHolds.hitstunLightMidStanding = (FighterHold)newHold; }
+                            if(directoryName.compareTo("hitstand_lowlt") == 0) { ((Fighter)newObject).fighterEventHolds.hitstunLightLowStanding = (FighterHold)newHold; }
+                            if(directoryName.compareTo("hitcrouch_midlt") == 0) { ((Fighter)newObject).fighterEventHolds.hitstunLightMidCrouching = (FighterHold)newHold; }
+                            if(directoryName.compareTo("hitcrouch_lowlt") == 0) { ((Fighter)newObject).fighterEventHolds.hitstunLightLowCrouching = (FighterHold)newHold; }
+                            if(directoryName.compareTo("hitaerial_lt") == 0) { ((Fighter)newObject).fighterEventHolds.hitstunLightAir = (FighterHold)newHold; }
+                            if(directoryName.compareTo("atklt") == 0) { ((Fighter)newObject).fighterEventHolds.attackLightNeutralGround = (FighterHold)newHold; }
+                            if(directoryName.compareTo("atklt_dwn") == 0) { ((Fighter)newObject).fighterEventHolds.attackLightDownGround = (FighterHold)newHold; }
+                            if(directoryName.compareTo("atklt_fwd") == 0) { ((Fighter)newObject).fighterEventHolds.attackLightForwardGround = (FighterHold)newHold; }
+                            if(directoryName.compareTo("atklt_up") == 0) { ((Fighter)newObject).fighterEventHolds.attackLightUpGround = (FighterHold)newHold; }
+                            if(directoryName.compareTo("atklt_air") == 0) { ((Fighter)newObject).fighterEventHolds.attackLightNeutralAir = (FighterHold)newHold; }
+                            if(directoryName.compareTo("atklt_airdwn") == 0) { ((Fighter)newObject).fighterEventHolds.attackLightDownAir = (FighterHold)newHold; }
+                            if(directoryName.compareTo("atklt_airfwd") == 0) { ((Fighter)newObject).fighterEventHolds.attackLightForwardAir = (FighterHold)newHold; }
+                            if(directoryName.compareTo("atklt_airup") == 0) { ((Fighter)newObject).fighterEventHolds.attackLightUpAir = (FighterHold)newHold; }
+                            if(directoryName.compareTo("atklt_airback") == 0) { ((Fighter)newObject).fighterEventHolds.attackLightBackwardAir = (FighterHold)newHold; }
+                        }
+                    }
+                    else
+                    {
+                        prevHold.nextHold = newHold;
+                    }
+                    
+                    prevHold = newHold;
+                }
+            }
+        
+            setCurrentlyLoadedObject(newObject);
+            newObject();
+            
+            workingDirectory = file.getParent();
+        }
+        catch(ParserConfigurationException e)
+        {
+            
+        }
+        catch(SAXException e)
+        {
+            
+        }
+        catch(IOException e)
+        {
+            
+        }
+    }
+    
+    private HSObjectHold getHoldFromId(HSObject object, int id)
+    {
+        for(HSObjectHold hold : object.holds)
+        {
+            if(hold.id == id) { return hold; }
+        }
+        
+        return null;
+    }
+    
+    private String createAbsolutePath(String relPath)
+    {
+        //break the working directory and relative path down into pieces
+        String[] workingDirectoryPieces = workingDirectory.split("\\\\");
+        String[] relPathPieces = relPath.split("\\\\");
+        
+        //count the double periods
+        int doublePeriods = 0;
+        for(int i = 0; i < relPathPieces.length; i++)
+        {
+            if(relPathPieces[i].equals(".."))
+            {
+                doublePeriods++;
+            }
+            else
+            {
+                break;
+            }
+        }
+        
+        //copy the working directory up until the double periods
+        String absolutePath = workingDirectoryPieces[0];
+        for(int i = 1; i < workingDirectoryPieces.length - doublePeriods; i++)
+        {
+            absolutePath += "\\" + workingDirectoryPieces[i];
+        }
+        
+        //copy the relative path past the doublePeriods
+        for(int i = doublePeriods; i < relPathPieces.length; i++)
+        {
+            absolutePath += "\\" + relPathPieces[i];
+        }
+        
+        return absolutePath;
+    }
+    
+    private void open()
+    {
+        JFileChooser fc = new JFileChooser();
+        int returnVal = fc.showOpenDialog(null);
+        File file;
+        
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            file = fc.getSelectedFile();
+        } else {
+            return;
+        }
+        
+        try
+        {
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(file);
+            doc.getDocumentElement().normalize();
+            
+            if(doc.getDocumentElement().getNodeName().compareTo("HSObjects") != 0)
+            {
+                return;
+            }
+            
+            Node object = doc.getDocumentElement().getFirstChild();
+            
+            HSObject loadObject;
+            
+            if(object.getNodeName().compareTo("Fighter") == 0)
+            {
+                loadObject = new Fighter();
+            }
+            else if(object.getNodeName().compareTo("PhysicsObject") == 0)
+            {
+                loadObject = new PhysicsObject();
+            }
+            else if(object.getNodeName().compareTo("TerrainObject") == 0)
+            {
+                loadObject = new TerrainObject();
+            }
+            else if(object.getNodeName().compareTo("HSObject") == 0)
+            {
+                loadObject = new HSObject();
+            }
+            else
+            {
+                return;
+            }
+            
+            //get the base path
+            workingDirectory = file.getParent();
+            
+            //get the definition sections
+            NodeList defSecs = object.getChildNodes();
+            NamedNodeMap terrainBoxAttributes = null;
+            NamedNodeMap uprightTerrainBoxAttributes = null;
+            NamedNodeMap crouchingTerrainBoxAttributes = null;
+            NamedNodeMap proneTerrainBoxAttributes = null;
+            NamedNodeMap compactTerrainBoxAttributes = null;
+            NamedNodeMap eventHoldsAttributes = null;
+            Node holds = null;
+            for(int i = 0; i < defSecs.getLength(); i++)
+            {
+                Node defSec = defSecs.item(i);
+                
+                if(defSec.getNodeName().compareTo("TerrainBox") == 0) terrainBoxAttributes = defSec.getAttributes();
+                if(defSec.getNodeName().compareTo("UprightTerrainBox") == 0) uprightTerrainBoxAttributes = defSec.getAttributes();
+                if(defSec.getNodeName().compareTo("CrouchingTerrainBox") == 0) crouchingTerrainBoxAttributes = defSec.getAttributes();
+                if(defSec.getNodeName().compareTo("ProneTerrainBox") == 0) proneTerrainBoxAttributes = defSec.getAttributes();
+                if(defSec.getNodeName().compareTo("CompactTerrainBox") == 0) compactTerrainBoxAttributes = defSec.getAttributes();
+                if(defSec.getNodeName().compareTo("EventHolds") == 0) eventHoldsAttributes = defSec.getAttributes();
+                if(defSec.getNodeName().compareTo("Holds") == 0) holds = defSec;
+            }
+            
+            //get holds
+            NodeList holdList = holds.getChildNodes();
+            for(int i = 0; i < holdList.getLength(); i++)
+            {
+                Node hold = holdList.item(i);
+                
+                if(hold.getNodeName().compareTo("Hold") != 0) { continue; }
+                
+                HSObjectHold loadHold;
+                
+                if(object.getNodeName().compareTo("Fighter") == 0)
+                {
+                    loadHold = new FighterHold();
+                }
+                else if(object.getNodeName().compareTo("PhysicsObject") == 0)
+                {
+                    loadHold = new PhysicsObjectHold();
+                }
+                else if(object.getNodeName().compareTo("TerrainObject") == 0)
+                {
+                    loadHold = new TerrainObjectHold();
+                }
+                else
+                {
+                    loadHold = new HSObjectHold();
+                }
+                
+                //get hold definition sections
+                NodeList holdSecs = hold.getChildNodes();
+                Node textures = null;
+                Node audioList = null;
+                Node attackBoxes = null;
+                Node hurtBoxes = null;
+                Node hitAudioList = null;
+                for(int j = 0; j < holdSecs.getLength(); j++)
+                {
+                    Node holdSec = holdSecs.item(j);
+
+                    if(holdSec.getNodeName().compareTo("Textures") == 0) textures = holdSec;
+                    if(holdSec.getNodeName().compareTo("AudioList") == 0) audioList = holdSec;
+                    if(holdSec.getNodeName().compareTo("AttackBoxes") == 0) attackBoxes = holdSec;
+                    if(holdSec.getNodeName().compareTo("HurtBoxes") == 0) hurtBoxes = holdSec;
+                    if(holdSec.getNodeName().compareTo("HitAudioList") == 0) hitAudioList = holdSec;
+                }
+                
+                //get hold attributes
+                NamedNodeMap holdAttributes = hold.getAttributes();
+                
+                //get hs object hold attributes
+                if(holdAttributes.getNamedItem("name") != null) loadHold.name = holdAttributes.getNamedItem("name").getNodeValue();
+                if(holdAttributes.getNamedItem("id") != null) loadHold.id = Integer.parseInt(holdAttributes.getNamedItem("id").getNodeValue());
+                if(holdAttributes.getNamedItem("nextHoldId") != null) loadHold.nextHoldId = Integer.parseInt(holdAttributes.getNamedItem("nextHoldId").getNodeValue());
+                if(holdAttributes.getNamedItem("duration") != null) loadHold.duration = Integer.parseInt(holdAttributes.getNamedItem("duration").getNodeValue());
+                
+                //get textures
+                if(textures != null)
+                {
+                    NodeList textureList = textures.getChildNodes();
+                    for(int j = 0; j < textureList.getLength(); j++)
+                    {
+                        if(textureList.item(j).getNodeName().compareTo("Texture") != 0) { continue; }
+                        NamedNodeMap textureAttributes = textureList.item(j).getAttributes();
+                        
+                        String filePath = "";
+                        if(textureAttributes.getNamedItem("textureFilePath") != null) filePath = createAbsolutePath(textureAttributes.getNamedItem("textureFilePath").getNodeValue());
+                        HSTexture tex = new HSTexture(filePath);
+                        if(textureAttributes.getNamedItem("depth") != null) tex.depth = Integer.parseInt(textureAttributes.getNamedItem("depth").getNodeValue());
+                        if(textureAttributes.getNamedItem("offsetX") != null) tex.offset.x = Float.parseFloat(textureAttributes.getNamedItem("offsetX").getNodeValue());
+                        if(textureAttributes.getNamedItem("offsetY") != null) tex.offset.y = Float.parseFloat(textureAttributes.getNamedItem("offsetY").getNodeValue());
+                        
+                        loadHold.textures.add(tex);
+                    }
+                }
+                
+                //get audio
+                if(audioList != null)
+                {
+                    NodeList audioListList = audioList.getChildNodes();
+                    for(int j = 0; j < audioListList.getLength(); j++)
+                    {
+                        if(audioListList.item(j).getNodeName().compareTo("Audio") != 0) { continue; }
+                        NamedNodeMap audioAttributes = audioListList.item(j).getAttributes();
+                        
+                        String filePath = "";
+                        if(audioAttributes.getNamedItem("audioFilePath") != null) filePath = createAbsolutePath(audioAttributes.getNamedItem("audioFilePath").getNodeValue());
+                        HSAudio aud = new HSAudio(filePath);
+                        if(audioAttributes.getNamedItem("delay") != null) aud.delay = Integer.parseInt(audioAttributes.getNamedItem("delay").getNodeValue());
+                        
+                        loadHold.audioList.add(aud);
+                    }
+                }
+                
+                if(loadHold.IsTerrainObjectHold())
+                {
+                    TerrainObjectHold toHold = (TerrainObjectHold)loadHold;
+                    
+                    //get terrain object hold attributes
+                    if(holdAttributes.getNamedItem("blockability") != null) toHold.blockability = Blockability.valueOf(holdAttributes.getNamedItem("blockability").getNodeValue());
+                    if(holdAttributes.getNamedItem("blockstun") != null) toHold.blockstun = Integer.parseInt(holdAttributes.getNamedItem("blockstun").getNodeValue());
+                    if(holdAttributes.getNamedItem("changeAttackBoxAttributes") != null) toHold.changeAttackBoxAttributes = Boolean.parseBoolean(holdAttributes.getNamedItem("changeAttackBoxAttributes").getNodeValue());
+                    if(holdAttributes.getNamedItem("damage") != null) toHold.damage = Integer.parseInt(holdAttributes.getNamedItem("damage").getNodeValue());
+                    if(holdAttributes.getNamedItem("forceX") != null) toHold.force.x = Float.parseFloat(holdAttributes.getNamedItem("forceX").getNodeValue());
+                    if(holdAttributes.getNamedItem("forceY") != null) toHold.force.y = Float.parseFloat(holdAttributes.getNamedItem("forceY").getNodeValue());
+                    if(holdAttributes.getNamedItem("hitstun") != null) toHold.hitstun = Integer.parseInt(holdAttributes.getNamedItem("hitstun").getNodeValue());
+                    if(holdAttributes.getNamedItem("horizontalDirectionBasedBlock") != null) toHold.horizontalDirectionBasedBlock = Boolean.parseBoolean(holdAttributes.getNamedItem("horizontalDirectionBasedBlock").getNodeValue());
+                    if(holdAttributes.getNamedItem("reversedHorizontalBlock") != null) toHold.reversedHorizontalBlock = Boolean.parseBoolean(holdAttributes.getNamedItem("reversedHorizontalBlock").getNodeValue());
+                    if(holdAttributes.getNamedItem("trips") != null) toHold.trips = Boolean.parseBoolean(holdAttributes.getNamedItem("trips").getNodeValue());
+                    
+                    //get attack boxes
+                    if(attackBoxes != null)
+                    {
+                        NodeList attackBoxList = attackBoxes.getChildNodes();
+                        for(int j = 0; j < attackBoxList.getLength(); j++)
+                        {
+                            if(attackBoxList.item(j).getNodeName().compareTo("Box") != 0) { continue; }
+                            NamedNodeMap attackBoxAttributes = attackBoxList.item(j).getAttributes();
+                            
+                            HSBox box = new HSBox();
+                            if(attackBoxAttributes.getNamedItem("width") != null) box.width = Float.parseFloat(attackBoxAttributes.getNamedItem("width").getNodeValue());
+                            if(attackBoxAttributes.getNamedItem("height") != null) box.height = Float.parseFloat(attackBoxAttributes.getNamedItem("height").getNodeValue());
+                            if(attackBoxAttributes.getNamedItem("offsetX") != null) box.offset.x = Float.parseFloat(attackBoxAttributes.getNamedItem("offsetX").getNodeValue());
+                            if(attackBoxAttributes.getNamedItem("offsetY") != null) box.offset.y = Float.parseFloat(attackBoxAttributes.getNamedItem("offsetY").getNodeValue());
+                            if(attackBoxAttributes.getNamedItem("depth") != null) box.depth = Integer.parseInt(attackBoxAttributes.getNamedItem("depth").getNodeValue());
+                            
+                            toHold.attackBoxes.add(box);
+                        }
+                    }
+                    
+                    //get hurt boxes
+                    if(hurtBoxes != null)
+                    {
+                        NodeList hurtBoxList = hurtBoxes.getChildNodes();
+                        for(int j = 0; j < hurtBoxList.getLength(); j++)
+                        {
+                            if(hurtBoxList.item(j).getNodeName().compareTo("Box") != 0) { continue; }
+                            NamedNodeMap hurtBoxAttributes = hurtBoxList.item(j).getAttributes();
+                            
+                            HSBox box = new HSBox();
+                            if(hurtBoxAttributes.getNamedItem("width") != null) box.width = Float.parseFloat(hurtBoxAttributes.getNamedItem("width").getNodeValue());
+                            if(hurtBoxAttributes.getNamedItem("height") != null) box.height = Float.parseFloat(hurtBoxAttributes.getNamedItem("height").getNodeValue());
+                            if(hurtBoxAttributes.getNamedItem("offsetX") != null) box.offset.x = Float.parseFloat(hurtBoxAttributes.getNamedItem("offsetX").getNodeValue());
+                            if(hurtBoxAttributes.getNamedItem("offsetY") != null) box.offset.y = Float.parseFloat(hurtBoxAttributes.getNamedItem("offsetY").getNodeValue());
+                            if(hurtBoxAttributes.getNamedItem("depth") != null) box.depth = Integer.parseInt(hurtBoxAttributes.getNamedItem("depth").getNodeValue());
+                            
+                            toHold.hurtBoxes.add(box);
+                        }
+                    }
+                    
+                    //get hit sounds
+                    if(hitAudioList != null)
+                    {
+                        NodeList hitAudioListList = hitAudioList.getChildNodes();
+                        for(int j = 0; j < hitAudioListList.getLength(); j++)
+                        {
+                            if(hitAudioListList.item(j).getNodeName().compareTo("HitAudio") != 0) { continue; }
+                            NamedNodeMap hitAudioAttributes = hitAudioListList.item(j).getAttributes();
+
+                            String filePath = "";
+                            if(hitAudioAttributes.getNamedItem("hitAudioFilePath") != null) filePath = createAbsolutePath(hitAudioAttributes.getNamedItem("hitAudioFilePath").getNodeValue());
+                            HSAudio aud = new HSAudio(filePath);
+                            if(hitAudioAttributes.getNamedItem("delay") != null) aud.delay = Integer.parseInt(hitAudioAttributes.getNamedItem("delay").getNodeValue());
+
+                            toHold.hitAudioList.add(aud);
+                        }
+                    }
+                }
+                
+                if(loadHold.IsPhysicsObjectHold())
+                {
+                    PhysicsObjectHold poHold = (PhysicsObjectHold)loadHold;
+                }
+                
+                if(loadHold.IsFighterHold())
+                {
+                    FighterHold fHold = (FighterHold)loadHold;
+                }
+                
+                loadObject.holds.add(loadHold);
+            }
+            
+            //get attributes
+            NamedNodeMap objectAttributes = object.getAttributes();
+            
+            //get hsobject attributes
+            if(objectAttributes.getNamedItem("name") != null) loadObject.name = objectAttributes.getNamedItem("name").getNodeValue();
+            if(objectAttributes.getNamedItem("lifetime") != null) loadObject.lifetime = Integer.parseInt(objectAttributes.getNamedItem("lifetime").getNodeValue());
+            
+            //get palettes
+            if(objectAttributes.getNamedItem("palette1FilePath") != null) loadObject.palettes[0].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette1FilePath").getNodeValue());
+            if(objectAttributes.getNamedItem("palette2FilePath") != null) loadObject.palettes[1].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette2FilePath").getNodeValue());
+            if(objectAttributes.getNamedItem("palette3FilePath") != null) loadObject.palettes[2].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette3FilePath").getNodeValue());
+            if(objectAttributes.getNamedItem("palette4FilePath") != null) loadObject.palettes[3].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette4FilePath").getNodeValue());
+            if(objectAttributes.getNamedItem("palette5FilePath") != null) loadObject.palettes[4].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette5FilePath").getNodeValue());
+            if(objectAttributes.getNamedItem("palette6FilePath") != null) loadObject.palettes[5].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette6FilePath").getNodeValue());
+            if(objectAttributes.getNamedItem("palette7FilePath") != null) loadObject.palettes[6].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette7FilePath").getNodeValue());
+            if(objectAttributes.getNamedItem("palette8FilePath") != null) loadObject.palettes[7].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette8FilePath").getNodeValue());
+            if(objectAttributes.getNamedItem("palette9FilePath") != null) loadObject.palettes[8].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette9FilePath").getNodeValue());
+            if(objectAttributes.getNamedItem("palette10FilePath") != null) loadObject.palettes[9].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette10FilePath").getNodeValue());
+            
+            //get hs object event holds
+            if(eventHoldsAttributes.getNamedItem("lifetimeDeath") != null)
+                loadObject.hsObjectEventHolds.lifetimeDeath = getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("lifetimeDeath").getNodeValue()));
+            
+            if(loadObject.IsTerrainObject())
+            {
+                TerrainObject tObject = (TerrainObject)loadObject;
+                
+                //get terrain object attributes
+                if(objectAttributes.getNamedItem("bounce") != null) tObject.bounce = Float.parseFloat(objectAttributes.getNamedItem("bounce").getNodeValue());
+                if(objectAttributes.getNamedItem("canBeJumpedThrough") != null) tObject.canBeJumpedThrough = Boolean.parseBoolean(objectAttributes.getNamedItem("canBeJumpedThrough").getNodeValue());
+                if(objectAttributes.getNamedItem("friction") != null) tObject.friction = Float.parseFloat(objectAttributes.getNamedItem("friction").getNodeValue());
+                if(objectAttributes.getNamedItem("health") != null) tObject.health = Integer.parseInt(objectAttributes.getNamedItem("health").getNodeValue());
+                if(objectAttributes.getNamedItem("takesTerrainDamage") != null) tObject.takesTerrainDamage = Boolean.parseBoolean(objectAttributes.getNamedItem("takesTerrainDamage").getNodeValue());
+                
+                //get terrain box
+                HSBox terrainBox = new HSBox();
+                if(terrainBoxAttributes.getNamedItem("width") != null) terrainBox.width = Float.parseFloat(terrainBoxAttributes.getNamedItem("width").getNodeValue());
+                if(terrainBoxAttributes.getNamedItem("height") != null) terrainBox.height = Float.parseFloat(terrainBoxAttributes.getNamedItem("height").getNodeValue());
+                if(terrainBoxAttributes.getNamedItem("offsetX") != null) terrainBox.offset.x = Float.parseFloat(terrainBoxAttributes.getNamedItem("offsetX").getNodeValue());
+                if(terrainBoxAttributes.getNamedItem("offsetY") != null) terrainBox.offset.y = Float.parseFloat(terrainBoxAttributes.getNamedItem("offsetY").getNodeValue());
+                if(terrainBoxAttributes.getNamedItem("depth") != null) terrainBox.depth = Integer.parseInt(terrainBoxAttributes.getNamedItem("depth").getNodeValue());
+                tObject.terrainBoxes.add(terrainBox);
+                
+                //get terrain object event holds
+                if(eventHoldsAttributes.getNamedItem("healthDeath") != null)
+                    tObject.terrainEventHolds.healthDeath = (TerrainObjectHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("healthDeath").getNodeValue()));
+            }
+            
+            if(loadObject.IsPhysicsObject())
+            {
+                PhysicsObject pObject = (PhysicsObject)loadObject;
+                
+                //get physics object attributes
+                if(objectAttributes.getNamedItem("falls") != null) pObject.falls = Boolean.parseBoolean(objectAttributes.getNamedItem("falls").getNodeValue());
+                if(objectAttributes.getNamedItem("mass") != null) pObject.mass = Float.parseFloat(objectAttributes.getNamedItem("mass").getNodeValue());
+                if(objectAttributes.getNamedItem("maxFallSpeed") != null) pObject.maxFallSpeed = Float.parseFloat(objectAttributes.getNamedItem("maxFallSpeed").getNodeValue());
+            }
+            
+            if(loadObject.IsFighter())
+            {
+                Fighter fighter = (Fighter)loadObject;
+                
+                //get fighter attributes
+                if(objectAttributes.getNamedItem("airActions") != null) fighter.airActions = Integer.parseInt(objectAttributes.getNamedItem("airActions").getNodeValue());
+                if(objectAttributes.getNamedItem("airControlAccel") != null) fighter.airControlAccel = Float.parseFloat(objectAttributes.getNamedItem("airControlAccel").getNodeValue());
+                if(objectAttributes.getNamedItem("backwardAirDashDuration") != null) fighter.backwardAirDashDuration = Integer.parseInt(objectAttributes.getNamedItem("backwardAirDashDuration").getNodeValue());
+                if(objectAttributes.getNamedItem("backwardAirDashSpeed") != null) fighter.backwardAirDashSpeed = Float.parseFloat(objectAttributes.getNamedItem("backwardAirDashSpeed").getNodeValue());
+                if(objectAttributes.getNamedItem("forwardAirDashDuration") != null) fighter.forwardAirDashDuration = Integer.parseInt(objectAttributes.getNamedItem("forwardAirDashDuration").getNodeValue());
+                if(objectAttributes.getNamedItem("forwardAirDashSpeed") != null) fighter.forwardAirDashSpeed = Float.parseFloat(objectAttributes.getNamedItem("forwardAirDashSpeed").getNodeValue());
+                if(objectAttributes.getNamedItem("jumpSpeed") != null) fighter.jumpSpeed = Float.parseFloat(objectAttributes.getNamedItem("jumpSpeed").getNodeValue());
+                if(objectAttributes.getNamedItem("maxAirControlSpeed") != null) fighter.maxAirControlSpeed = Float.parseFloat(objectAttributes.getNamedItem("maxAirControlSpeed").getNodeValue());
+                if(objectAttributes.getNamedItem("runSpeed") != null) fighter.runSpeed = Float.parseFloat(objectAttributes.getNamedItem("runSpeed").getNodeValue());
+                if(objectAttributes.getNamedItem("stepHeight") != null) fighter.stepHeight = Float.parseFloat(objectAttributes.getNamedItem("stepHeight").getNodeValue());
+                if(objectAttributes.getNamedItem("walkSpeed") != null) fighter.walkSpeed = Float.parseFloat(objectAttributes.getNamedItem("walkSpeed").getNodeValue());
+                
+                //get upright terrain box
+                HSBox uprightTerrainBox = new HSBox();
+                if(uprightTerrainBoxAttributes.getNamedItem("width") != null) uprightTerrainBox.width = Float.parseFloat(uprightTerrainBoxAttributes.getNamedItem("width").getNodeValue());
+                if(uprightTerrainBoxAttributes.getNamedItem("height") != null) uprightTerrainBox.height = Float.parseFloat(uprightTerrainBoxAttributes.getNamedItem("height").getNodeValue());
+                if(uprightTerrainBoxAttributes.getNamedItem("offsetX") != null) uprightTerrainBox.offset.x = Float.parseFloat(uprightTerrainBoxAttributes.getNamedItem("offsetX").getNodeValue());
+                if(uprightTerrainBoxAttributes.getNamedItem("offsetY") != null) uprightTerrainBox.offset.y = Float.parseFloat(uprightTerrainBoxAttributes.getNamedItem("offsetY").getNodeValue());
+                if(uprightTerrainBoxAttributes.getNamedItem("depth") != null) uprightTerrainBox.depth = Integer.parseInt(uprightTerrainBoxAttributes.getNamedItem("depth").getNodeValue());
+                fighter.uprightTerrainBoxes.add(uprightTerrainBox);
+                
+                //get crouching terrain box
+                HSBox crouchingTerrainBox = new HSBox();
+                if(crouchingTerrainBoxAttributes.getNamedItem("width") != null) crouchingTerrainBox.width = Float.parseFloat(crouchingTerrainBoxAttributes.getNamedItem("width").getNodeValue());
+                if(crouchingTerrainBoxAttributes.getNamedItem("height") != null) crouchingTerrainBox.height = Float.parseFloat(crouchingTerrainBoxAttributes.getNamedItem("height").getNodeValue());
+                if(crouchingTerrainBoxAttributes.getNamedItem("offsetX") != null) crouchingTerrainBox.offset.x = Float.parseFloat(crouchingTerrainBoxAttributes.getNamedItem("offsetX").getNodeValue());
+                if(crouchingTerrainBoxAttributes.getNamedItem("offsetY") != null) crouchingTerrainBox.offset.y = Float.parseFloat(crouchingTerrainBoxAttributes.getNamedItem("offsetY").getNodeValue());
+                if(crouchingTerrainBoxAttributes.getNamedItem("depth") != null) crouchingTerrainBox.depth = Integer.parseInt(crouchingTerrainBoxAttributes.getNamedItem("depth").getNodeValue());
+                fighter.crouchingTerrainBoxes.add(crouchingTerrainBox);
+                
+                //get prone terrain box
+                HSBox proneTerrainBox = new HSBox();
+                if(proneTerrainBoxAttributes.getNamedItem("width") != null) proneTerrainBox.width = Float.parseFloat(proneTerrainBoxAttributes.getNamedItem("width").getNodeValue());
+                if(proneTerrainBoxAttributes.getNamedItem("height") != null) proneTerrainBox.height = Float.parseFloat(proneTerrainBoxAttributes.getNamedItem("height").getNodeValue());
+                if(proneTerrainBoxAttributes.getNamedItem("offsetX") != null) proneTerrainBox.offset.x = Float.parseFloat(proneTerrainBoxAttributes.getNamedItem("offsetX").getNodeValue());
+                if(proneTerrainBoxAttributes.getNamedItem("offsetY") != null) proneTerrainBox.offset.y = Float.parseFloat(proneTerrainBoxAttributes.getNamedItem("offsetY").getNodeValue());
+                if(proneTerrainBoxAttributes.getNamedItem("depth") != null) proneTerrainBox.depth = Integer.parseInt(proneTerrainBoxAttributes.getNamedItem("depth").getNodeValue());
+                fighter.proneTerrainBoxes.add(proneTerrainBox);
+                
+                //get compact terrain box
+                HSBox compactTerrainBox = new HSBox();
+                if(compactTerrainBoxAttributes.getNamedItem("width") != null) compactTerrainBox.width = Float.parseFloat(compactTerrainBoxAttributes.getNamedItem("width").getNodeValue());
+                if(compactTerrainBoxAttributes.getNamedItem("height") != null) compactTerrainBox.height = Float.parseFloat(compactTerrainBoxAttributes.getNamedItem("height").getNodeValue());
+                if(compactTerrainBoxAttributes.getNamedItem("offsetX") != null) compactTerrainBox.offset.x = Float.parseFloat(compactTerrainBoxAttributes.getNamedItem("offsetX").getNodeValue());
+                if(compactTerrainBoxAttributes.getNamedItem("offsetY") != null) compactTerrainBox.offset.y = Float.parseFloat(compactTerrainBoxAttributes.getNamedItem("offsetY").getNodeValue());
+                if(compactTerrainBoxAttributes.getNamedItem("depth") != null) compactTerrainBox.depth = Integer.parseInt(compactTerrainBoxAttributes.getNamedItem("depth").getNodeValue());
+                fighter.compactTerrainBoxes.add(compactTerrainBox);
+                
+                //get fighter event holds
+                if(eventHoldsAttributes.getNamedItem("standing") != null)
+                    fighter.fighterEventHolds.standing = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("standing").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("turn") != null)
+                    fighter.fighterEventHolds.turn = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("turn").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("walk") != null)
+                    fighter.fighterEventHolds.walk = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("walk").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("walking") != null)
+                    fighter.fighterEventHolds.walking = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("walking").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("walkingTurn") != null)
+                    fighter.fighterEventHolds.walkingTurn = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("walkingTurn").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("run") != null)
+                    fighter.fighterEventHolds.run = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("run").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("running") != null)
+                    fighter.fighterEventHolds.running = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("running").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("runningTurn") != null)
+                    fighter.fighterEventHolds.runningTurn = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("runningTurn").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("runningStop") != null)
+                    fighter.fighterEventHolds.runningStop = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("runningStop").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("crouch") != null)
+                    fighter.fighterEventHolds.crouch = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("crouch").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("crouching") != null)
+                    fighter.fighterEventHolds.crouching = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("crouching").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("crouchingTurn") != null)
+                    fighter.fighterEventHolds.crouchingTurn = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("crouchingTurn").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("stand") != null)
+                    fighter.fighterEventHolds.stand = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("stand").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("jumpNeutralStart") != null)
+                    fighter.fighterEventHolds.jumpNeutralStart = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("jumpNeutralStart").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("jumpNeutralStartAir") != null)
+                    fighter.fighterEventHolds.jumpNeutralStartAir = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("jumpNeutralStartAir").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("jumpNeutralRising") != null)
+                    fighter.fighterEventHolds.jumpNeutralRising = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("jumpNeutralRising").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("jumpNeutralFall") != null)
+                    fighter.fighterEventHolds.jumpNeutralFall = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("jumpNeutralFall").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("jumpNeutralFalling") != null)
+                    fighter.fighterEventHolds.jumpNeutralFalling = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("jumpNeutralFalling").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("jumpNeutralLand") != null)
+                    fighter.fighterEventHolds.jumpNeutralLand = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("jumpNeutralLand").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("jumpBackwardRising") != null)
+                    fighter.fighterEventHolds.jumpBackwardRising = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("jumpBackwardRising").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("jumpBackwardFall") != null)
+                    fighter.fighterEventHolds.jumpBackwardFall = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("jumpBackwardFall").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("airDashForward") != null)
+                    fighter.fighterEventHolds.airDashForward = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("airDashForward").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("airDashBackward") != null)
+                    fighter.fighterEventHolds.airDashBackward = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("airDashBackward").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("blockHigh") != null)
+                    fighter.fighterEventHolds.blockHigh = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("blockHigh").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("blockLow") != null)
+                    fighter.fighterEventHolds.blockLow = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("blockLow").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("blockAir") != null)
+                    fighter.fighterEventHolds.blockAir = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("blockAir").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("hitstunLightHighStanding") != null)
+                    fighter.fighterEventHolds.hitstunLightHighStanding = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("hitstunLightHighStanding").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("hitstunLightMidStanding") != null)
+                    fighter.fighterEventHolds.hitstunLightMidStanding = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("hitstunLightMidStanding").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("hitstunLightLowStanding") != null)
+                    fighter.fighterEventHolds.hitstunLightLowStanding = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("hitstunLightLowStanding").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("hitstunLightMidCrouching") != null)
+                    fighter.fighterEventHolds.hitstunLightMidCrouching = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("hitstunLightMidCrouching").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("hitstunLightLowCrouching") != null)
+                    fighter.fighterEventHolds.hitstunLightLowCrouching = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("hitstunLightLowCrouching").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("hitstunLightAir") != null)
+                    fighter.fighterEventHolds.hitstunLightAir = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("hitstunLightAir").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("attackLightNeutralGround") != null)
+                    fighter.fighterEventHolds.attackLightNeutralGround = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("attackLightNeutralGround").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("attackLightDownGround") != null)
+                    fighter.fighterEventHolds.attackLightDownGround = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("attackLightDownGround").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("attackLightUpGround") != null)
+                    fighter.fighterEventHolds.attackLightUpGround = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("attackLightUpGround").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("attackLightForwardGround") != null)
+                    fighter.fighterEventHolds.attackLightForwardGround = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("attackLightForwardGround").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("attackLightNeutralAir") != null)
+                    fighter.fighterEventHolds.attackLightNeutralAir = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("attackLightNeutralAir").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("attackLightDownAir") != null)
+                    fighter.fighterEventHolds.attackLightDownAir = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("attackLightDownAir").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("attackLightUpAir") != null)
+                    fighter.fighterEventHolds.attackLightUpAir = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("attackLightUpAir").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("attackLightForwardAir") != null)
+                    fighter.fighterEventHolds.attackLightForwardAir = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("attackLightForwardAir").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("attackLightBackwardAir") != null)
+                    fighter.fighterEventHolds.attackLightBackwardAir = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("attackLightBackwardAir").getNodeValue()));
+            }
+            
+            //finally, get next holds
+            for(HSObjectHold hold : loadObject.holds)
+            {
+                if(hold.nextHoldId != 0) hold.nextHold = getHoldFromId(loadObject, hold.nextHoldId);
+            }
+            
+            setCurrentlyLoadedObject(loadObject);
+            newObject();
+        }
+        catch(ParserConfigurationException e)
+        {
+            
+        }
+        catch(SAXException e)
+        {
+            
+        }
+        catch(IOException e)
+        {
+            
+        }
+    }
+    
+    private String createRelativePath(String absPath)
+    {
+        //break the working directory and absolute path down into pieces
+        String[] workingDirectoryPieces = workingDirectory.split("\\\\");
+        String[] absPathPieces = absPath.split("\\\\");
+        
+        //first, make sure they share the same drive
+        if(!workingDirectoryPieces[0].equals(absPathPieces[0]))
+        {
+            return "";
+        }
+        
+        //compare each until either one ends or a point of divergeance is found
+        int end = workingDirectoryPieces.length > absPathPieces.length ? absPathPieces.length : workingDirectoryPieces.length;
+        int divergeancePoint = end;
+        for(int i = 0; i < end; i++)
+        {
+            if(!workingDirectoryPieces[i].equals(absPathPieces[i]))
+            {
+                divergeancePoint = i;
+                break;
+            }
+        }
+        
+        //add double periods to signify parent directories
+        String relativePath = "";
+        for(int i = 0; i < end - divergeancePoint; i++)
+        {
+            relativePath += "..\\";
+        }
+        
+        //add the absolute path starting with the divergeance point
+        for(int i = divergeancePoint; i < absPathPieces.length; i++)
+        {
+            if(i > divergeancePoint)
+            {
+                relativePath += "\\";
+            }
+            relativePath += absPathPieces[i];
+        }
+        
+        return relativePath;
+    }
+    
+    private void createDefinitionFile()
+    {
+        if(currentlyLoadedObject == null) { return; }
+        
+        try
+        {
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.newDocument();
+            
+            Element root = doc.createElement("HSObjects");
+            
+            //set the proper object type
+            Element object;
+            if(currentlyLoadedObject.IsFighter())
+            {
+                object = doc.createElement("Fighter");
+            }
+            else if(currentlyLoadedObject.IsPhysicsObject())
+            {
+                object = doc.createElement("PhysicsObject");
+            }
+            else if(currentlyLoadedObject.IsTerrainObject())
+            {
+                object = doc.createElement("TerrainObject");
+            }
+            else
+            {
+                object = doc.createElement("HSObject");
+            }
+            
+            //get the list of holds. this will set all of their IDs
+            HSObjectHold[] holdList = holdListPane.getAllHolds();
+            Element eventHolds = doc.createElement("EventHolds");
+            
+            //get HSObject attributes
+            object.setAttribute("name", currentlyLoadedObject.name);
+            object.setAttribute("lifetime", "" + currentlyLoadedObject.lifetime);
+            int palNum = 1;
+            for(HSPalette p : currentlyLoadedObject.palettes)
+            {
+                if(p.palFilePath.isEmpty()) { continue; }
+                
+                object.setAttribute("palette" + palNum + "FilePath", createRelativePath(p.palFilePath));
+                palNum++;
+            }
+            
+            //get HSObject event holds
+            if(currentlyLoadedObject.hsObjectEventHolds.lifetimeDeath != null) { eventHolds.setAttribute("lifetimeDeath", "" + currentlyLoadedObject.hsObjectEventHolds.lifetimeDeath.id); }
+            
+            if(currentlyLoadedObject.IsTerrainObject())
+            {
+                //get TerrainObject attributes
+                TerrainObject tObject = (TerrainObject)currentlyLoadedObject;
+                
+                object.setAttribute("bounce", "" + tObject.bounce);
+                object.setAttribute("friction", "" + tObject.friction);
+                object.setAttribute("health", "" + tObject.health);
+                object.setAttribute("takesTerrainDamage", "" + tObject.takesTerrainDamage);
+                object.setAttribute("canBeJumpedThrough", "" + tObject.canBeJumpedThrough);
+                
+                //get TerrainObject terrain box
+                Element terrainBox = doc.createElement("TerrainBox");
+                terrainBox.setAttribute("offsetX", "" + tObject.terrainBoxes.get(0).offset.x);
+                terrainBox.setAttribute("offsetY", "" + tObject.terrainBoxes.get(0).offset.y);
+                terrainBox.setAttribute("width", "" + tObject.terrainBoxes.get(0).width);
+                terrainBox.setAttribute("height", "" + tObject.terrainBoxes.get(0).height);
+                terrainBox.setAttribute("depth", "" + tObject.terrainBoxes.get(0).depth);
+                object.appendChild(terrainBox);
+                
+                //get TerrainObject event holds
+                if(tObject.terrainEventHolds.healthDeath != null) { eventHolds.setAttribute("healthDeath", "" + tObject.terrainEventHolds.healthDeath.id); }
+            }
+            
+            if(currentlyLoadedObject.IsPhysicsObject())
+            {
+                //get PhysicsObject attributes
+                PhysicsObject pObject = (PhysicsObject)currentlyLoadedObject;
+                
+                object.setAttribute("falls", "" + pObject.falls);
+                object.setAttribute("mass", "" + pObject.mass);
+                object.setAttribute("maxFallSpeed", "" + pObject.maxFallSpeed);
+            }
+            
+            if(currentlyLoadedObject.IsFighter())
+            {
+                //get Fighter attributes
+                Fighter fighter = (Fighter)currentlyLoadedObject;
+                
+                object.setAttribute("airActions", "" + fighter.airActions);
+                object.setAttribute("airControlAccel", "" + fighter.airControlAccel);
+                object.setAttribute("backwardAirDashDuration", "" + fighter.backwardAirDashDuration);
+                object.setAttribute("backwardAirDashSpeed", "" + fighter.backwardAirDashSpeed);
+                object.setAttribute("forwardAirDashDuration", "" + fighter.forwardAirDashDuration);
+                object.setAttribute("forwardAirDashSpeed", "" + fighter.forwardAirDashSpeed);
+                object.setAttribute("jumpSpeed", "" + fighter.jumpSpeed);
+                object.setAttribute("maxAirControlSpeed", "" + fighter.maxAirControlSpeed);
+                object.setAttribute("runSpeed", "" + fighter.runSpeed);
+                object.setAttribute("stepHeight", "" + fighter.stepHeight);
+                object.setAttribute("walkSpeed", "" + fighter.walkSpeed);
+                
+                //get Fighter upright terrain box
+                Element uprightTerrainBox = doc.createElement("UprightTerrainBox");
+                uprightTerrainBox.setAttribute("offsetX", "" + fighter.uprightTerrainBoxes.get(0).offset.x);
+                uprightTerrainBox.setAttribute("offsetY", "" + fighter.uprightTerrainBoxes.get(0).offset.y);
+                uprightTerrainBox.setAttribute("width", "" + fighter.uprightTerrainBoxes.get(0).width);
+                uprightTerrainBox.setAttribute("height", "" + fighter.uprightTerrainBoxes.get(0).height);
+                uprightTerrainBox.setAttribute("depth", "" + fighter.terrainBoxes.get(0).depth);
+                object.appendChild(uprightTerrainBox);
+                
+                //get Fighter crouching terrain box
+                Element crouchingTerrainBox = doc.createElement("CrouchingTerrainBox");
+                crouchingTerrainBox.setAttribute("offsetX", "" + fighter.crouchingTerrainBoxes.get(0).offset.x);
+                crouchingTerrainBox.setAttribute("offsetY", "" + fighter.crouchingTerrainBoxes.get(0).offset.y);
+                crouchingTerrainBox.setAttribute("width", "" + fighter.crouchingTerrainBoxes.get(0).width);
+                crouchingTerrainBox.setAttribute("height", "" + fighter.crouchingTerrainBoxes.get(0).height);
+                crouchingTerrainBox.setAttribute("depth", "" + fighter.terrainBoxes.get(0).depth);
+                object.appendChild(crouchingTerrainBox);
+                
+                //get Fighter upright terrain box
+                Element proneTerrainBox = doc.createElement("ProneTerrainBox");
+                proneTerrainBox.setAttribute("offsetX", "" + fighter.proneTerrainBoxes.get(0).offset.x);
+                proneTerrainBox.setAttribute("offsetY", "" + fighter.proneTerrainBoxes.get(0).offset.y);
+                proneTerrainBox.setAttribute("width", "" + fighter.proneTerrainBoxes.get(0).width);
+                proneTerrainBox.setAttribute("height", "" + fighter.proneTerrainBoxes.get(0).height);
+                proneTerrainBox.setAttribute("depth", "" + fighter.terrainBoxes.get(0).depth);
+                object.appendChild(proneTerrainBox);
+                
+                //get Fighter compact terrain box
+                Element compactTerrainBox = doc.createElement("CompactTerrainBox");
+                compactTerrainBox.setAttribute("offsetX", "" + fighter.compactTerrainBoxes.get(0).offset.x);
+                compactTerrainBox.setAttribute("offsetY", "" + fighter.compactTerrainBoxes.get(0).offset.y);
+                compactTerrainBox.setAttribute("width", "" + fighter.compactTerrainBoxes.get(0).width);
+                compactTerrainBox.setAttribute("height", "" + fighter.compactTerrainBoxes.get(0).height);
+                compactTerrainBox.setAttribute("depth", "" + fighter.terrainBoxes.get(0).depth);
+                object.appendChild(compactTerrainBox);
+                
+                //get Fighter event holds
+                if(fighter.fighterEventHolds.standing != null) { eventHolds.setAttribute("standing", "" + fighter.fighterEventHolds.standing.id); }
+                if(fighter.fighterEventHolds.turn != null) { eventHolds.setAttribute("turn", "" + fighter.fighterEventHolds.turn.id); }
+                if(fighter.fighterEventHolds.crouch != null) { eventHolds.setAttribute("crouch", "" + fighter.fighterEventHolds.crouch.id); }
+                if(fighter.fighterEventHolds.crouching != null) { eventHolds.setAttribute("crouching", "" + fighter.fighterEventHolds.crouching.id); }
+                if(fighter.fighterEventHolds.crouchingTurn != null) { eventHolds.setAttribute("crouchingTurn", "" + fighter.fighterEventHolds.crouchingTurn.id); }
+                if(fighter.fighterEventHolds.stand != null) { eventHolds.setAttribute("stand", "" + fighter.fighterEventHolds.stand.id); }
+                if(fighter.fighterEventHolds.walk != null) { eventHolds.setAttribute("walk", "" + fighter.fighterEventHolds.walk.id); }
+                if(fighter.fighterEventHolds.walking != null) { eventHolds.setAttribute("walking", "" + fighter.fighterEventHolds.walking.id); }
+                if(fighter.fighterEventHolds.walkingTurn != null) { eventHolds.setAttribute("walkingTurn", "" + fighter.fighterEventHolds.walkingTurn.id); }
+                if(fighter.fighterEventHolds.run != null) { eventHolds.setAttribute("run", "" + fighter.fighterEventHolds.run.id); }
+                if(fighter.fighterEventHolds.running != null) { eventHolds.setAttribute("running", "" + fighter.fighterEventHolds.running.id); }
+                if(fighter.fighterEventHolds.runningTurn != null) { eventHolds.setAttribute("runningTurn", "" + fighter.fighterEventHolds.runningTurn.id); }
+                if(fighter.fighterEventHolds.runningStop != null) { eventHolds.setAttribute("runningStop", "" + fighter.fighterEventHolds.runningStop.id); }
+                if(fighter.fighterEventHolds.jumpNeutralStart != null) { eventHolds.setAttribute("jumpNeutralStart", "" + fighter.fighterEventHolds.jumpNeutralStart.id); }
+                if(fighter.fighterEventHolds.jumpNeutralStartAir != null) { eventHolds.setAttribute("jumpNeutralStartAir", "" + fighter.fighterEventHolds.jumpNeutralStartAir.id); }
+                if(fighter.fighterEventHolds.jumpNeutralRising != null) { eventHolds.setAttribute("jumpNeutralRising", "" + fighter.fighterEventHolds.jumpNeutralRising.id); }
+                if(fighter.fighterEventHolds.jumpNeutralFall != null) { eventHolds.setAttribute("jumpNeutralFall", "" + fighter.fighterEventHolds.jumpNeutralFall.id); }
+                if(fighter.fighterEventHolds.jumpNeutralFalling != null) { eventHolds.setAttribute("jumpNeutralFalling", "" + fighter.fighterEventHolds.jumpNeutralFalling.id); }
+                if(fighter.fighterEventHolds.jumpNeutralLand != null) { eventHolds.setAttribute("jumpNeutralLand", "" + fighter.fighterEventHolds.jumpNeutralLand.id); }
+                if(fighter.fighterEventHolds.jumpBackwardRising != null) { eventHolds.setAttribute("jumpBackwardRising", "" + fighter.fighterEventHolds.jumpBackwardRising.id); }
+                if(fighter.fighterEventHolds.jumpBackwardFall != null) { eventHolds.setAttribute("jumpBackwardFall", "" + fighter.fighterEventHolds.jumpBackwardFall.id); }
+                if(fighter.fighterEventHolds.airDashForward != null) { eventHolds.setAttribute("airDashForward", "" + fighter.fighterEventHolds.airDashForward.id); }
+                if(fighter.fighterEventHolds.airDashBackward != null) { eventHolds.setAttribute("airDashBackward", "" + fighter.fighterEventHolds.airDashBackward.id); }
+                if(fighter.fighterEventHolds.blockHigh != null) { eventHolds.setAttribute("blockHigh", "" + fighter.fighterEventHolds.blockHigh.id); }
+                if(fighter.fighterEventHolds.blockLow != null) { eventHolds.setAttribute("blockLow", "" + fighter.fighterEventHolds.blockLow.id); }
+                if(fighter.fighterEventHolds.blockAir != null) { eventHolds.setAttribute("blockAir", "" + fighter.fighterEventHolds.blockAir.id); }
+                if(fighter.fighterEventHolds.hitstunLightHighStanding != null) { eventHolds.setAttribute("hitstunLightHighStanding", "" + fighter.fighterEventHolds.hitstunLightHighStanding.id); }
+                if(fighter.fighterEventHolds.hitstunLightMidStanding != null) { eventHolds.setAttribute("hitstunLightMidStanding", "" + fighter.fighterEventHolds.hitstunLightMidStanding.id); }
+                if(fighter.fighterEventHolds.hitstunLightLowStanding != null) { eventHolds.setAttribute("hitstunLightLowStanding", "" + fighter.fighterEventHolds.hitstunLightLowStanding.id); }
+                if(fighter.fighterEventHolds.hitstunLightMidCrouching != null) { eventHolds.setAttribute("hitstunLightMidCrouching", "" + fighter.fighterEventHolds.hitstunLightMidCrouching.id); }
+                if(fighter.fighterEventHolds.hitstunLightLowCrouching != null) { eventHolds.setAttribute("hitstunLightLowCrouching", "" + fighter.fighterEventHolds.hitstunLightLowCrouching.id); }
+                if(fighter.fighterEventHolds.hitstunLightAir != null) { eventHolds.setAttribute("hitstunLightAir", "" + fighter.fighterEventHolds.hitstunLightAir.id); }
+                if(fighter.fighterEventHolds.attackLightNeutralGround != null) { eventHolds.setAttribute("attackLightNeutralGround", "" + fighter.fighterEventHolds.attackLightNeutralGround.id); }
+                if(fighter.fighterEventHolds.attackLightDownGround != null) { eventHolds.setAttribute("attackLightDownGround", "" + fighter.fighterEventHolds.attackLightDownGround.id); }
+                if(fighter.fighterEventHolds.attackLightUpGround != null) { eventHolds.setAttribute("attackLightUpGround", "" + fighter.fighterEventHolds.attackLightUpGround.id); }
+                if(fighter.fighterEventHolds.attackLightForwardGround != null) { eventHolds.setAttribute("attackLightForwardGround", "" + fighter.fighterEventHolds.attackLightForwardGround.id); }
+                if(fighter.fighterEventHolds.attackLightNeutralAir != null) { eventHolds.setAttribute("attackLightNeutralAir", "" + fighter.fighterEventHolds.attackLightNeutralAir.id); }
+                if(fighter.fighterEventHolds.attackLightDownAir != null) { eventHolds.setAttribute("attackLightDownAir", "" + fighter.fighterEventHolds.attackLightDownAir.id); }
+                if(fighter.fighterEventHolds.attackLightUpAir != null) { eventHolds.setAttribute("attackLightUpAir", "" + fighter.fighterEventHolds.attackLightUpAir.id); }
+                if(fighter.fighterEventHolds.attackLightForwardAir != null) { eventHolds.setAttribute("attackLightForwardAir", "" + fighter.fighterEventHolds.attackLightForwardAir.id); }
+                if(fighter.fighterEventHolds.attackLightBackwardAir != null) { eventHolds.setAttribute("attackLightBackwardAir", "" + fighter.fighterEventHolds.attackLightBackwardAir.id); }
+            }
+            
+            object.appendChild(eventHolds);
+            
+            //get holds
+            Element holds = doc.createElement("Holds");
+            for(HSObjectHold h : holdList)
+            {
+                Element hold = doc.createElement("Hold");
+                
+                //get HSObjectHold attributes
+                hold.setAttribute("name", h.name);
+                hold.setAttribute("duration", "" + h.duration);
+                hold.setAttribute("id", "" + h.id);
+                if(h.nextHold != null) { hold.setAttribute("nextHoldId", "" + h.nextHold.id); }
+                
+                if(h.IsTerrainObjectHold())
+                {
+                    //get TerrainObjectHold attributes
+                    TerrainObjectHold th = (TerrainObjectHold)h;
+                    
+                    hold.setAttribute("blockability", "" + th.blockability);
+                    hold.setAttribute("blockstun", "" + th.blockstun);
+                    hold.setAttribute("changeAttackBoxAttributes", "" + th.changeAttackBoxAttributes);
+                    hold.setAttribute("damage", "" + th.damage);
+                    hold.setAttribute("forceX", "" + th.force.x);
+                    hold.setAttribute("forceY", "" + th.force.y);
+                    hold.setAttribute("hitstun", "" + th.hitstun);
+                    hold.setAttribute("horizontalDirectionBasedBlock", "" + th.horizontalDirectionBasedBlock);
+                    hold.setAttribute("reversedHorizontalBlock", "" + th.reversedHorizontalBlock);
+                    hold.setAttribute("trips", "" + th.trips);
+                    
+                    //get attack boxes
+                    if(!th.attackBoxes.isEmpty())
+                    {
+                        Element attackBoxes = doc.createElement("AttackBoxes");
+                        for(HSBox b : th.attackBoxes)
+                        {
+                            Element box = doc.createElement("Box");
+                            box.setAttribute("offsetX", "" + b.offset.x);
+                            box.setAttribute("offsetY", "" + b.offset.y);
+                            box.setAttribute("width", "" + b.width);
+                            box.setAttribute("height", "" + b.height);
+                            box.setAttribute("depth", "" + b.depth);
+                            attackBoxes.appendChild(box);
+                        }
+                        hold.appendChild(attackBoxes);
+                    }
+                    
+                    //get hurt boxes
+                    if(!th.hurtBoxes.isEmpty())
+                    {
+                        Element hurtBoxes = doc.createElement("HurtBoxes");
+                        for(HSBox b : th.hurtBoxes)
+                        {
+                            Element box = doc.createElement("Box");
+                            box.setAttribute("offsetX", "" + b.offset.x);
+                            box.setAttribute("offsetY", "" + b.offset.y);
+                            box.setAttribute("width", "" + b.width);
+                            box.setAttribute("height", "" + b.height);
+                            box.setAttribute("depth", "" + b.depth);
+                            hurtBoxes.appendChild(box);
+                        }
+                        hold.appendChild(hurtBoxes);
+                    }
+                    
+                    //get hit sounds
+                    if(!th.hitAudioList.isEmpty())
+                    {
+                        Element hitAudioList = doc.createElement("HitAudioList");
+                        for(HSAudio a : th.hitAudioList)
+                        {
+                            Element hitAudio = doc.createElement("HitAudio");
+                            hitAudio.setAttribute("delay", "" + a.delay);
+                            hitAudio.setAttribute("hitAudioFilePath", createRelativePath(a.filePath));
+                            hitAudioList.appendChild(hitAudio);
+                        }
+                        hold.appendChild(hitAudioList);
+                    }
+                }
+                
+                if(h.IsPhysicsObjectHold())
+                {
+                    //get PhysicsObjectHold attributes
+                    PhysicsObjectHold ph = (PhysicsObjectHold)h;
+                }
+                
+                if(h.IsFighterHold())
+                {
+                    //get FighterHold attributes
+                    FighterHold fh = (FighterHold)h;
+                }
+                
+                //get textures
+                if(!h.textures.isEmpty())
+                {
+                    Element textures = doc.createElement("Textures");
+                    for(HSTexture t : h.textures)
+                    {
+                        Element texture = doc.createElement("Texture");
+                        texture.setAttribute("depth", "" + t.depth);
+                        texture.setAttribute("offsetX", "" + t.offset.x);
+                        texture.setAttribute("offsetY", "" + t.offset.y);
+                        texture.setAttribute("textureFilePath", createRelativePath(t.filePath));
+                        textures.appendChild(texture);
+                    }
+                    hold.appendChild(textures);
+                }
+                
+                //get sounds
+                if(!h.audioList.isEmpty())
+                {
+                    Element audioList = doc.createElement("AudioList");
+                    for(HSAudio a : h.audioList)
+                    {
+                        Element audio = doc.createElement("Audio");
+                        audio.setAttribute("delay", "" + a.delay);
+                        audio.setAttribute("audioFilePath", createRelativePath(a.filePath));
+                        audioList.appendChild(audio);
+                    }
+                    hold.appendChild(audioList);
+                }
+                
+                holds.appendChild(hold);
+            }
+            object.appendChild(holds);
+            root.appendChild(object);
+            doc.appendChild(root);
+            
+            //finally, save the file
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource source = new DOMSource(doc);
+            StreamResult result = new StreamResult(new File(workingDirectory + "\\" + currentlyLoadedObject.name + ".xml"));
+            transformer.transform(source, result);
+        }
+        catch(ParserConfigurationException e)
+        {
+            
+        }
+        catch(TransformerConfigurationException e)
+        {
+            
+        }
+        catch(TransformerException e)
+        {
+            
+        }
+    }
+    
+    private void saveAs()
+    {
+        if(currentlyLoadedObject == null) { return; }
+    }
+    
+    private void save()
+    {
+        if(currentlyLoadedObject == null || workingDirectory.isEmpty()) { return; }
+        
+        File wd = new File(workingDirectory);
+        if(!wd.exists()) { return; }
+        
+        createDefinitionFile();
+    }
+    
+    private void delete()
+    {
+        textureHitboxPane.textureHitboxPane.removeSelectedItem();
+    }
+    
+    private void selectAll()
+    {
+        textureHitboxPane.textureHitboxPane.selectAll();
+    }
+    
+    private void createObjectAttributesWindow()
+    {
+        ObjectAttributesWindow window = new ObjectAttributesWindow(this, currentlyLoadedObject);
+        window.setVisible(true);
+    }
+    
+    private void createEventHoldsWindow()
+    {
+        EventHoldsWindow window = new EventHoldsWindow(this, currentlyLoadedObject);
+        window.setVisible(true);
+    }
+    
+    private void createPalettesWindow()
+    {
+        PalettesWindow window = new PalettesWindow(this);
+        window.setVisible(true);
+    }
+    
+    @Override
+    public void actionPerformed(ActionEvent e)
+    {
+        switch(e.getActionCommand())
+        {
+            case "newGraphic": newGraphic(); break;
+            case "newTerrain": newTerrain(); break;
+            case "newPhysicsObject": newPhysicsObject(); break;
+            case "newFighter": newFighter(); break;
+            case "generate": generate(); break;
+            case "open": open(); break;
+            case "save": save(); break;
+            case "saveAs": saveAs(); break;
+            case "delete": delete(); break;
+            case "selectAll": selectAll(); break;
+            case "objectAttributes": createObjectAttributesWindow(); break;
+            case "eventHolds": createEventHoldsWindow(); break;
+            case "palettes": createPalettesWindow(); break;
+        }
+    }
+}
