@@ -97,6 +97,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         JMenuItem open;
         JMenuItem save;
         JMenuItem saveAs;
+        JMenuItem importAnimation;
         JMenu edit;
         JMenuItem undo;
         JMenuItem redo;
@@ -151,6 +152,10 @@ public class HoldListWindow extends JFrame implements ActionListener {
         saveAs.setActionCommand("saveAs");
         saveAs.addActionListener(this);
         //
+        importAnimation = new JMenuItem("Import Animation");
+        importAnimation.setActionCommand("importAnimation");
+        importAnimation.addActionListener(this);
+        //
         newObject.add(newGraphic);
         newObject.add(newTerrain);
         newObject.add(newPhysicsObject);
@@ -160,6 +165,8 @@ public class HoldListWindow extends JFrame implements ActionListener {
         file.add(open);
         file.add(save);
         file.add(saveAs);
+        file.add(new JSeparator());
+        file.add(importAnimation);
         menuBar.add(file);
         
         edit = new JMenu("Edit");
@@ -1522,6 +1529,10 @@ public class HoldListWindow extends JFrame implements ActionListener {
         
         createDefinitionFile();
     }
+	
+	private void importAnimation() {
+		
+	}
 
 	private void undo() {
 		textureHitboxPane.undo();
@@ -1584,6 +1595,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
             case "open": open(); break;
             case "save": save(); break;
             case "saveAs": saveAs(); break;
+            case "importAnimation": importAnimation(); break;
             case "undo": undo(); break;
             case "redo": redo(); break;
             case "cut": cut(); break;
@@ -1596,7 +1608,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
             case "palettes": createPalettesWindow(); break;
         }
     }
-	
+
 	private class KeyDispatcher implements KeyEventDispatcher {
 		@Override
 		public boolean dispatchKeyEvent(KeyEvent e) {
