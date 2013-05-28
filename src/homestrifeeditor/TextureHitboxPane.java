@@ -13,6 +13,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
+
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -27,7 +29,9 @@ import javax.swing.ScrollPaneConstants;
  * @author Darlos9D
  */
 public class TextureHitboxPane extends JPanel implements ActionListener, ItemListener {
-    public static int textureHitboxPaneWidth = 1920 * 4;
+	private static final long serialVersionUID = 1L;
+	
+	public static int textureHitboxPaneWidth = 1920 * 4;
     public static int textureHitboxPaneHeight = 1080 * 4;
     
     public HoldListWindow parent;
@@ -38,7 +42,7 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
     private JToolBar textureHitboxToolBar;
     
     private JLabel terrainBoxLabel;
-    private JComboBox terrainBoxCombo;
+    private JComboBox<?> terrainBoxCombo;
     
     private JButton addAttackBoxButton;
     private JButton addHurtBoxButton;
@@ -48,6 +52,9 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
     private JButton showHideTerrainBoxButton;
     private JButton showHideAttackBoxesButton;
     private JButton showHideHurtBoxesButton;
+    
+    //Currently cut/copied object
+    public ArrayList<JLabel> clipboard;
     
     public TextureHitboxPane(HoldListWindow theParent)
     {
@@ -74,7 +81,7 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
         terrainBoxOptions[1] = "Crouching";
         terrainBoxOptions[2] = "Prone";
         terrainBoxOptions[3] = "Compact";
-        terrainBoxCombo = new JComboBox(terrainBoxOptions);
+        terrainBoxCombo = new JComboBox<Object>(terrainBoxOptions);
         terrainBoxCombo.addItemListener(this);
         terrainBoxCombo.setName("terrainBoxCombo");
         
@@ -321,7 +328,7 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
             case "addTexture": textureHitboxPane.addTexture(); break;
             case "addAttackBox": textureHitboxPane.addAttackBox(); break;
             case "addHurtBox": textureHitboxPane.addHurtBox(); break;
-            case "remove": textureHitboxPane.removeSelectedItem(); break;
+            case "remove": textureHitboxPane.removeSelectedItems(); break;
             case "edit": textureHitboxPane.editSelectedItem(); break;
             case "showHideTex": showHideTexturesButtonClicked(); break;
             case "showHideTer": showHideTerrainBoxButtonClicked(); break;
@@ -338,4 +345,24 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
             setCorrectTerrainBox();
         }
     }
+
+	public void undo() {
+		textureHitboxPane.undo();
+	}
+
+	public void redo() {
+		textureHitboxPane.redo();		
+	}
+
+	public void cut() {
+		textureHitboxPane.cut();
+	}
+
+	public void copy() {
+		textureHitboxPane.copy();
+	}
+
+	public void paste() {
+		textureHitboxPane.paste();
+	}
 }

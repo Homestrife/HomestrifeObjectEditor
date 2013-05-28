@@ -22,7 +22,10 @@ import javax.swing.JLayeredPane;
  * @author Darlos9D
  */
 public class TextureHitboxLayeredPane extends JLayeredPane implements MouseListener, MouseMotionListener {
-    private static int defaultHitBoxSize = 200;
+	//Stupid annoying warnings
+	private static final long serialVersionUID = 1L;
+
+	private static int defaultHitBoxSize = 200;
     
     public TextureHitboxPane parent;
     public ArrayList<JLabel> selectedItems;
@@ -31,6 +34,9 @@ public class TextureHitboxLayeredPane extends JLayeredPane implements MouseListe
     public boolean showTerrainBox;
     public boolean showAttackBoxes;
     public boolean showHurtBoxes;
+    
+    //TODO: Undoing things
+    //private ArrayList<> actions;
     
     public TextureHitboxLayeredPane(TextureHitboxPane theParent)
     {
@@ -254,12 +260,11 @@ public class TextureHitboxLayeredPane extends JLayeredPane implements MouseListe
     
     public void addTexture()
     {
-        JFileChooser fc = new JFileChooser();
-        int returnVal = fc.showOpenDialog(null);
+        int returnVal = parent.parent.fileChooser.showOpenDialog(null);
         File file;
         
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            file = fc.getSelectedFile();
+            file = parent.parent.fileChooser.getSelectedFile();
         } else {
             return;
         }
@@ -330,7 +335,7 @@ public class TextureHitboxLayeredPane extends JLayeredPane implements MouseListe
         addHurtBox(newBox);
     }
     
-    public void removeSelectedItem()
+    public void removeSelectedItems()
     {
         ArrayList<JLabel> removedItems = new ArrayList<JLabel>();
         for(JLabel selectedItem : selectedItems)
@@ -495,4 +500,43 @@ public class TextureHitboxLayeredPane extends JLayeredPane implements MouseListe
     {
         
     }
+
+	public void undo() {
+		
+	}
+
+	public void redo() {
+		
+	}
+
+	public void cut() {
+		parent.clipboard = new ArrayList<JLabel>(selectedItems);
+		removeSelectedItems();
+	}
+
+	public void copy() {
+		parent.clipboard = new ArrayList<JLabel>(selectedItems);
+	}
+
+	public void paste() {
+        for(Component c : parent.clipboard)
+        {
+            if(c.getName().compareTo("texture") == 0)
+            {
+            	addTexture(((HSTextureLabel)c).texture);
+            }
+            else if(c.getName().compareTo("terrain") == 0)
+            {
+            	//Nothing yet
+            }
+            else if(c.getName().compareTo("attack") == 0)
+            {
+            	addAttackBox(((HSBoxLabel)c).box);
+            }
+            else if(c.getName().compareTo("hurt") == 0)
+            {
+            	addHurtBox(((HSBoxLabel)c).box);
+            }
+        }
+	}
 }

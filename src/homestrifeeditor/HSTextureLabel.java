@@ -4,12 +4,8 @@
  */
 package homestrifeeditor;
 
-import java.awt.AlphaComposite;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -22,7 +18,9 @@ import javax.swing.JLabel;
  * @author Darlos9D
  */
 public class HSTextureLabel extends JLabel implements MouseListener, MouseMotionListener {
-    public TextureHitboxLayeredPane parent;
+	private static final long serialVersionUID = 1L;
+	
+	public TextureHitboxLayeredPane parent;
     public HSTexture texture;
     public ImageIcon icon;
     

@@ -24,7 +24,7 @@ public class HSObject {
         holds = new ArrayList<HSObjectHold>();
         lifetime = 0;
         hsObjectEventHolds = new HSObjectEventHolds();
-        palettes = new HSPalette[10];
+        palettes = new HSPalette[20];
         for(int i = 0; i < palettes.length; i++)
         {
             palettes[i] = new HSPalette();

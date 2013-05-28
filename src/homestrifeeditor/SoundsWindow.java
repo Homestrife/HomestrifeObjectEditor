@@ -5,7 +5,8 @@
 package homestrifeeditor;
 
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -13,9 +14,9 @@ import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -27,8 +28,6 @@ import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -39,41 +38,49 @@ import javax.swing.event.ListSelectionListener;
  * @author Darlos9D
  */
 public class SoundsWindow extends JFrame implements ActionListener, ListSelectionListener, MouseListener, ChangeListener {
-    private static int windowWidth = 800;
-    private static int windowHeight = 400;
-    
+	private static final long serialVersionUID = 1L;
+	
+	private static int windowWidth = 400;
+    private static int windowHeight = 200;
+    /*
     private static int gridWidth = 650;
-    private static int gridRowHeight = 45;
+    private static int gridRowHeight = 20;
     private static int gridColumns = 2;
     private static int gridHorizontalGap = 10;
     private static int gridVerticalGap = 5;
-    
+    */
     private HoldAttributesWindow parent;
-    private HSObjectHold hold;
+    private Object object;
     private String mode;
     
-    public DefaultListModel soundListModel;
-    public JList soundList;
+    public DefaultListModel<HSAudio> soundListModel;
+    public JList<HSAudio> soundList;
     
     private JToolBar soundListToolBar;
     
     private JLabel soundFile;
-    private JButton loadSoundButton;    private static String loadSoundTooltip = "<html>Load a sound from the hard drive.</html>";
-    private JSpinner delaySpinner;       private static String delayTooltip = "<html>Which frame of this hold the sound triggers on.</html>";
+    private JButton changeSoundButton;    	private static String changeSoundTooltip = "<html>Load a sound from the hard drive.</html>";
+    private JSpinner delaySpinner;       	private static String delayTooltip = "<html>Which frame of this hold the sound triggers on.</html>";
+    private JCheckBox exclusiveCheckBox;	private static String exclusiveToolTip = "<html>If set, this sound cancels out all other exclusive sounds</html>";		
+    private JSpinner percentageSpinner; 	private static String percentageToolTip = "<html>When enabled, the % chance that this sound will play</html>";
+    private JCheckBox percentageCheckBox;
     
-    public SoundsWindow(HoldAttributesWindow theParent, HSObjectHold theHold, String theMode)
+    public SoundsWindow(HoldAttributesWindow theParent, Object theObject, String theMode)
     {
         parent = theParent;
-        hold = theHold;
+        object = theObject;
         mode = theMode;
         
         if(mode.compareTo("hold") == 0)
         {
-            setTitle("Hold Sounds - " + hold.name);
+            setTitle("Hold Sounds - " + ((HSObjectHold)object).name);
         }
         else if(mode.compareTo("hit") == 0)
         {
-            setTitle("Hit Sounds - " + hold.name);
+            setTitle("Hit Sounds - " + ((HSObjectHold)object).name);
+        }
+        else if(mode.compareTo("onHit") == 0) {
+        	setTitle("On Hit Sounds - " + ((HSObject)object).name);
         }
         setSize(windowWidth, windowHeight);
         setLocationRelativeTo(null);
@@ -84,8 +91,8 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
     private void createWindowContents()
     {
         JLabel soundListLabel = new JLabel("Sound List");
-        soundListModel = new DefaultListModel();
-        soundList = new JList(soundListModel);
+        soundListModel = new DefaultListModel<HSAudio>();
+        soundList = new JList<HSAudio>(soundListModel);
         soundList.setName("soundList");
         soundList.setCellRenderer(new SoundListCellRenderer());
         soundList.addListSelectionListener(this);
@@ -93,17 +100,20 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
         
         if(mode.compareTo("hold") == 0)
         {
-            for (HSAudio a : hold.audioList)
+            for (HSAudio a : ((HSObjectHold)object).audioList)
             {
                 soundListModel.addElement(a);
             }
         }
         else if(mode.compareTo("hit") == 0)
         {
-            for (HSAudio a : ((TerrainObjectHold)hold).hitAudioList)
+            for (HSAudio a : ((TerrainObjectHold)object).hitAudioList)
             {
                 soundListModel.addElement(a);
             }
+        }
+        else if(mode.compareTo("onHit") == 0) {
+        	//TODO: this
         }
         
         JScrollPane holdListScrollPane = new JScrollPane(soundList);
@@ -130,13 +140,13 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
         soundListPane.add(soundListToolBar, BorderLayout.PAGE_END);
         
         JLabel soundFileLabel = new JLabel("File:");
-        soundFile = new JLabel("");
+        soundFile = new JLabel("N/A");
         
-        loadSoundButton = new JButton("Load...");
-        loadSoundButton.setToolTipText(loadSoundTooltip);
-        loadSoundButton.setActionCommand("loadSound");
-        loadSoundButton.addActionListener(this);
-        loadSoundButton.setEnabled(false);
+        changeSoundButton = new JButton("Change Sound...");
+        changeSoundButton.setToolTipText(changeSoundTooltip);
+        changeSoundButton.setActionCommand("changeSound");
+        changeSoundButton.setEnabled(false);
+        changeSoundButton.addActionListener(this);
         
         JLabel delayLabel = new JLabel("Delay");
         delayLabel.setToolTipText(delayTooltip);
@@ -146,27 +156,97 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
         delaySpinner.addChangeListener(this);
         delaySpinner.setEnabled(false);
         
+        exclusiveCheckBox = new JCheckBox("Exclusive");
+        exclusiveCheckBox.setToolTipText(exclusiveToolTip);
+        exclusiveCheckBox.setEnabled(false);
+        exclusiveCheckBox.addChangeListener(this);
+        
+        percentageSpinner = new JSpinner(new SpinnerNumberModel(100, 0, 100, 1));
+        percentageSpinner.setToolTipText(percentageToolTip);
+        percentageSpinner.addChangeListener(this);
+        percentageSpinner.setEnabled(false);
+        
+        percentageCheckBox = new JCheckBox("Play Chance");
+        percentageCheckBox.setToolTipText(percentageToolTip);
+        percentageCheckBox.setEnabled(false);
+        percentageCheckBox.addChangeListener(this);
+        
+        /*
         JPanel soundDataPane = new JPanel(new GridLayout(2, gridColumns, gridHorizontalGap, gridVerticalGap));
         soundDataPane.setSize(gridWidth, gridRowHeight * 2);
         soundDataPane.setBorder(new TitledBorder("General Attributes"));
         soundDataPane.add(soundFileLabel);
         soundDataPane.add(soundFile);
         soundDataPane.add(loadSoundButton);
+        soundDataPane.add(exclusiveCheckBox);
         soundDataPane.add(new JLabel(""));
         soundDataPane.add(delayLabel);
         soundDataPane.add(delaySpinner);
+        */
+        JPanel soundDataPane = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
         
-        this.setContentPane(new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, soundListPane, soundDataPane));
+        gbc.weightx = .1;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        soundDataPane.add(soundFileLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        soundDataPane.add(soundFile, gbc);
+        
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 2;
+        gbc.ipady = 20;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        soundDataPane.add(changeSoundButton, gbc);
+        
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 1;
+        gbc.ipady = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        soundDataPane.add(delayLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        soundDataPane.add(delaySpinner, gbc);
+        
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        soundDataPane.add(exclusiveCheckBox, gbc);
+        
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.gridwidth = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        soundDataPane.add(percentageCheckBox, gbc);
+        
+        gbc.gridx = 1;
+        gbc.gridy = 4;
+        gbc.gridwidth = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.PAGE_END;
+        soundDataPane.add(percentageSpinner, gbc);
+        
+        JSplitPane sPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, soundListPane, soundDataPane);
+        sPane.setDividerLocation(100);
+        this.setContentPane(sPane);
     }
     
     private void addSoundToSoundList()
     {
-        JFileChooser fc = new JFileChooser();
-        int returnVal = fc.showOpenDialog(null);
+        int returnVal = parent.parent.parent.fileChooser.showOpenDialog(this);
         File file;
         
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            file = fc.getSelectedFile();
+            file = parent.parent.parent.fileChooser.getSelectedFile();
         } else {
             return;
         }
@@ -177,11 +257,15 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
         
         if(mode.compareTo("hold") == 0)
         {
-            hold.audioList.add(newAudio);
+        	((HSObjectHold)object).audioList.add(newAudio);
         }
         else if(mode.compareTo("hit") == 0)
         {
-            ((TerrainObjectHold)hold).hitAudioList.add(newAudio);
+            ((TerrainObjectHold)object).hitAudioList.add(newAudio);
+        }
+        else if(mode.compareTo("onHit") == 0)
+        {
+            //TODO: this
         }
         
         if(index >= 0)
@@ -199,11 +283,15 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
         HSAudio audio = (HSAudio)soundListModel.remove(index);
         if(mode.compareTo("hold") == 0)
         {
-            hold.audioList.remove(audio);
+        	((HSObjectHold)object).audioList.remove(audio);
         }
         else if(mode.compareTo("hit") == 0)
         {
-            ((TerrainObjectHold)hold).hitAudioList.remove(audio);
+            ((TerrainObjectHold)object).hitAudioList.remove(audio);
+        }
+        else if(mode.compareTo("onHit") == 0)
+        {
+            //TODO: this
         }
         return audio;
     }
@@ -238,30 +326,36 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
     
     private void unloadSoundData()
     {
-        soundFile.setText("");
-        loadSoundButton.setEnabled(false);
+        soundFile.setText("N/A");
+        changeSoundButton.setEnabled(false);
         delaySpinner.setValue(0);
         delaySpinner.setEnabled(false);
+        exclusiveCheckBox.setEnabled(false);
+        percentageSpinner.setEnabled(false);
+        percentageCheckBox.setEnabled(false);
     }
     
     private void loadSoundData(HSAudio sound)
     {
         File file = new File(sound.filePath);
-        
-        soundFile.setText(file.getPath());
-        loadSoundButton.setEnabled(true);
+
+        soundFile.setText(file.getName());
+        soundFile.setToolTipText(file.getPath());
+        changeSoundButton.setEnabled(true);
         delaySpinner.setValue(sound.delay);
         delaySpinner.setEnabled(true);
+        exclusiveCheckBox.setEnabled(true);
+        percentageSpinner.setEnabled(true);
+        percentageCheckBox.setEnabled(true);
     }
     
-    private void loadSound()
+    private void changeSound()
     {
-        JFileChooser fc = new JFileChooser();
-        int returnVal = fc.showOpenDialog(null);
+        int returnVal = parent.parent.parent.fileChooser.showOpenDialog(this);
         File file;
         
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            file = fc.getSelectedFile();
+            file = parent.parent.parent.fileChooser.getSelectedFile();
         } else {
             return;
         }
@@ -272,7 +366,8 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
         if(sound != null)
         {
             sound.filePath = file.getPath();
-            soundFile.setText(file.getPath());
+            soundFile.setText(file.getName());
+            soundFile.setToolTipText(file.getPath());
         }
         
         soundList.repaint();
@@ -289,6 +384,33 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
         }
     }
     
+    private void exclusivityChanged()
+    {
+        int index = soundList.getSelectedIndex();
+        HSAudio sound = (HSAudio)soundListModel.get(index);
+        
+        if(sound != null)
+        {
+            sound.exclusive = exclusiveCheckBox.isSelected();
+        }
+    }
+    
+    private void percentageChanged()
+    {
+        int index = soundList.getSelectedIndex();
+        HSAudio sound = (HSAudio)soundListModel.get(index);
+        
+        if(sound != null)
+        {
+            sound.percentage = (int)percentageSpinner.getValue();
+        }
+    }
+    
+    private void percentageCheckboxChanged()
+    {
+    	percentageSpinner.setEnabled(percentageCheckBox.isSelected());
+    }
+    
     @Override
     public void actionPerformed(ActionEvent e)
     {
@@ -296,7 +418,7 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
         {
             case "addSound": addSoundToSoundList(); break;
             case "removeSounds": removeSelectedSoundsFromSoundList(); break;
-            case "loadSound": loadSound(); break;
+            case "changeSound": changeSound(); break;
         }
     }
     
@@ -368,6 +490,12 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
         if(e.getSource().getClass().getName().contains("JSpinner"))
         {
             delayChanged();
+            percentageChanged();
+        }
+        else if(e.getSource().getClass().getName().contains("JCheckBox"))
+        {
+        	exclusivityChanged();
+            percentageCheckboxChanged();
         }
     }
 }

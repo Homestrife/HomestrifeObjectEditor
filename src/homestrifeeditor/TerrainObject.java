@@ -12,6 +12,7 @@ import java.util.ArrayList;
  */
 public class TerrainObject extends HSObject {
     public ArrayList<HSBox> terrainBoxes;
+    public ArrayList<HSAudio> onHitSounds;
     public boolean canBeJumpedThrough;
     public int health;
     public float bounce;
@@ -25,6 +26,7 @@ public class TerrainObject extends HSObject {
         
         name = "New Terrain";
         terrainBoxes = new ArrayList<HSBox>();
+        onHitSounds = new ArrayList<HSAudio>();
         canBeJumpedThrough = false;
         health = 0;
         bounce = 0;

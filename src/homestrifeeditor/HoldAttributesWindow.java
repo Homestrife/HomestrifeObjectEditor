@@ -33,7 +33,9 @@ import javax.swing.event.DocumentListener;
  * @author Darlos9D
  */
 public class HoldAttributesWindow extends JFrame implements ActionListener, ChangeListener, DocumentListener, ItemListener {
-    private static int windowWidth = 800;
+	private static final long serialVersionUID = 1L;
+	
+	private static int windowWidth = 800;
     private static int windowHeightGeneral = 600;
     private static int windowHeightTerrain = 360;
     private static int windowBorderBuffer = 10;
@@ -44,12 +46,12 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
     private static int gridHorizontalGap = 10;
     private static int gridVerticalGap = 5;
     
-    private HoldListPane parent;
+    public HoldListPane parent;
     private HSObjectHold hold;
     
     private JTextField nameField;           private static String nameTooltip = "<html>The name to be displayed in the hold list.</html>";
     private JSpinner durationSpinner;       private static String durationTooltip = "<html>How many frames this hold lasts. The game runs at 60 frames per second.</html>";
-    private JComboBox nextHoldCombo;        private static String nextHoldTooltip = "<html>Which hold this object should switch to once this hold's duration expires.<br>If this is set to NONE, the engine will determine the next hold some other way.</html>";
+    private JComboBox<?> nextHoldCombo;        private static String nextHoldTooltip = "<html>Which hold this object should switch to once this hold's duration expires.<br>If this is set to NONE, the engine will determine the next hold some other way.</html>";
     private JButton holdSoundsButton;       private static String holdSoundsTooltip = "<html>Add/Edit sounds that occur in this hold</html>";
     
     private JCheckBox changeAttackBoxAttributesCheck; private static String changeAttackBoxAttributesTooltip = "<html>If this is unchecked, this hold will inherit the attack<br/>attributes of any hold that has this hold as its<br/>next hold.</html>";
@@ -62,7 +64,7 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
     private JSpinner forceYSpinner;         private static String forceYTooltip = "<html>When another physics object is struck by one of this object's<br>attack boxes, its Y velocity is set to this value.</html>";
     private JCheckBox tripsCheck;           private static String tripsTooltip = "<html>If checked, another fighter will fall prone if struck by one of this object's attack boxes.</html>";
     
-    private JComboBox blockabilityCombo;    private static String blockabilityTooltip = "<html>Unblockable: This object's attack boxes cannot be blocked.<br>High: This object's attack boxes must be blocked while standing or jumping.<br>Low: This object's attack boxes must be blocked while crouching or jumping.<br>Mid: This object's attack boxes can be blocked while crouching, standing, or jumping.</html>";
+    private JComboBox<?> blockabilityCombo;    private static String blockabilityTooltip = "<html>Unblockable: This object's attack boxes cannot be blocked.<br>High: This object's attack boxes must be blocked while standing or jumping.<br>Low: This object's attack boxes must be blocked while crouching or jumping.<br>Mid: This object's attack boxes can be blocked while crouching, standing, or jumping.</html>";
     private JCheckBox directionBlockCheck;  private static String directionBlockTooltip = "<html>If checked, another figher must be facing in the opposite<br>direction that this object is facing in order to block this<br>object's attack boxes.<br>Normally, whether this object's attack boxes must be blocked while<br>facing left or right is determined by which side of the defending<br>fighter this object is on, regardless of which way this object is facing.</html>";
     private JCheckBox reverseBlockCheck;    private static String reverseBlockTooltip = "<html>If checked, another fighter must face the direction opposite<br>of what they would normally need to in order to block this object's attack boxes.</html>";
     private JButton hitSoundsButton;        private static String hitSoundsTooltip = "<html>Add/Edit sounds that occur upon an attack box collision</html>";
@@ -104,7 +106,7 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         {
             allHoldsPlusNull[i + 1] = allHolds[i];
         }
-        nextHoldCombo = new JComboBox(allHoldsPlusNull);
+        nextHoldCombo = new JComboBox<Object>(allHoldsPlusNull);
         nextHoldCombo.setRenderer(holdComboRenderer);
         if(hold.nextHold == null)
         {
@@ -166,7 +168,7 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             
             JLabel blockabilityLabel = new JLabel("Blockability");
             blockabilityLabel.setToolTipText(blockabilityTooltip);
-            blockabilityCombo = new JComboBox(Blockability.values());
+            blockabilityCombo = new JComboBox<Object>(Blockability.values());
             blockabilityCombo.setToolTipText(blockabilityTooltip);
             blockabilityCombo.setSelectedItem(toHold.blockability);
             blockabilityCombo.setActionCommand("fieldChanged");

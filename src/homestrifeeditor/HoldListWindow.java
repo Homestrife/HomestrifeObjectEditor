@@ -5,10 +5,13 @@
 package homestrifeeditor;
 
 import java.awt.Dimension;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JComponent;
@@ -16,6 +19,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
@@ -41,7 +45,9 @@ import org.xml.sax.SAXException;
  * @author Darlos9D
  */
 public class HoldListWindow extends JFrame implements ActionListener {
-    public static String BaseWindowTitle = "Homestrife Editor - ";
+	private static final long serialVersionUID = 1L;
+	
+	public static String BaseWindowTitle = "Homestrife Editor - ";
     public static int windowWidth = 800;
     public static int windowHeight = 600;
     
@@ -54,20 +60,28 @@ public class HoldListWindow extends JFrame implements ActionListener {
     
     public String workingDirectory;
     
+    //File chooser is declared at the class level so that it remembers last folder location..
+    public JFileChooser fileChooser;
+    
     public HoldListWindow()
     {
         currentlyLoadedObject = null;
         
         workingDirectory = "";
         
+        fileChooser = new JFileChooser("..");
+        
         setTitle(BaseWindowTitle + "No Object Loaded");
         setSize(windowWidth, windowHeight);
         setMinimumSize(new Dimension(windowWidth, windowHeight));
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        
+
         createMenuBar();
         createWindowContents();
+        
+        KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+        manager.addKeyEventDispatcher(new KeyDispatcher());
     }
     
     private void createMenuBar()
@@ -103,29 +117,40 @@ public class HoldListWindow extends JFrame implements ActionListener {
         
         file = new JMenu("File");
         newObject = new JMenu("New");
+        //
         newGraphic = new JMenuItem("Graphic");
-        newTerrain = new JMenuItem("Terrain");
-        newPhysicsObject = new JMenuItem("Physics Object");
-        newFighter = new JMenuItem("Fighter");
         newGraphic.setActionCommand("newGraphic");
         newGraphic.addActionListener(this);
+        //
+        newTerrain = new JMenuItem("Terrain");
         newTerrain.setActionCommand("newTerrain");
         newTerrain.addActionListener(this);
+        //
+        newPhysicsObject = new JMenuItem("Physics Object");
         newPhysicsObject.setActionCommand("newPhysicsObject");
         newPhysicsObject.addActionListener(this);
+        //
+        newFighter = new JMenuItem("Fighter");
         newFighter.setActionCommand("newFighter");
         newFighter.addActionListener(this);
+        //
         generate = new JMenuItem("Generate...");
         generate.setActionCommand("generate");
         generate.addActionListener(this);
+        //
         open = new JMenuItem("Open...");
         open.setActionCommand("open");
         open.addActionListener(this);
+        //
         save = new JMenuItem("Save");
         save.setActionCommand("save");
         save.addActionListener(this);
         save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
+        //
         saveAs = new JMenuItem("Save As...");
+        saveAs.setActionCommand("saveAs");
+        saveAs.addActionListener(this);
+        //
         newObject.add(newGraphic);
         newObject.add(newTerrain);
         newObject.add(newPhysicsObject);
@@ -138,19 +163,42 @@ public class HoldListWindow extends JFrame implements ActionListener {
         menuBar.add(file);
         
         edit = new JMenu("Edit");
+        //
         undo = new JMenuItem("Undo");
+        undo.setActionCommand("undo");
+        undo.addActionListener(this);
+        undo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK));
+        //
         redo = new JMenuItem("Redo");
+        redo.setActionCommand("redo");
+        redo.addActionListener(this);
+        //
         cut = new JMenuItem("Cut");
+        cut.setActionCommand("cut");
+        cut.addActionListener(this);
+        cut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK));
+        //
         copy = new JMenuItem("Copy");
+        copy.setActionCommand("copy");
+        copy.addActionListener(this);
+        copy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK));
+        //
         paste = new JMenuItem("Paste");
+        paste.setActionCommand("paste");
+        paste.addActionListener(this);
+        paste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK));
+        //
         delete = new JMenuItem("Delete");
-        selectAll = new JMenuItem("Select All");
-        delete.addActionListener(this);
         delete.setActionCommand("delete");
+        delete.addActionListener(this);
         delete.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
-        selectAll.addActionListener(this);
+        //
+        selectAll = new JMenuItem("Select All");
         selectAll.setActionCommand("selectAll");
+        selectAll.addActionListener(this);
         selectAll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK));
+        //
+        
         edit.add(undo);
         edit.add(redo);
         edit.add(new JSeparator());
@@ -274,6 +322,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
     
     public void newGraphic()
     {
+    	workingDirectory = "";
         setCurrentlyLoadedObject(new HSObject());
         HSObjectHold newHold = new HSObjectHold();
         currentlyLoadedObject.holds.add(newHold);
@@ -282,6 +331,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
     
     public void newTerrain()
     {
+    	workingDirectory = "";
         setCurrentlyLoadedObject(new TerrainObject());
         TerrainObjectHold newHold = new TerrainObjectHold();
         currentlyLoadedObject.holds.add(newHold);
@@ -290,6 +340,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
     
     public void newPhysicsObject()
     {
+    	workingDirectory = "";
         setCurrentlyLoadedObject(new PhysicsObject());
         PhysicsObjectHold newHold = new PhysicsObjectHold();
         currentlyLoadedObject.holds.add(newHold);
@@ -298,6 +349,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
     
     public void newFighter()
     {
+    	workingDirectory = "";
         setCurrentlyLoadedObject(new Fighter());
         FighterHold newHold = new FighterHold();
         currentlyLoadedObject.holds.add(newHold);
@@ -307,12 +359,11 @@ public class HoldListWindow extends JFrame implements ActionListener {
     
     private void generate()
     {
-        JFileChooser fc = new JFileChooser();
-        int returnVal = fc.showOpenDialog(null);
+        int returnVal = fileChooser.showOpenDialog(this);
         File file;
         
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            file = fc.getSelectedFile();
+            file = fileChooser.getSelectedFile();
         } else {
             return;
         }
@@ -572,12 +623,11 @@ public class HoldListWindow extends JFrame implements ActionListener {
     
     private void open()
     {
-        JFileChooser fc = new JFileChooser();
-        int returnVal = fc.showOpenDialog(null);
+        int returnVal = fileChooser.showOpenDialog(this);
         File file;
         
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            file = fc.getSelectedFile();
+            file = fileChooser.getSelectedFile();
         } else {
             return;
         }
@@ -1159,7 +1209,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                 
                 //get TerrainObject event holds
                 if(tObject.terrainEventHolds.healthDeath != null) { eventHolds.setAttribute("healthDeath", "" + tObject.terrainEventHolds.healthDeath.id); }
-            }
+            } //End Is Terrain Object
             
             if(currentlyLoadedObject.IsPhysicsObject())
             {
@@ -1169,7 +1219,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                 object.setAttribute("falls", "" + pObject.falls);
                 object.setAttribute("mass", "" + pObject.mass);
                 object.setAttribute("maxFallSpeed", "" + pObject.maxFallSpeed);
-            }
+            } //End Is Physics Object
             
             if(currentlyLoadedObject.IsFighter())
             {
@@ -1266,7 +1316,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                 if(fighter.fighterEventHolds.attackLightUpAir != null) { eventHolds.setAttribute("attackLightUpAir", "" + fighter.fighterEventHolds.attackLightUpAir.id); }
                 if(fighter.fighterEventHolds.attackLightForwardAir != null) { eventHolds.setAttribute("attackLightForwardAir", "" + fighter.fighterEventHolds.attackLightForwardAir.id); }
                 if(fighter.fighterEventHolds.attackLightBackwardAir != null) { eventHolds.setAttribute("attackLightBackwardAir", "" + fighter.fighterEventHolds.attackLightBackwardAir.id); }
-            }
+            } //End Is Fighter
             
             object.appendChild(eventHolds);
             
@@ -1341,6 +1391,9 @@ public class HoldListWindow extends JFrame implements ActionListener {
                             Element hitAudio = doc.createElement("HitAudio");
                             hitAudio.setAttribute("delay", "" + a.delay);
                             hitAudio.setAttribute("hitAudioFilePath", createRelativePath(a.filePath));
+                            hitAudio.setAttribute("exclusive", "" + a.exclusive);
+                            hitAudio.setAttribute("percentage", "" + a.percentage);
+                            hitAudio.setAttribute("usePercentage", "" + a.usePercentage);
                             hitAudioList.appendChild(hitAudio);
                         }
                         hold.appendChild(hitAudioList);
@@ -1384,6 +1437,9 @@ public class HoldListWindow extends JFrame implements ActionListener {
                         Element audio = doc.createElement("Audio");
                         audio.setAttribute("delay", "" + a.delay);
                         audio.setAttribute("audioFilePath", createRelativePath(a.filePath));
+                        audio.setAttribute("exclusive", "" + a.exclusive);
+                        audio.setAttribute("percentage", "" + a.percentage);
+                        audio.setAttribute("usePercentage", "" + a.usePercentage);
                         audioList.appendChild(audio);
                     }
                     hold.appendChild(audioList);
@@ -1418,22 +1474,61 @@ public class HoldListWindow extends JFrame implements ActionListener {
     
     private void saveAs()
     {
-        if(currentlyLoadedObject == null) { return; }
+        if(currentlyLoadedObject == null) {
+        	JOptionPane.showMessageDialog(this, "No Object loaded", "Whoops", JOptionPane.ERROR_MESSAGE);
+        	return;
+        }
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int returnVal = fileChooser.showSaveDialog(this);
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        File file;
+        
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            file = fileChooser.getSelectedFile();
+        } else {
+            return;
+        }
+
+        workingDirectory = file.getAbsolutePath();
+        
+        //Now that we have a working directory, we can save
+        save();
     }
     
     private void save()
     {
-        if(currentlyLoadedObject == null || workingDirectory.isEmpty()) { return; }
+        //If we don't have a working directory or a loaded object, we should save as instead (save as can handle the lack of a loaded object as well)
+        if(currentlyLoadedObject == null || workingDirectory.isEmpty()) { saveAs(); }
         
         File wd = new File(workingDirectory);
         if(!wd.exists()) { return; }
         
         createDefinitionFile();
     }
+
+	private void undo() {
+		textureHitboxPane.undo();
+	}
+
+	private void redo() {
+		textureHitboxPane.redo();		
+	}
+
+	private void cut() {
+		textureHitboxPane.cut();
+	}
+
+	private void copy() {
+		textureHitboxPane.copy();
+	}
+
+	private void paste() {
+		textureHitboxPane.paste();
+	}
     
     private void delete()
     {
-        textureHitboxPane.textureHitboxPane.removeSelectedItem();
+        textureHitboxPane.textureHitboxPane.removeSelectedItems();
     }
     
     private void selectAll()
@@ -1472,6 +1567,11 @@ public class HoldListWindow extends JFrame implements ActionListener {
             case "open": open(); break;
             case "save": save(); break;
             case "saveAs": saveAs(); break;
+            case "undo": undo(); break;
+            case "redo": redo(); break;
+            case "cut": cut(); break;
+            case "copy": copy(); break;
+            case "paste": paste(); break;
             case "delete": delete(); break;
             case "selectAll": selectAll(); break;
             case "objectAttributes": createObjectAttributesWindow(); break;
@@ -1479,4 +1579,22 @@ public class HoldListWindow extends JFrame implements ActionListener {
             case "palettes": createPalettesWindow(); break;
         }
     }
+	
+	private class KeyDispatcher implements KeyEventDispatcher {
+		@Override
+		public boolean dispatchKeyEvent(KeyEvent e) {
+			if(e.getID() == KeyEvent.KEY_PRESSED) {
+				if ((e.getKeyCode() == KeyEvent.VK_X) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
+					cut();
+		        }
+				else if ((e.getKeyCode() == KeyEvent.VK_C) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
+					copy();
+		        }
+				else if ((e.getKeyCode() == KeyEvent.VK_V) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
+					paste();
+		        }
+			}
+			return false;
+		}
+	}
 }

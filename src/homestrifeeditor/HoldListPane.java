@@ -28,10 +28,12 @@ import javax.swing.event.ListSelectionListener;
  * @author Darlos9D
  */
 public class HoldListPane extends JPanel implements ActionListener, ListSelectionListener, MouseListener {
-    public HoldListWindow parent;
+	private static final long serialVersionUID = 1L;
+
+	public HoldListWindow parent;
     
-    public DefaultListModel holdListModel;
-    public JList holdList;
+    public DefaultListModel<HSObjectHold> holdListModel;
+    public JList<HSObjectHold> holdList;
     
     private JToolBar holdListToolBar;
     
@@ -44,8 +46,8 @@ public class HoldListPane extends JPanel implements ActionListener, ListSelectio
     private void createPaneContents()
     {
         JLabel holdListLabel = new JLabel("Hold List");
-        holdListModel = new DefaultListModel();
-        holdList = new JList(holdListModel);
+        holdListModel = new DefaultListModel<HSObjectHold>();
+        holdList = new JList<HSObjectHold>(holdListModel);
         holdList.setName("holdList");
         holdList.setCellRenderer(new HoldListCellRenderer());
         holdList.addListSelectionListener(this);

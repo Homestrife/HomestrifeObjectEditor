@@ -31,11 +31,13 @@ import javax.swing.event.DocumentListener;
  * @author Darlos9D
  */
 public class ObjectAttributesWindow extends JFrame implements ActionListener, ChangeListener, DocumentListener, ItemListener {
-    private static int windowWidth = 720;
-    private static int windowHeightGeneral = 125;
-    private static int windowHeightTerrain = 200;
-    private static int windowHeightPhysics = 270;
-    private static int windowHeightFighter = 440;
+	private static final long serialVersionUID = 1L;
+	
+	private static int windowWidth = 720;
+    private static int windowHeightGeneral = 155;
+    private static int windowHeightTerrain = 230;
+    private static int windowHeightPhysics = 300;
+    private static int windowHeightFighter = 470;
     private static int windowBorderBuffer = 10;
     
     private static int gridWidth = 700;
@@ -126,20 +128,25 @@ public class ObjectAttributesWindow extends JFrame implements ActionListener, Ch
             healthSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 99999, 1));
             healthSpinner.setValue(tObject.health);
             healthSpinner.addChangeListener(this);
+            //
             JLabel bounceLabel = new JLabel("Bounce");
             bounceSpinner = new JSpinner(new SpinnerNumberModel(value, min, max, stepSize));
             bounceSpinner.setValue(tObject.bounce);
             bounceSpinner.addChangeListener(this);
+            //
             JLabel frictionLabel = new JLabel("Friction");
             frictionSpinner = new JSpinner(new SpinnerNumberModel(value, min, max, stepSize));
             frictionSpinner.setValue(tObject.friction);
             frictionSpinner.addChangeListener(this);
+            //
             JLabel takesTerrainDamageLabel = new JLabel("Takes Impact Damage");
             takesTerrainDamageCheck = new JCheckBox("", tObject.takesTerrainDamage);
             takesTerrainDamageCheck.setActionCommand("fieldChanged");
             takesTerrainDamageCheck.addActionListener(this);
+            //
+            JButton getHitSounds = new JButton("Sounds on Hit...");
 
-            JPanel terrainInterface = new JPanel(new GridLayout(2, gridColumns, gridHorizontalGap, gridVerticalGap));
+            JPanel terrainInterface = new JPanel(new GridLayout(0, gridColumns, gridHorizontalGap, gridVerticalGap));
             terrainInterface.setSize(gridWidth, gridRowHeight * 3);
             terrainInterface.setBorder(new TitledBorder("Health & Impact Attributes"));
             terrainInterface.add(healthLabel);
@@ -150,6 +157,10 @@ public class ObjectAttributesWindow extends JFrame implements ActionListener, Ch
             terrainInterface.add(takesTerrainDamageCheck);
             terrainInterface.add(frictionLabel);
             terrainInterface.add(frictionSpinner);
+            terrainInterface.add(new JLabel(""));
+            terrainInterface.add(new JLabel(""));
+            terrainInterface.add(new JLabel(""));
+            //terrainInterface.add(getHitSounds);
 
             objectAttributesPane.add(terrainInterface);
         }

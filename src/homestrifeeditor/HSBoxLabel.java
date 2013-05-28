@@ -23,7 +23,9 @@ import javax.swing.JLabel;
  * @author Darlos9D
  */
 public class HSBoxLabel extends JLabel implements MouseListener, MouseMotionListener {
-    private static int resizeBoxSize = 10;
+	private static final long serialVersionUID = 1L;
+
+	private static int resizeBoxSize = 10;
     
     public TextureHitboxLayeredPane parent;
     public HSBox box;
@@ -207,6 +209,8 @@ public class HSBoxLabel extends JLabel implements MouseListener, MouseMotionList
     {
         if(!parent.selectedItems.contains(this)) { return; }
         
+        final int MINSIZE = 10;
+        
         Component c = e.getComponent();
         
         if(c == null) { return ; }
@@ -232,11 +236,25 @@ public class HSBoxLabel extends JLabel implements MouseListener, MouseMotionList
             box.offset.y += yDiff;
             box.width -= xDiff;
             box.height -= yDiff;
+
+            if(box.width < MINSIZE) {
+            	box.offset.x -= -box.width + MINSIZE;
+            	box.width = MINSIZE;
+            }
+            if(box.height < MINSIZE) {
+            	box.offset.y -= -box.height + MINSIZE;
+            	box.height = MINSIZE;
+            }
         }
         else if(resizeBoxPressed == top)
         {
             box.offset.y += yDiff;
             box.height -= yDiff;
+            
+            if(box.height < MINSIZE) {
+            	box.offset.y -= -box.height + MINSIZE;
+            	box.height = MINSIZE;
+            }
         }
         else if(resizeBoxPressed == topRight)
         {
@@ -244,16 +262,33 @@ public class HSBoxLabel extends JLabel implements MouseListener, MouseMotionList
             box.width += xDiff;
             mouseStartX = e.getX();
             box.height -= yDiff;
+            
+            if(box.width < MINSIZE) {
+            	box.width = MINSIZE;
+            }
+            if(box.height < MINSIZE) {
+            	box.offset.y -= -box.height + MINSIZE;
+            	box.height = MINSIZE;
+            }
         }
         else if(resizeBoxPressed == left)
         {
             box.offset.x += xDiff;
             box.width -= xDiff;
+
+            if(box.width < MINSIZE) {
+            	box.offset.x -= -box.width + MINSIZE;
+            	box.width = MINSIZE;
+            }
         }
         else if(resizeBoxPressed == right)
         {
             box.width += xDiff;
             mouseStartX = e.getX();
+            
+            if(box.width < MINSIZE) {
+            	box.width = MINSIZE;
+            }
         }
         else if(resizeBoxPressed == bottomLeft)
         {
@@ -261,11 +296,19 @@ public class HSBoxLabel extends JLabel implements MouseListener, MouseMotionList
             box.width -= xDiff;
             box.height += yDiff;
             mouseStartY = e.getY();
+
+            if(box.width < MINSIZE) {
+            	box.offset.x -= -box.width + MINSIZE;
+            	box.width = MINSIZE;
+            }
+            if(box.height < MINSIZE) box.height = MINSIZE;
         }
         else if(resizeBoxPressed == bottom)
         {
             box.height += yDiff;
             mouseStartY = e.getY();
+            
+            if(box.height < MINSIZE) box.height = MINSIZE;
         }
         else if(resizeBoxPressed == bottomRight)
         {
@@ -273,6 +316,13 @@ public class HSBoxLabel extends JLabel implements MouseListener, MouseMotionList
             mouseStartX = e.getX();
             box.height += yDiff;
             mouseStartY = e.getY();
+            
+            if(box.width < MINSIZE) {
+            	box.width = MINSIZE;
+            }
+            if(box.height < MINSIZE) {
+            	box.height = MINSIZE;
+            }
         }
         
         Point pos = parent.parent.getSwingOffset(box.offset.x, box.offset.y);
