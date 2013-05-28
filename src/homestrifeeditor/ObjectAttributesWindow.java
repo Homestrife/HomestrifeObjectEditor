@@ -145,6 +145,8 @@ public class ObjectAttributesWindow extends JFrame implements ActionListener, Ch
             takesTerrainDamageCheck.addActionListener(this);
             //
             JButton getHitSounds = new JButton("Sounds on Hit...");
+            getHitSounds.setActionCommand("onHit");
+            getHitSounds.addActionListener(this);
 
             JPanel terrainInterface = new JPanel(new GridLayout(0, gridColumns, gridHorizontalGap, gridVerticalGap));
             terrainInterface.setSize(gridWidth, gridRowHeight * 3);
@@ -160,7 +162,7 @@ public class ObjectAttributesWindow extends JFrame implements ActionListener, Ch
             terrainInterface.add(new JLabel(""));
             terrainInterface.add(new JLabel(""));
             terrainInterface.add(new JLabel(""));
-            //terrainInterface.add(getHitSounds);
+            terrainInterface.add(getHitSounds);
 
             objectAttributesPane.add(terrainInterface);
         }
@@ -380,6 +382,11 @@ public class ObjectAttributesWindow extends JFrame implements ActionListener, Ch
         applyButton.setEnabled(true);
     }
     
+    public void onHitSounds() {
+        SoundsWindow window = new SoundsWindow(this, hsObject, "onHit");
+        window.setVisible(true);
+	}
+    
     @Override
     public void actionPerformed(ActionEvent e)
     {
@@ -388,11 +395,12 @@ public class ObjectAttributesWindow extends JFrame implements ActionListener, Ch
             case "okButton": okButtonPressed(); break;
             case "closeButton": closeButtonPressed(); break;
             case "applyButton": applyButtonPressed(); break;
-            case "fieldChanged": fieldChanged();
+            case "fieldChanged": fieldChanged(); break;
+            case "onHit": onHitSounds(); break;
         }
     }
-    
-    @Override
+
+	@Override
     public void stateChanged(ChangeEvent e)
     {
         fieldChanged();

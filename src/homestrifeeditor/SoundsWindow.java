@@ -49,7 +49,7 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
     private static int gridHorizontalGap = 10;
     private static int gridVerticalGap = 5;
     */
-    private HoldAttributesWindow parent;
+    private JFrame parent;
     private Object object;
     private String mode;
     
@@ -65,7 +65,7 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
     private JSpinner percentageSpinner; 	private static String percentageToolTip = "<html>When enabled, the % chance that this sound will play</html>";
     private JCheckBox percentageCheckBox;
     
-    public SoundsWindow(HoldAttributesWindow theParent, Object theObject, String theMode)
+    public SoundsWindow(JFrame theParent, Object theObject, String theMode)
     {
         parent = theParent;
         object = theObject;
@@ -113,7 +113,9 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
             }
         }
         else if(mode.compareTo("onHit") == 0) {
-        	//TODO: this
+        	for(HSAudio a : ((TerrainObject)object).onHitSounds) {
+        		soundListModel.addElement(a);
+        	}
         }
         
         JScrollPane holdListScrollPane = new JScrollPane(soundList);
@@ -242,11 +244,11 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
     
     private void addSoundToSoundList()
     {
-        int returnVal = parent.parent.parent.fileChooser.showOpenDialog(this);
+        int returnVal = HoldListWindow.fileChooser.showOpenDialog(this);
         File file;
         
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            file = parent.parent.parent.fileChooser.getSelectedFile();
+            file = HoldListWindow.fileChooser.getSelectedFile();
         } else {
             return;
         }
@@ -265,7 +267,7 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
         }
         else if(mode.compareTo("onHit") == 0)
         {
-            //TODO: this
+            ((TerrainObject)object).onHitSounds.add(newAudio);
         }
         
         if(index >= 0)
@@ -291,7 +293,7 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
         }
         else if(mode.compareTo("onHit") == 0)
         {
-            //TODO: this
+            ((TerrainObject)object).onHitSounds.remove(audio);
         }
         return audio;
     }
@@ -351,11 +353,11 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
     
     private void changeSound()
     {
-        int returnVal = parent.parent.parent.fileChooser.showOpenDialog(this);
+        int returnVal = HoldListWindow.fileChooser.showOpenDialog(this);
         File file;
         
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            file = parent.parent.parent.fileChooser.getSelectedFile();
+            file = HoldListWindow.fileChooser.getSelectedFile();
         } else {
             return;
         }

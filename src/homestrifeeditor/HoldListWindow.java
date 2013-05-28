@@ -61,7 +61,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
     public String workingDirectory;
     
     //File chooser is declared at the class level so that it remembers last folder location..
-    public JFileChooser fileChooser;
+    public static JFileChooser fileChooser;
     
     public HoldListWindow()
     {
@@ -196,7 +196,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         selectAll = new JMenuItem("Select All");
         selectAll.setActionCommand("selectAll");
         selectAll.addActionListener(this);
-        selectAll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK));
+        selectAll.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.ALT_DOWN_MASK));
         //
         
         edit.add(undo);
@@ -1207,6 +1207,23 @@ public class HoldListWindow extends JFrame implements ActionListener {
                 terrainBox.setAttribute("depth", "" + tObject.terrainBoxes.get(0).depth);
                 object.appendChild(terrainBox);
                 
+                //on hit sounds
+                if(!tObject.onHitSounds.isEmpty())
+                {
+                    Element hitAudioList = doc.createElement("OnHitAudioList");
+                    for(HSAudio a : tObject.onHitSounds)
+                    {
+                        Element hitAudio = doc.createElement("OnHitAudio");
+                        hitAudio.setAttribute("delay", "" + a.delay);
+                        hitAudio.setAttribute("hitAudioFilePath", createRelativePath(a.filePath));
+                        hitAudio.setAttribute("exclusive", "" + a.exclusive);
+                        hitAudio.setAttribute("percentage", "" + a.percentage);
+                        hitAudio.setAttribute("usePercentage", "" + a.usePercentage);
+                        hitAudioList.appendChild(hitAudio);
+                    }
+                    object.appendChild(hitAudioList);
+                }
+                
                 //get TerrainObject event holds
                 if(tObject.terrainEventHolds.healthDeath != null) { eventHolds.setAttribute("healthDeath", "" + tObject.terrainEventHolds.healthDeath.id); }
             } //End Is Terrain Object
@@ -1593,6 +1610,12 @@ public class HoldListWindow extends JFrame implements ActionListener {
 				else if ((e.getKeyCode() == KeyEvent.VK_V) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
 					paste();
 		        }
+				/*
+				 * TODO: Fix Control + A
+				else if ((e.getKeyCode() == KeyEvent.VK_A) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
+					selectAll();
+				}
+				*/
 			}
 			return false;
 		}
