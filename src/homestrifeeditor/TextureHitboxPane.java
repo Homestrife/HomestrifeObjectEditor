@@ -317,9 +317,15 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
     	Boolean lastLocked = null;
 		//First we must go through the list to get the first "locked" value
     	for(JLabel jl : textureHitboxPane.selectedItems) {
-			if(jl.getName().compareTo("terrain") != 0 && jl.getName().compareTo("attack") != 0 && jl.getName().compareTo("hurt") != 0) continue;
-			lastLocked = ((HSBoxLabel)jl).locked;
-			break;
+			if(jl.getName().compareTo("terrain") != 0 && jl.getName().compareTo("attack") != 0 && jl.getName().compareTo("hurt") != 0 && jl.getName().compareTo("texture") != 0) continue;
+			if(jl.getName().compareTo("texture") == 0) {
+				lastLocked = ((HSTextureLabel)jl).locked;
+				break;				
+			}
+			else {
+				lastLocked = ((HSBoxLabel)jl).locked;
+				break;
+			}
 		}
     	if(lastLocked == null) {
     		lockBoxButton.setEnabled(false);
@@ -327,12 +333,21 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
     	}
 		lockBoxButton.setEnabled(true);
 		for(JLabel jl : textureHitboxPane.selectedItems) {
-			if(jl.getName().compareTo("terrain") != 0 && jl.getName().compareTo("attack") != 0 && jl.getName().compareTo("hurt") != 0) continue;
-			boolean isLocked = ((HSBoxLabel)jl).locked;
-			if(isLocked != lastLocked.booleanValue()) {
-				allSame = false;
+			if(jl.getName().compareTo("terrain") != 0 && jl.getName().compareTo("attack") != 0 && jl.getName().compareTo("hurt") != 0 && jl.getName().compareTo("texture") != 0) continue;
+			if(jl.getName().compareTo("texture") == 0) {
+				boolean isLocked = ((HSTextureLabel)jl).locked;
+				if(isLocked != lastLocked.booleanValue()) {
+					allSame = false;
+				}
+				lastLocked = isLocked;
 			}
-			lastLocked = isLocked;
+			else {
+				boolean isLocked = ((HSBoxLabel)jl).locked;
+				if(isLocked != lastLocked.booleanValue()) {
+					allSame = false;
+				}
+				lastLocked = isLocked;
+			}
 		}
 		
 		if(!allSame) {
@@ -356,23 +371,43 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
     	boolean noBoxes = true;
 		//First we must go through the list to get the first "locked" value
     	for(JLabel jl : textureHitboxPane.selectedItems) {
-			if(jl.getName().compareTo("terrain") != 0 && jl.getName().compareTo("attack") != 0 && jl.getName().compareTo("hurt") != 0) continue;
-			lastLocked = ((HSBoxLabel)jl).locked;
-			noBoxes = false;
-			break;
+			if(jl.getName().compareTo("terrain") != 0 && jl.getName().compareTo("attack") != 0 && jl.getName().compareTo("hurt") != 0 && jl.getName().compareTo("texture") != 0) continue;
+			if(jl.getName().compareTo("texture") == 0) {
+				lastLocked = ((HSTextureLabel)jl).locked;
+				noBoxes = false;
+				break;				
+			}
+			else {
+				lastLocked = ((HSBoxLabel)jl).locked;
+				noBoxes = false;
+				break;
+			}
 		}
     	if(noBoxes) return;
 		for(JLabel jl : textureHitboxPane.selectedItems) {
-			if(jl.getName().compareTo("terrain") != 0 && jl.getName().compareTo("attack") != 0 && jl.getName().compareTo("hurt") != 0) continue;
-			boolean isLocked = ((HSBoxLabel)jl).locked;
-			if(isLocked != lastLocked) {
-				allSame = false;
+			if(jl.getName().compareTo("terrain") != 0 && jl.getName().compareTo("attack") != 0 && jl.getName().compareTo("hurt") != 0 && jl.getName().compareTo("texture") != 0) continue;
+			if(jl.getName().compareTo("texture") == 0) {
+				boolean isLocked = ((HSTextureLabel)jl).locked;
+				if(isLocked != lastLocked) {
+					allSame = false;
+				}
+				((HSTextureLabel)jl).locked = !isLocked;
+				lastLocked = isLocked;
+				
+		        //((HSTextureLabel)jl).updateColor();
+		        //repaint();				
 			}
-			((HSBoxLabel)jl).locked = !isLocked;
-			lastLocked = isLocked;
-			
-	        ((HSBoxLabel)jl).updateColor();
-	        repaint();
+			else {
+				boolean isLocked = ((HSBoxLabel)jl).locked;
+				if(isLocked != lastLocked) {
+					allSame = false;
+				}
+				((HSBoxLabel)jl).locked = !isLocked;
+				lastLocked = isLocked;
+				
+		        ((HSBoxLabel)jl).updateColor();
+		        repaint();
+			}
 		}
 		lastLocked = !lastLocked;
 		
