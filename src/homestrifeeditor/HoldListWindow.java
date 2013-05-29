@@ -1558,10 +1558,22 @@ public class HoldListWindow extends JFrame implements ActionListener {
         	}
         }
         else if(currentlyLoadedObject.IsPhysicsObject()) {
-        	
+        	for(File f : files) {
+        		//System.out.println(f.getPath());
+        		PhysicsObjectHold hold = new FighterHold();
+        		hold.textures.add(new HSTexture(f.getAbsolutePath()));
+        		hold.name = f.getName().split("\\.")[0];
+        		holdListPane.addHoldToHoldList(hold, holdListPane.holdList.getSelectedIndex());
+        	}        	
         }
         else if(currentlyLoadedObject.IsTerrainObject()) {
-        	
+        	for(File f : files) {
+        		//System.out.println(f.getPath());
+        		TerrainObjectHold hold = new FighterHold();
+        		hold.textures.add(new HSTexture(f.getAbsolutePath()));
+        		hold.name = f.getName().split("\\.")[0];
+        		holdListPane.addHoldToHoldList(hold, holdListPane.holdList.getSelectedIndex());
+        	}        	
         }
         fileChooser.setMultiSelectionEnabled(false);
 	}
