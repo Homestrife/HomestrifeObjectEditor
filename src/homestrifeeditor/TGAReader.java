@@ -108,10 +108,13 @@ public class TGAReader {
             {
                 return null; //this needs to be RLE, either indexed or truecolor
             }
+        	boolean useInternalPalette = imageType == 9 && palFilePath.isEmpty();
+        	/*
             if(imageType == 9 && palFilePath.isEmpty())
             {
                 return null; //an indexed texture requires a palette
             }
+            */
             file.skip(2); //skip the first two bytes of the color map specification
             file.read(colorMapLengthBytes); colorMapLength = byteArrayToShort(colorMapLengthBytes, bigEndian); //get the length of the color map
             colorMapEntrySize = (byte)file.read(); //get the size of each color map entry
@@ -143,10 +146,6 @@ public class TGAReader {
                 rightAlign = false; //the pixels are left-aligned
             }
             file.skip(imageIDLength); //skip the image ID
-            if(colorMapType != 0)
-            {
-                file.skip(colorMapLength * bytesPerColorMapEntry); //skip the color map data
-            }
             
             //okay, time for the fun part: picking through the image data.
             //it's ALWAYS going to be in RLE format so we can't just grab the raw data.
@@ -158,13 +157,26 @@ public class TGAReader {
             byte[] color = new byte[colorBytesPerPixel]; //create a buffer to hold color data before it gets passed to the imageData
             Color colorObj = null;
             indexBytes = new byte[bytesPerPixel];
-            if(imageType == 9)
+            if(imageType == 9 && !useInternalPalette)
             {
                 palFile = new FileInputStream(palFilePath); //open the palette file, if this is an indexed image
                 palData = new byte[palFile.available()];
                 palFile.read(palData);
                 palFile.close();
             }
+            else if(colorMapType != 0 && !useInternalPalette)
+            {
+                file.skip(colorMapLength * bytesPerColorMapEntry); //skip the color map data
+            }
+            else if(useInternalPalette && colorMapType != 0) {
+            	palData = new byte[colorMapLength * bytesPerColorMapEntry];
+            	file.read(palData);
+            }
+            else if(imageType == 9) {
+            	//We need palettes
+            	return null;
+            }
+            
             while(curPixels < maxPixels)
             {
                 repCount = (byte)file.read(); //get the repetition count field
