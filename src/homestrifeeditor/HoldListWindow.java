@@ -97,6 +97,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         JMenuItem open;
         JMenuItem save;
         JMenuItem saveAs;
+        JMenuItem importAnimation;
         JMenu edit;
         JMenuItem undo;
         JMenuItem redo;
@@ -151,6 +152,10 @@ public class HoldListWindow extends JFrame implements ActionListener {
         saveAs.setActionCommand("saveAs");
         saveAs.addActionListener(this);
         //
+        importAnimation = new JMenuItem("Import Animation");
+        importAnimation.setActionCommand("importAnimation");
+        importAnimation.addActionListener(this);
+        //
         newObject.add(newGraphic);
         newObject.add(newTerrain);
         newObject.add(newPhysicsObject);
@@ -160,6 +165,8 @@ public class HoldListWindow extends JFrame implements ActionListener {
         file.add(open);
         file.add(save);
         file.add(saveAs);
+        file.add(new JSeparator());
+        file.add(importAnimation);
         menuBar.add(file);
         
         edit = new JMenu("Edit");
@@ -1522,6 +1529,48 @@ public class HoldListWindow extends JFrame implements ActionListener {
         
         createDefinitionFile();
     }
+	
+	private void importAnimation() {
+        if(currentlyLoadedObject == null) {
+        	JOptionPane.showMessageDialog(this, "No Object loaded", "Whoops", JOptionPane.ERROR_MESSAGE);
+        	return;
+        }
+        fileChooser.setMultiSelectionEnabled(true);
+        int returnVal = fileChooser.showOpenDialog(this);
+        File[] files;
+        
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            files = fileChooser.getSelectedFiles();
+        } else {
+            return;
+        }
+        
+        if(currentlyLoadedObject.IsFighter()) {
+        	for(File f : files) {
+        		FighterHold hold = new FighterHold();
+        		hold.textures.add(new HSTexture(f.getAbsolutePath()));
+        		hold.name = f.getName().split("\\.")[0];
+        		holdListPane.addHoldToHoldList(hold, holdListPane.holdList.getSelectedIndex());
+        	}
+        }
+        else if(currentlyLoadedObject.IsPhysicsObject()) {
+        	for(File f : files) {
+        		PhysicsObjectHold hold = new FighterHold();
+        		hold.textures.add(new HSTexture(f.getAbsolutePath()));
+        		hold.name = f.getName().split("\\.")[0];
+        		holdListPane.addHoldToHoldList(hold, holdListPane.holdList.getSelectedIndex());
+        	}        	
+        }
+        else if(currentlyLoadedObject.IsTerrainObject()) {
+        	for(File f : files) {
+        		TerrainObjectHold hold = new FighterHold();
+        		hold.textures.add(new HSTexture(f.getAbsolutePath()));
+        		hold.name = f.getName().split("\\.")[0];
+        		holdListPane.addHoldToHoldList(hold, holdListPane.holdList.getSelectedIndex());
+        	}        	
+        }
+        fileChooser.setMultiSelectionEnabled(false);
+	}
 
 	private void undo() {
 		textureHitboxPane.undo();
@@ -1584,6 +1633,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
             case "open": open(); break;
             case "save": save(); break;
             case "saveAs": saveAs(); break;
+            case "importAnimation": importAnimation(); break;
             case "undo": undo(); break;
             case "redo": redo(); break;
             case "cut": cut(); break;
@@ -1596,7 +1646,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
             case "palettes": createPalettesWindow(); break;
         }
     }
-	
+
 	private class KeyDispatcher implements KeyEventDispatcher {
 		@Override
 		public boolean dispatchKeyEvent(KeyEvent e) {
