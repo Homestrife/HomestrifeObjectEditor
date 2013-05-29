@@ -10,6 +10,7 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
@@ -30,6 +31,8 @@ public class HSTextureLabel extends JLabel implements MouseListener, MouseMotion
     private int mouseMoveThreshold;
     private boolean moveBox;
     
+    public boolean locked;
+    
     public HSTextureLabel(TextureHitboxLayeredPane theParent, HSTexture theTexture)
     {
         super();
@@ -40,6 +43,7 @@ public class HSTextureLabel extends JLabel implements MouseListener, MouseMotion
         mouseStartY = 0;
         mouseMoveThreshold = 5;
         moveBox = false;
+        locked = false;
         loadIcon();
         addMouseListener(this);
         addMouseMotionListener(this);
@@ -122,6 +126,7 @@ public class HSTextureLabel extends JLabel implements MouseListener, MouseMotion
     public void mouseDragged(MouseEvent e)
     {
         if(!parent.selectedItems.contains(this)) { return; }
+        if(locked) return;
         
         Component c = e.getComponent();
         
