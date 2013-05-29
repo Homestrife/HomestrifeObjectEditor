@@ -1545,12 +1545,8 @@ public class HoldListWindow extends JFrame implements ActionListener {
             return;
         }
         
-        //TODO: this
-
-        
         if(currentlyLoadedObject.IsFighter()) {
         	for(File f : files) {
-        		//System.out.println(f.getPath());
         		FighterHold hold = new FighterHold();
         		hold.textures.add(new HSTexture(f.getAbsolutePath()));
         		hold.name = f.getName().split("\\.")[0];
@@ -1559,7 +1555,6 @@ public class HoldListWindow extends JFrame implements ActionListener {
         }
         else if(currentlyLoadedObject.IsPhysicsObject()) {
         	for(File f : files) {
-        		//System.out.println(f.getPath());
         		PhysicsObjectHold hold = new FighterHold();
         		hold.textures.add(new HSTexture(f.getAbsolutePath()));
         		hold.name = f.getName().split("\\.")[0];
@@ -1568,7 +1563,6 @@ public class HoldListWindow extends JFrame implements ActionListener {
         }
         else if(currentlyLoadedObject.IsTerrainObject()) {
         	for(File f : files) {
-        		//System.out.println(f.getPath());
         		TerrainObjectHold hold = new FighterHold();
         		hold.textures.add(new HSTexture(f.getAbsolutePath()));
         		hold.name = f.getName().split("\\.")[0];
