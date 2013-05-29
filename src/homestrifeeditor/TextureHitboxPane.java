@@ -15,6 +15,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -52,6 +53,7 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
     private JButton showHideTerrainBoxButton;
     private JButton showHideAttackBoxesButton;
     private JButton showHideHurtBoxesButton;
+    private JButton lockBoxButton;
     
     //Currently cut/copied object
     public ArrayList<JLabel> clipboard;
@@ -91,17 +93,17 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
         terrainBoxPanel.add(terrainBoxLabel);
         terrainBoxPanel.add(terrainBoxCombo);
         
-        JButton addTextureButton = new JButton("+ Tex");
+        JButton addTextureButton = new JButton("+Tex");
         addTextureButton.setActionCommand("addTexture");
         addTextureButton.setToolTipText("Create New Texture");
         addTextureButton.addActionListener(this);
         
-        addAttackBoxButton = new JButton("+ Atk");
+        addAttackBoxButton = new JButton("+Atk");
         addAttackBoxButton.setActionCommand("addAttackBox");
         addAttackBoxButton.setToolTipText("Create New Attack Hitbox");
         addAttackBoxButton.addActionListener(this);
         
-        addHurtBoxButton = new JButton("+ Hrt");
+        addHurtBoxButton = new JButton("+Hrt");
         addHurtBoxButton.setActionCommand("addHurtBox");
         addHurtBoxButton.setToolTipText("Create New Hurt Hitbox");
         addHurtBoxButton.addActionListener(this);
@@ -116,25 +118,30 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
         editButton.setToolTipText("Edit Texture or Hitbox Attributes");
         editButton.addActionListener(this);
         
-        showHideTexturesButton = new JButton("Hide Tex");
+        showHideTexturesButton = new JButton("HideTex");
         showHideTexturesButton.setActionCommand("showHideTex");
         showHideTexturesButton.setToolTipText("Show/Hide Textures");
         showHideTexturesButton.addActionListener(this);
         
-        showHideTerrainBoxButton = new JButton("Hide Ter");
+        showHideTerrainBoxButton = new JButton("HideTer");
         showHideTerrainBoxButton.setActionCommand("showHideTer");
         showHideTerrainBoxButton.setToolTipText("Show/Hide Terrain Box");
         showHideTerrainBoxButton.addActionListener(this);
         
-        showHideAttackBoxesButton = new JButton("Hide Atk");
+        showHideAttackBoxesButton = new JButton("HideAtk");
         showHideAttackBoxesButton.setActionCommand("showHideAtk");
         showHideAttackBoxesButton.setToolTipText("Show/Hide Attack Boxes");
         showHideAttackBoxesButton.addActionListener(this);
         
-        showHideHurtBoxesButton = new JButton("Hide Hrt");
+        showHideHurtBoxesButton = new JButton("HideHrt");
         showHideHurtBoxesButton.setActionCommand("showHideHrt");
         showHideHurtBoxesButton.setToolTipText("Show/Hide Hurt Boxes");
         showHideHurtBoxesButton.addActionListener(this);
+        
+        lockBoxButton = new JButton("Lock");
+        lockBoxButton.setActionCommand("lock");
+        lockBoxButton.setToolTipText("Lock/Unlock selected boxes");
+        lockBoxButton.addActionListener(this);
         
         textureHitboxToolBar = new JToolBar();
         textureHitboxToolBar.setFloatable(false);
@@ -147,6 +154,7 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
         textureHitboxToolBar.add(showHideTerrainBoxButton);
         textureHitboxToolBar.add(showHideAttackBoxesButton);
         textureHitboxToolBar.add(showHideHurtBoxesButton);
+        textureHitboxToolBar.add(lockBoxButton);
         
         JPanel textureHitboxToolPane = new JPanel(new BorderLayout());
         textureHitboxToolPane.add(terrainBoxPanel, BorderLayout.LINE_START);
@@ -280,26 +288,101 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
     private void showHideTexturesButtonClicked()
     {
         textureHitboxPane.showHideTextures();
-        showHideTexturesButton.setText(textureHitboxPane.showTextures ? "Hide Tex" : "Show Tex");
+        showHideTexturesButton.setText(textureHitboxPane.showTextures ? "HideTex" : "ShowTex");
     }
     
     private void showHideTerrainBoxButtonClicked()
     {
         textureHitboxPane.showHideTerrainBox();
-        showHideTerrainBoxButton.setText(textureHitboxPane.showTerrainBox ? "Hide Ter" : "Show Ter");
+        showHideTerrainBoxButton.setText(textureHitboxPane.showTerrainBox ? "HideTer" : "ShowTer");
     }
     
     private void showHideAttackBoxesButtonClicked()
     {
         textureHitboxPane.showHideAttackBoxes();
-        showHideAttackBoxesButton.setText(textureHitboxPane.showAttackBoxes ? "Hide Atk" : "Show Atk");
+        showHideAttackBoxesButton.setText(textureHitboxPane.showAttackBoxes ? "HideAtk" : "ShowAtk");
     }
     
     private void showHideHurtBoxesButtonclicked()
     {
         textureHitboxPane.showHideHurtBoxes();
-        showHideHurtBoxesButton.setText(textureHitboxPane.showHurtBoxes ? "Hide Hrt" : "Show Hrt");
+        showHideHurtBoxesButton.setText(textureHitboxPane.showHurtBoxes ? "HideHrt" : "ShowHrt");
     }
+    
+    public void updateLockButton() {
+    	boolean allSame = true;
+    	String newLabel = "";
+    	
+    	Boolean lastLocked = null;
+		//First we must go through the list to get the first "locked" value
+    	for(JLabel jl : textureHitboxPane.selectedItems) {
+			if(jl.getName().compareTo("terrain") != 0 && jl.getName().compareTo("attack") != 0 && jl.getName().compareTo("hurt") != 0) continue;
+			lastLocked = ((HSBoxLabel)jl).locked;
+			break;
+		}
+    	if(lastLocked == null) return;
+		for(JLabel jl : textureHitboxPane.selectedItems) {
+			if(jl.getName().compareTo("terrain") != 0 && jl.getName().compareTo("attack") != 0 && jl.getName().compareTo("hurt") != 0) continue;
+			boolean isLocked = ((HSBoxLabel)jl).locked;
+			if(isLocked != lastLocked.booleanValue()) {
+				allSame = false;
+			}
+			lastLocked = isLocked;
+		}
+		
+		if(!allSame) {
+			newLabel = "(Un)Lock";
+		}
+		else if(lastLocked) {
+			newLabel = "Unlock";
+		}
+		else if(!lastLocked) {
+			newLabel = "Lock";
+		}
+		
+		lockBoxButton.setText(newLabel);    	
+    }
+    
+    private void lockedButtonClicked() {
+    	boolean allSame = true;
+    	String newLabel = "";
+    	
+    	boolean lastLocked = false;
+    	boolean noBoxes = true;
+		//First we must go through the list to get the first "locked" value
+    	for(JLabel jl : textureHitboxPane.selectedItems) {
+			if(jl.getName().compareTo("terrain") != 0 && jl.getName().compareTo("attack") != 0 && jl.getName().compareTo("hurt") != 0) continue;
+			lastLocked = ((HSBoxLabel)jl).locked;
+			noBoxes = false;
+			break;
+		}
+    	if(noBoxes) return;
+		for(JLabel jl : textureHitboxPane.selectedItems) {
+			if(jl.getName().compareTo("terrain") != 0 && jl.getName().compareTo("attack") != 0 && jl.getName().compareTo("hurt") != 0) continue;
+			boolean isLocked = ((HSBoxLabel)jl).locked;
+			if(isLocked != lastLocked) {
+				allSame = false;
+			}
+			((HSBoxLabel)jl).locked = !isLocked;
+			lastLocked = isLocked;
+			
+	        ((HSBoxLabel)jl).updateColor();
+	        repaint();
+		}
+		lastLocked = !lastLocked;
+		
+		if(!allSame) {
+			newLabel = "(Un)Lock";
+		}
+		else if(lastLocked) {
+			newLabel = "Unlock";
+		}
+		else if(!lastLocked) {
+			newLabel = "Lock";
+		}
+		
+		lockBoxButton.setText(newLabel);
+	}
     
     public void setCorrectTerrainBox()
     {
@@ -335,10 +418,11 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
             case "showHideTer": showHideTerrainBoxButtonClicked(); break;
             case "showHideAtk": showHideAttackBoxesButtonClicked(); break;
             case "showHideHrt": showHideHurtBoxesButtonclicked(); break;
+            case "lock": lockedButtonClicked(); break;
         }
     }
-    
-    @Override
+
+	@Override
     public void itemStateChanged(ItemEvent e)
     {
         if(((Component)e.getSource()).getName().compareTo("terrainBoxCombo") == 0)

@@ -114,6 +114,7 @@ public class TextureHitboxLayeredPane extends JLayeredPane implements MouseListe
         
         selectedItems.add(selectedLabel);
         selectedLabel.setBorder(BorderFactory.createDashedBorder(Color.BLACK));
+        parent.updateLockButton();
         
         repaint();
     }

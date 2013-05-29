@@ -47,6 +47,8 @@ public class HSBoxLabel extends JLabel implements MouseListener, MouseMotionList
     private int mouseMoveThreshold;
     private boolean moveBox;
     
+    public boolean locked;
+    
     public HSBoxLabel(TextureHitboxLayeredPane theParent, HSBox theBox)
     {
         super();
@@ -66,6 +68,7 @@ public class HSBoxLabel extends JLabel implements MouseListener, MouseMotionList
         resizeBoxPressed = null;
         mouseMoveThreshold = 5;
         moveBox = false;
+        locked = false;
         setText("");
         Point pos = parent.parent.getSwingOffset(box.offset.x, box.offset.y);
         setMinimumSize(new Dimension((int)box.width, (int)box.height));
@@ -92,23 +95,41 @@ public class HSBoxLabel extends JLabel implements MouseListener, MouseMotionList
     public void setAsTerrainBox()
     {
         setName("terrain");
-        setBackground(Color.green);
-        setBorder(BorderFactory.createLineBorder(Color.green, 1, false));
+        updateColor();
     }
     
     public void setAsAttackBox()
     {
         setName("attack");
-        setBackground(Color.red);
-        setBorder(BorderFactory.createLineBorder(Color.red, 1, false));
+        updateColor();
     }
     
     public void setAsHurtBox()
     {
         setName("hurt");
-        setBackground(Color.blue);
-        setBorder(BorderFactory.createLineBorder(Color.blue, 1, false));
+        updateColor();
     }
+
+	public void updateColor() {
+        if(getName().compareTo("terrain") == 0)
+        {
+            setBackground(Color.green);
+            setBorder(BorderFactory.createLineBorder(Color.green, 1, false));  	
+        }
+        else if(getName().compareTo("attack") == 0)
+        {
+            setBackground(Color.red);
+            setBorder(BorderFactory.createLineBorder(Color.red, 1, false));
+        }
+        else if(getName().compareTo("hurt") == 0)
+        {
+            setBackground(Color.blue);
+            setBorder(BorderFactory.createLineBorder(Color.blue, 1, false));
+        }
+        if(locked) {
+        	setBackground(getBackground().darker());
+        }
+	}
     
     public void createHitboxAttributesWindow()
     {
@@ -118,7 +139,7 @@ public class HSBoxLabel extends JLabel implements MouseListener, MouseMotionList
     
     @Override
     public void paint(Graphics g) 
-    {
+    {        
         Graphics2D g2 = (Graphics2D) g.create();
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
         
@@ -208,6 +229,7 @@ public class HSBoxLabel extends JLabel implements MouseListener, MouseMotionList
     public void mouseDragged(MouseEvent e)
     {
         if(!parent.selectedItems.contains(this)) { return; }
+        if(locked) return;
         
         final int MINSIZE = 10;
         
