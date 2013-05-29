@@ -30,6 +30,8 @@ public class HSTextureLabel extends JLabel implements MouseListener, MouseMotion
     private int mouseMoveThreshold;
     private boolean moveBox;
     
+    public boolean locked;
+    
     public HSTextureLabel(TextureHitboxLayeredPane theParent, HSTexture theTexture)
     {
         super();
@@ -40,6 +42,7 @@ public class HSTextureLabel extends JLabel implements MouseListener, MouseMotion
         mouseStartY = 0;
         mouseMoveThreshold = 5;
         moveBox = false;
+        locked = false;
         loadIcon();
         addMouseListener(this);
         addMouseMotionListener(this);

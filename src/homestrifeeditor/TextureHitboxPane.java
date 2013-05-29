@@ -261,6 +261,7 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
         }
         
         setAllEnabled(true);
+        updateLockButton();
     }
     
     public void unloadHoldData()
@@ -320,7 +321,11 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
 			lastLocked = ((HSBoxLabel)jl).locked;
 			break;
 		}
-    	if(lastLocked == null) return;
+    	if(lastLocked == null) {
+    		lockBoxButton.setEnabled(false);
+    		return;
+    	}
+		lockBoxButton.setEnabled(true);
 		for(JLabel jl : textureHitboxPane.selectedItems) {
 			if(jl.getName().compareTo("terrain") != 0 && jl.getName().compareTo("attack") != 0 && jl.getName().compareTo("hurt") != 0) continue;
 			boolean isLocked = ((HSBoxLabel)jl).locked;

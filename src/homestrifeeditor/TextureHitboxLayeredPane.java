@@ -73,6 +73,8 @@ public class TextureHitboxLayeredPane extends JLayeredPane implements MouseListe
         
         selectedItems.remove(label);
         
+        parent.updateLockButton();
+        
         repaint();
     }
     
@@ -100,6 +102,8 @@ public class TextureHitboxLayeredPane extends JLayeredPane implements MouseListe
         
         selectedItems.clear();
         
+        parent.updateLockButton();
+        
         repaint();
     }
     
@@ -114,6 +118,7 @@ public class TextureHitboxLayeredPane extends JLayeredPane implements MouseListe
         
         selectedItems.add(selectedLabel);
         selectedLabel.setBorder(BorderFactory.createDashedBorder(Color.BLACK));
+        
         parent.updateLockButton();
         
         repaint();
