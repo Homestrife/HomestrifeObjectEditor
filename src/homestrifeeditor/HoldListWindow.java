@@ -1531,7 +1531,38 @@ public class HoldListWindow extends JFrame implements ActionListener {
     }
 	
 	private void importAnimation() {
-		
+        if(currentlyLoadedObject == null) {
+        	JOptionPane.showMessageDialog(this, "No Object loaded", "Whoops", JOptionPane.ERROR_MESSAGE);
+        	return;
+        }
+        fileChooser.setMultiSelectionEnabled(true);
+        int returnVal = fileChooser.showOpenDialog(this);
+        File[] files;
+        
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            files = fileChooser.getSelectedFiles();
+        } else {
+            return;
+        }
+        
+        //TODO: this
+
+        
+        if(currentlyLoadedObject.IsFighter()) {
+        	for(File f : files) {
+        		//System.out.println(f.getPath());
+        		FighterHold hold = new FighterHold();
+        		//hold.textures.add(new HSTexture(f.getAbsolutePath()));
+        		//holdListPane.addHoldToHoldList(hold, holdListPane.holdList.getSelectedIndex());
+        	}
+        }
+        else if(currentlyLoadedObject.IsPhysicsObject()) {
+        	
+        }
+        else if(currentlyLoadedObject.IsTerrainObject()) {
+        	
+        }
+        fileChooser.setMultiSelectionEnabled(false);
 	}
 
 	private void undo() {

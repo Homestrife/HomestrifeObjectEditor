@@ -258,18 +258,8 @@ public class TextureHitboxLayeredPane extends JLayeredPane implements MouseListe
         setSelected(texLabel, false);
     }
     
-    public void addTexture()
-    {
-        int returnVal = parent.parent.fileChooser.showOpenDialog(null);
-        File file;
-        
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            file = parent.parent.fileChooser.getSelectedFile();
-        } else {
-            return;
-        }
-        
-        HSTexture newTex = new HSTexture(file.getPath());
+    public void addTexture(String path) {        
+        HSTexture newTex = new HSTexture(path);
         
         moveAllTextureDepthsDown();
         newTex.depth = 0;
@@ -279,6 +269,20 @@ public class TextureHitboxLayeredPane extends JLayeredPane implements MouseListe
         parent.hold.textures.add(newTex);
         
         addTexture(newTex);
+    }
+    
+    public void addTexture()
+    {
+        int returnVal = HoldListWindow.fileChooser.showOpenDialog(null);
+        File file;
+        
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            file = HoldListWindow.fileChooser.getSelectedFile();
+        } else {
+            return;
+        }
+        
+        addTexture(file.getPath());
     }
     
     public void addAttackBox(HSBox box)
