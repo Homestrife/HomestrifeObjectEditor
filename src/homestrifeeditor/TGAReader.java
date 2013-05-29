@@ -174,6 +174,7 @@ public class TGAReader {
             }
             else if(imageType == 9) {
             	//We need palettes
+            	file.close();
             	return null;
             }
             

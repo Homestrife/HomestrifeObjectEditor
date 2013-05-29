@@ -1652,14 +1652,20 @@ public class HoldListWindow extends JFrame implements ActionListener {
 		public boolean dispatchKeyEvent(KeyEvent e) {
 			if(e.getID() == KeyEvent.KEY_PRESSED) {
 				if ((e.getKeyCode() == KeyEvent.VK_X) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
-					cut();
+					if(holdListPane.holdList.isFocusOwner())
+						cut();	
 		        }
 				else if ((e.getKeyCode() == KeyEvent.VK_C) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
-					copy();
+					if(holdListPane.holdList.isFocusOwner())
+						copy();
 		        }
 				else if ((e.getKeyCode() == KeyEvent.VK_V) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
-					paste();
+					if(holdListPane.holdList.isFocusOwner())
+						paste();
 		        }
+				else {
+					
+				}
 				/*
 				 * TODO: Fix Control + A
 				else if ((e.getKeyCode() == KeyEvent.VK_A) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {

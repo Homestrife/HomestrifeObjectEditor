@@ -60,6 +60,7 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
     {
         parent = theParent;
         hold = null;
+        clipboard = new ArrayList<JLabel>();
         
         createPaneContents();
     }

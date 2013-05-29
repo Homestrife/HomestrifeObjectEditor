@@ -514,11 +514,12 @@ public class TextureHitboxLayeredPane extends JLayeredPane implements MouseListe
 	}
 
 	public void cut() {
-		parent.clipboard = new ArrayList<JLabel>(selectedItems);
+		copy();
 		removeSelectedItems();
 	}
 
 	public void copy() {
+		parent.clipboard.clear();
 		parent.clipboard = new ArrayList<JLabel>(selectedItems);
 	}
 
