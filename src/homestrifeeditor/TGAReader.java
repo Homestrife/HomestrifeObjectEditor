@@ -159,14 +159,11 @@ public class TGAReader {
             indexBytes = new byte[bytesPerPixel];
             if(imageType == 9 && !useInternalPalette)
             {
+                file.skip(colorMapLength * bytesPerColorMapEntry); //skip the color map data
                 palFile = new FileInputStream(palFilePath); //open the palette file, if this is an indexed image
                 palData = new byte[palFile.available()];
                 palFile.read(palData);
                 palFile.close();
-            }
-            else if(colorMapType != 0 && !useInternalPalette)
-            {
-                file.skip(colorMapLength * bytesPerColorMapEntry); //skip the color map data
             }
             else if(useInternalPalette && colorMapType != 0) {
             	palData = new byte[colorMapLength * bytesPerColorMapEntry];
@@ -176,6 +173,9 @@ public class TGAReader {
             	//We need palettes
             	file.close();
             	return null;
+            }
+            else {
+            	//?
             }
             
             while(curPixels < maxPixels)
