@@ -11,6 +11,7 @@ import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Comparator;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -1546,28 +1547,46 @@ public class HoldListWindow extends JFrame implements ActionListener {
         }
         
         if(currentlyLoadedObject.IsFighter()) {
+        	FighterHold lastHold = null;
         	for(File f : files) {
         		FighterHold hold = new FighterHold();
         		hold.textures.add(new HSTexture(f.getAbsolutePath()));
         		hold.name = f.getName().split("\\.")[0];
         		holdListPane.addHoldToHoldList(hold, holdListPane.holdList.getSelectedIndex());
+        		if(lastHold != null) {
+        			lastHold.nextHold = hold;
+        			lastHold.nextHoldId = hold.id;
+        		}
+        		lastHold = hold;
         	}
         }
         else if(currentlyLoadedObject.IsPhysicsObject()) {
+        	PhysicsObjectHold lastHold = null;
         	for(File f : files) {
         		PhysicsObjectHold hold = new FighterHold();
         		hold.textures.add(new HSTexture(f.getAbsolutePath()));
         		hold.name = f.getName().split("\\.")[0];
         		holdListPane.addHoldToHoldList(hold, holdListPane.holdList.getSelectedIndex());
+        		if(lastHold != null) {
+        			lastHold.nextHold = hold;
+        			lastHold.nextHoldId = hold.id;
+        		}
+        		lastHold = hold;
         	}        	
         }
         else if(currentlyLoadedObject.IsTerrainObject()) {
+        	TerrainObjectHold lastHold = null;
         	for(File f : files) {
         		TerrainObjectHold hold = new FighterHold();
         		hold.textures.add(new HSTexture(f.getAbsolutePath()));
         		hold.name = f.getName().split("\\.")[0];
         		int a = hold.nextHoldId;
         		holdListPane.addHoldToHoldList(hold, holdListPane.holdList.getSelectedIndex());
+        		if(lastHold != null) {
+        			lastHold.nextHold = hold;
+        			lastHold.nextHoldId = hold.id;
+        		}
+        		lastHold = hold;
         	}        	
         }
         fileChooser.setMultiSelectionEnabled(false);
