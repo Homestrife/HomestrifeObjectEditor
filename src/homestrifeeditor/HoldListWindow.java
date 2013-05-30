@@ -1566,6 +1566,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         		TerrainObjectHold hold = new FighterHold();
         		hold.textures.add(new HSTexture(f.getAbsolutePath()));
         		hold.name = f.getName().split("\\.")[0];
+        		int a = hold.nextHoldId;
         		holdListPane.addHoldToHoldList(hold, holdListPane.holdList.getSelectedIndex());
         	}        	
         }

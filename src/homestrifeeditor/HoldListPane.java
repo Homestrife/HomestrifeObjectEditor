@@ -116,12 +116,13 @@ public class HoldListPane extends JPanel implements ActionListener, ListSelectio
         
         if(index >= 0)
         {
-            holdListModel.add(index, hold);
+            holdListModel.add(index + 1, hold);
         }
         else
         {
             holdListModel.addElement(hold);
         }
+        moveIndexDown();
     }
     
     public void addHoldToHoldList(HSObjectHold hold)
@@ -314,6 +315,20 @@ public class HoldListPane extends JPanel implements ActionListener, ListSelectio
     {
         MassShiftWindow window = new MassShiftWindow(this);
         window.setVisible(true);
+    }
+    
+    public void moveIndexUp() {
+        int index = holdList.getSelectedIndex();
+       //if(index - 1 < holdList.getMinSelectionIndex()) return;
+    	holdList.setSelectedIndex(index - 1);
+    	holdList.ensureIndexIsVisible(index - 1);
+    }
+    
+    public void moveIndexDown() {
+        int index = holdList.getSelectedIndex();
+        //if(index + 1 > holdList.getMaxSelectionIndex()) return;
+    	holdList.setSelectedIndex(index + 1);
+    	holdList.ensureIndexIsVisible(index + 1);
     }
     
     @Override
