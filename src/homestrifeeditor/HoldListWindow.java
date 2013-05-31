@@ -49,7 +49,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	
 	public static String BaseWindowTitle = "Homestrife Editor - ";
-    public static int windowWidth = 800;
+    public static int windowWidth = 1000;
     public static int windowHeight = 600;
     
     public static int newObjectTerrainBoxSize = 200;
