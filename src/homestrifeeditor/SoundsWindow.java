@@ -61,7 +61,7 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
     private JLabel soundFile;
     private JButton changeSoundButton;    	private static String changeSoundTooltip = "<html>Load a sound from the hard drive.</html>";
     private JSpinner delaySpinner;       	private static String delayTooltip = "<html>Which frame of this hold the sound triggers on.</html>";
-    private JCheckBox exclusiveCheckBox;	private static String exclusiveToolTip = "<html>If set, this sound cancels out all other exclusive sounds</html>";		
+    private JCheckBox exclusiveCheckBox;	private static String exclusiveToolTip = "<html>If set, this sound cancels out all other exclusive sounds previously produced by this object</html>";		
     private JSpinner percentageSpinner; 	private static String percentageToolTip = "<html>When enabled, the % chance that this sound will play</html>";
     private JCheckBox percentageCheckBox;
     

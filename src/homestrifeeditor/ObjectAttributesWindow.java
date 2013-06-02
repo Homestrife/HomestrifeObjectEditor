@@ -382,10 +382,11 @@ public class ObjectAttributesWindow extends JFrame implements ActionListener, Ch
         applyButton.setEnabled(true);
     }
     
-    public void onHitSounds() {
+    public void onHitSounds()
+    {
         SoundsWindow window = new SoundsWindow(this, hsObject, "onHit");
         window.setVisible(true);
-	}
+    }
     
     @Override
     public void actionPerformed(ActionEvent e)
