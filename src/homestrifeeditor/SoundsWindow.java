@@ -161,7 +161,8 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
         exclusiveCheckBox = new JCheckBox("Exclusive");
         exclusiveCheckBox.setToolTipText(exclusiveToolTip);
         exclusiveCheckBox.setEnabled(false);
-        exclusiveCheckBox.addChangeListener(this);
+        exclusiveCheckBox.setActionCommand("changeExclusive");
+        exclusiveCheckBox.addActionListener(this);
         
         percentageSpinner = new JSpinner(new SpinnerNumberModel(100, 0, 100, 1));
         percentageSpinner.setToolTipText(percentageToolTip);
@@ -171,7 +172,8 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
         percentageCheckBox = new JCheckBox("Play Chance");
         percentageCheckBox.setToolTipText(percentageToolTip);
         percentageCheckBox.setEnabled(false);
-        percentageCheckBox.addChangeListener(this);
+        percentageCheckBox.setActionCommand("changeUsePercentage");
+        percentageCheckBox.addActionListener(this);
         
         /*
         JPanel soundDataPane = new JPanel(new GridLayout(2, gridColumns, gridHorizontalGap, gridVerticalGap));
@@ -346,8 +348,20 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
         changeSoundButton.setEnabled(true);
         delaySpinner.setValue(sound.delay);
         delaySpinner.setEnabled(true);
+        exclusiveCheckBox.setSelected(sound.exclusive);
         exclusiveCheckBox.setEnabled(true);
-        percentageSpinner.setEnabled(true);
+        percentageSpinner.setValue(sound.percentage);
+        
+        if(sound.usePercentage)
+        {
+            percentageSpinner.setEnabled(true);
+        }
+        else
+        {
+            percentageSpinner.setEnabled(false);
+        }
+        
+        percentageCheckBox.setSelected(sound.usePercentage);
         percentageCheckBox.setEnabled(true);
     }
     
@@ -386,7 +400,7 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
         }
     }
     
-    private void exclusivityChanged()
+    private void changeExclusive()
     {
         int index = soundList.getSelectedIndex();
         HSAudio sound = (HSAudio)soundListModel.get(index);
@@ -408,8 +422,16 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
         }
     }
     
-    private void percentageCheckboxChanged()
+    private void changeUsePercentage()
     {
+        int index = soundList.getSelectedIndex();
+        HSAudio sound = (HSAudio)soundListModel.get(index);
+        
+        if(sound != null)
+        {
+            sound.usePercentage = percentageCheckBox.isSelected();
+        }
+        
     	percentageSpinner.setEnabled(percentageCheckBox.isSelected());
     }
     
@@ -421,6 +443,8 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
             case "addSound": addSoundToSoundList(); break;
             case "removeSounds": removeSelectedSoundsFromSoundList(); break;
             case "changeSound": changeSound(); break;
+            case "changeExclusive": changeExclusive(); break;
+            case "changeUsePercentage": changeUsePercentage(); break;
         }
     }
     
@@ -493,11 +517,6 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
         {
             delayChanged();
             percentageChanged();
-        }
-        else if(e.getSource().getClass().getName().contains("JCheckBox"))
-        {
-        	exclusivityChanged();
-            percentageCheckboxChanged();
         }
     }
 }
