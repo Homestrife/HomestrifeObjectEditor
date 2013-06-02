@@ -242,7 +242,7 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
         
         for(HSTexture tex : hold.textures)
         {
-            textureHitboxPane.addTexture(tex);
+            textureHitboxPane.addTexture(tex, false);
         }
         
         if(hold.IsTerrainObjectHold())
@@ -251,12 +251,12 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
             
             for(HSBox box : toHold.attackBoxes)
             {
-                textureHitboxPane.addAttackBox(box);
+                textureHitboxPane.addAttackBox(box, false);
             }
             
             for(HSBox box : toHold.hurtBoxes)
             {
-                textureHitboxPane.addHurtBox(box);
+                textureHitboxPane.addHurtBox(box, false);
             }
         }
         

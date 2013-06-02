@@ -255,11 +255,19 @@ public class TextureHitboxLayeredPane extends JLayeredPane implements MouseListe
     
     public void addTexture(HSTexture tex)
     {
+    	addTexture(tex, true);
+    }
+    
+    public void addTexture(HSTexture tex, boolean addToHold)
+    {
         HSTextureLabel texLabel = new HSTextureLabel(this, tex);
         if(texLabel.getIcon() == null) { return; }
         texLabel.setVisible(showTextures);
         
         add(texLabel, new Integer(tex.depth));
+        
+        if(addToHold)
+            parent.hold.textures.add(tex);
         
         setSelected(texLabel, false);
     }
@@ -271,8 +279,6 @@ public class TextureHitboxLayeredPane extends JLayeredPane implements MouseListe
         newTex.depth = 0;
         newTex.offset.x = 0;
         newTex.offset.y = 0;
-        
-        parent.hold.textures.add(newTex);
         
         addTexture(newTex);
     }
@@ -293,11 +299,19 @@ public class TextureHitboxLayeredPane extends JLayeredPane implements MouseListe
     
     public void addAttackBox(HSBox box)
     {
+        addAttackBox(box, true);
+    }
+    
+    public void addAttackBox(HSBox box, boolean addToHold)
+    {
         HSBoxLabel boxLabel = new HSBoxLabel(this, box);
         boxLabel.setAsAttackBox();
         boxLabel.setVisible(showAttackBoxes);
         
         add(boxLabel, new Integer(box.depth));
+        
+        if(addToHold) 
+            ((TerrainObjectHold)parent.hold).attackBoxes.add(box);
         
         setSelected(boxLabel, false);
     }
@@ -313,18 +327,24 @@ public class TextureHitboxLayeredPane extends JLayeredPane implements MouseListe
         newBox.offset.x = 0;
         newBox.offset.y = 0;
         
-        ((TerrainObjectHold)parent.hold).attackBoxes.add(newBox);
-        
         addAttackBox(newBox);
     }
     
     public void addHurtBox(HSBox box)
+    {
+    	addHurtBox(box, true);
+    }
+    
+    public void addHurtBox(HSBox box, boolean addToHold)
     {
         HSBoxLabel boxLabel = new HSBoxLabel(this, box);
         boxLabel.setAsHurtBox();
         boxLabel.setVisible(showHurtBoxes);
         
         add(boxLabel, new Integer(box.depth));
+        
+        if(addToHold)
+            ((TerrainObjectHold)parent.hold).hurtBoxes.add(box);
         
         setSelected(boxLabel, false);
     }
@@ -339,8 +359,6 @@ public class TextureHitboxLayeredPane extends JLayeredPane implements MouseListe
         newBox.height = defaultHitBoxSize;
         newBox.offset.x = 0;
         newBox.offset.y = 0;
-        
-        ((TerrainObjectHold)parent.hold).hurtBoxes.add(newBox);
         
         addHurtBox(newBox);
     }
