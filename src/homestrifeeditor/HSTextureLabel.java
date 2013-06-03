@@ -11,6 +11,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
+import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
@@ -47,6 +48,13 @@ public class HSTextureLabel extends JLabel implements MouseListener, MouseMotion
         loadIcon();
         addMouseListener(this);
         addMouseMotionListener(this);
+    }
+    
+    public HSTextureLabel(HSTextureLabel l) {
+    	//Woo deep copy
+    	this(l.parent, l.texture);
+    	setBounds(l.getBounds());
+    	texture = new HSTexture(texture);
     }
     
     public void loadIcon()

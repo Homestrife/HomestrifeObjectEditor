@@ -22,4 +22,11 @@ public class HSTexture {
         depth = 0;
         filePath = theFilePath;
     }
+    
+    public HSTexture(HSTexture t) {
+    	//Deep copy
+    	offset = new HSVect2D(t.offset);
+    	depth = t.depth;
+    	filePath = new String(t.filePath);
+    }
 }

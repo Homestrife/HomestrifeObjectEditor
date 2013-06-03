@@ -543,16 +543,11 @@ public class TextureHitboxLayeredPane extends JLayeredPane implements MouseListe
 	}
 
 	public void copy() {
-		parent.clipboard.clear();
-		parent.clipboard = new ArrayList<JLabel>(selectedItems);
-	}
-
-	public void paste() {
-        for(Component c : parent.clipboard)
-        {
+		parent.clipboard = new ArrayList<JLabel>();
+		for(JLabel c : selectedItems) {
             if(c.getName().compareTo("texture") == 0)
             {
-            	addTexture(((HSTextureLabel)c).texture);
+            	parent.clipboard.add(new HSTextureLabel((HSTextureLabel)c));
             }
             else if(c.getName().compareTo("terrain") == 0)
             {
@@ -560,11 +555,33 @@ public class TextureHitboxLayeredPane extends JLayeredPane implements MouseListe
             }
             else if(c.getName().compareTo("attack") == 0)
             {
-            	addAttackBox(((HSBoxLabel)c).box);
+            	parent.clipboard.add(new HSBoxLabel((HSBoxLabel)c));
             }
             else if(c.getName().compareTo("hurt") == 0)
             {
-            	addHurtBox(((HSBoxLabel)c).box);
+            	parent.clipboard.add(new HSBoxLabel((HSBoxLabel)c));
+            }
+		}
+	}
+
+	public void paste() {
+        for(Component c : parent.clipboard)
+        {
+            if(c.getName().compareTo("texture") == 0)
+            {
+            	addTexture((new HSTexture(((HSTextureLabel)c).texture)));
+            }
+            else if(c.getName().compareTo("terrain") == 0)
+            {
+            	//Nothing yet
+            }
+            else if(c.getName().compareTo("attack") == 0)
+            {
+            	addAttackBox(new HSBox(((HSBoxLabel)c).box));
+            }
+            else if(c.getName().compareTo("hurt") == 0)
+            {
+            	addHurtBox(new HSBox(((HSBoxLabel)c).box));
             }
         }
 	}

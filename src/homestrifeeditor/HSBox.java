@@ -21,4 +21,12 @@ public class HSBox {
         offset = new HSVect2D();
         depth = 0;
     }
+    
+    public HSBox(HSBox b) {
+    	//deep copy
+    	height = b.height;
+    	width = b.width;
+    	offset = new HSVect2D(b.offset);
+    	depth = b.depth;
+    }
 }

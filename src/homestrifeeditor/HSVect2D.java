@@ -17,4 +17,10 @@ public class HSVect2D {
         x = 0;
         y = 0;
     }
+    
+    public HSVect2D(HSVect2D v) {
+    	//Thats one deep copy
+    	x = v.x;
+    	y = v.y;
+    }
 }
