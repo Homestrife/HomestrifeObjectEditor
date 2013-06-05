@@ -866,6 +866,9 @@ public class HoldListWindow extends JFrame implements ActionListener {
                             if(hitAudioAttributes.getNamedItem("hitAudioFilePath") != null) filePath = createAbsolutePath(hitAudioAttributes.getNamedItem("hitAudioFilePath").getNodeValue());
                             HSAudio aud = new HSAudio(filePath);
                             if(hitAudioAttributes.getNamedItem("delay") != null) aud.delay = Integer.parseInt(hitAudioAttributes.getNamedItem("delay").getNodeValue());
+                            if(hitAudioAttributes.getNamedItem("exclusive") != null) aud.exclusive = Boolean.parseBoolean(hitAudioAttributes.getNamedItem("exclusive").getNodeValue());
+                            if(hitAudioAttributes.getNamedItem("usePercentage") != null) aud.usePercentage = Boolean.parseBoolean(hitAudioAttributes.getNamedItem("usePercentage").getNodeValue());
+                            if(hitAudioAttributes.getNamedItem("percentage") != null) aud.percentage = Integer.parseInt(hitAudioAttributes.getNamedItem("percentage").getNodeValue());
 
                             toHold.hitAudioList.add(aud);
                         }
