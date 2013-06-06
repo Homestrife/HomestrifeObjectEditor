@@ -571,15 +571,15 @@ public class HoldListWindow extends JFrame implements ActionListener {
         }
         catch(ParserConfigurationException e)
         {
-            
+        	JOptionPane.showMessageDialog(this, e.getMessage(), "Parser Configuration Exception", JOptionPane.ERROR_MESSAGE);    
         }
         catch(SAXException e)
         {
-            
+        	JOptionPane.showMessageDialog(this, e.getMessage(), "SAX Exception", JOptionPane.ERROR_MESSAGE);                
         }
         catch(IOException e)
         {
-            
+        	JOptionPane.showMessageDialog(this, e.getMessage(), "IO Exception", JOptionPane.ERROR_MESSAGE);                
         }
     }
     
@@ -1491,15 +1491,16 @@ public class HoldListWindow extends JFrame implements ActionListener {
         }
         catch(ParserConfigurationException e)
         {
+        	JOptionPane.showMessageDialog(this, e.getMessage(), "Parser Configuration Exception", JOptionPane.ERROR_MESSAGE);  
             
         }
         catch(TransformerConfigurationException e)
         {
-            
+        	JOptionPane.showMessageDialog(this, e.getMessage(), "Transformer Configuration Exception", JOptionPane.ERROR_MESSAGE);
         }
         catch(TransformerException e)
         {
-            
+        	JOptionPane.showMessageDialog(this, e.getMessage(), "Transformer Exception", JOptionPane.ERROR_MESSAGE);   
         }
     }
     

@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -271,11 +272,12 @@ public class TGAReader {
         }
         catch(FileNotFoundException e)
         {
+        	JOptionPane.showMessageDialog(null, e.getMessage(), "File Not Found Exception", JOptionPane.ERROR_MESSAGE);   
             return null;
         }
         catch(IOException e)
         {
-            
+        	JOptionPane.showMessageDialog(null, e.getMessage(), "IO Exception", JOptionPane.ERROR_MESSAGE);               
         }
         
         ImageIcon icon = new ImageIcon(image);
