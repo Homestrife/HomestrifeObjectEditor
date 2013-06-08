@@ -1631,18 +1631,30 @@ public class HoldListWindow extends JFrame implements ActionListener {
     
     private void createObjectAttributesWindow()
     {
+    	if(currentlyLoadedObject == null) {
+    		JOptionPane.showMessageDialog(this, "No Object loaded", "Whoops", JOptionPane.ERROR_MESSAGE);  
+    		return;
+    	}
         ObjectAttributesWindow window = new ObjectAttributesWindow(this, currentlyLoadedObject);
         window.setVisible(true);
     }
     
     private void createEventHoldsWindow()
     {
+    	if(currentlyLoadedObject == null) {
+    		JOptionPane.showMessageDialog(this, "No Object loaded", "Whoops", JOptionPane.ERROR_MESSAGE);  
+    		return;
+    	}
         EventHoldsWindow window = new EventHoldsWindow(this, currentlyLoadedObject);
         window.setVisible(true);
     }
     
     private void createPalettesWindow()
     {
+    	if(currentlyLoadedObject == null) {
+    		JOptionPane.showMessageDialog(this, "No Object loaded", "Whoops", JOptionPane.ERROR_MESSAGE);  
+    		return;
+    	}
         PalettesWindow window = new PalettesWindow(this);
         window.setVisible(true);
     }
