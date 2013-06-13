@@ -38,7 +38,7 @@ public class PalettesWindow extends JFrame implements ActionListener, ItemListen
     
     private HoldListWindow parent;
     
-    private JComboBox paletteCombo;
+    private JComboBox<?> paletteCombo;
     
     private JButton applyButton;
     private JLabel pathLabel;
@@ -58,7 +58,7 @@ public class PalettesWindow extends JFrame implements ActionListener, ItemListen
     private void createWindowContents()
     {
         JLabel paletteLabel = new JLabel("Current Palette");
-        paletteCombo = new JComboBox(parent.currentlyLoadedObject.palettes);
+        paletteCombo = new JComboBox<Object>(parent.currentlyLoadedObject.palettes.toArray());
         paletteCombo.setRenderer(new PaletteComboBoxRenderer());
         paletteCombo.setSelectedIndex(parent.currentlyLoadedObject.curPalette);
         paletteCombo.addItemListener(this);

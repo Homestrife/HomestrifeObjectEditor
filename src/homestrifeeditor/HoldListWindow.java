@@ -433,8 +433,10 @@ public class HoldListWindow extends JFrame implements ActionListener {
                     String type = Files.probeContentType(p.toPath());
                     if(type != null || !p.getName().endsWith(".hsp")) { continue; }
                     //if the type is null but the file ends with .hsp then it's PROBABLY a homestrife palette
-                    
-                    newObject.palettes[paletteIndex].palFilePath = p.getAbsolutePath();
+                    HSPalette pal = new HSPalette();
+                    pal.palFilePath = p.getAbsolutePath();
+                    newObject.palettes.add(pal);
+                    //newObject.palettes[paletteIndex].palFilePath = p.getAbsolutePath();
                     
                     paletteIndex++;
                     
@@ -468,7 +470,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                     else { newHold = new HSObjectHold(); }
                     
                     //see if we can actually load the file as a texture
-                    ImageIcon icon = TGAReader.loadTGA(h.getAbsolutePath(), newObject.palettes[0].palFilePath);
+                    ImageIcon icon = TGAReader.loadTGA(h.getAbsolutePath(), newObject.palettes.size() > 0 ? newObject.palettes.get(0).palFilePath : "");
                     
                     if(icon == null) { continue; } //whoops
                     
@@ -896,6 +898,16 @@ public class HoldListWindow extends JFrame implements ActionListener {
             if(objectAttributes.getNamedItem("lifetime") != null) loadObject.lifetime = Integer.parseInt(objectAttributes.getNamedItem("lifetime").getNodeValue());
             
             //get palettes
+            for(int i=1;;i++) {
+            	if(objectAttributes.getNamedItem("palette" + i + "FilePath") == null) {
+            		break;
+            	}
+            	HSPalette pal = new HSPalette();
+            	pal.palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette" + i + "FilePath").getNodeValue());
+            	pal.name = "Palette " + i;
+            	loadObject.palettes.add(pal);
+            }
+            /*
             if(objectAttributes.getNamedItem("palette1FilePath") != null) loadObject.palettes[0].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette1FilePath").getNodeValue());
             if(objectAttributes.getNamedItem("palette2FilePath") != null) loadObject.palettes[1].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette2FilePath").getNodeValue());
             if(objectAttributes.getNamedItem("palette3FilePath") != null) loadObject.palettes[2].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette3FilePath").getNodeValue());
@@ -906,6 +918,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
             if(objectAttributes.getNamedItem("palette8FilePath") != null) loadObject.palettes[7].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette8FilePath").getNodeValue());
             if(objectAttributes.getNamedItem("palette9FilePath") != null) loadObject.palettes[8].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette9FilePath").getNodeValue());
             if(objectAttributes.getNamedItem("palette10FilePath") != null) loadObject.palettes[9].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette10FilePath").getNodeValue());
+            */
             
             //get hs object event holds
             if(eventHoldsAttributes.getNamedItem("lifetimeDeath") != null)
