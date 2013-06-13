@@ -60,7 +60,12 @@ public class PalettesWindow extends JFrame implements ActionListener, ItemListen
         JLabel paletteLabel = new JLabel("Current Palette");
         paletteCombo = new JComboBox<Object>(parent.currentlyLoadedObject.palettes.toArray());
         paletteCombo.setRenderer(new PaletteComboBoxRenderer());
-        paletteCombo.setSelectedIndex(parent.currentlyLoadedObject.curPalette);
+        if(paletteCombo.getItemCount() > 0) {
+        	paletteCombo.setSelectedIndex(parent.currentlyLoadedObject.curPalette);
+        }
+        else {
+        	
+        }
         paletteCombo.addItemListener(this);
         
         JButton loadPaletteButton = new JButton("Load...");
@@ -113,7 +118,11 @@ public class PalettesWindow extends JFrame implements ActionListener, ItemListen
     
     private void setPathLabelText()
     {
-        if(((HSPalette)paletteCombo.getSelectedItem()).palFilePath.isEmpty())
+    	if(paletteCombo.getItemCount() == 0)
+        {
+            pathLabel.setText("NO FILE SELECTED");
+        }
+    	else if(((HSPalette)paletteCombo.getSelectedItem()).palFilePath.isEmpty())
         {
             pathLabel.setText("NO FILE SELECTED");
         }

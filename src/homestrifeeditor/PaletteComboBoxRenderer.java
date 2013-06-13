@@ -31,7 +31,10 @@ public class PaletteComboBoxRenderer extends JLabel implements ListCellRenderer 
         
         
         String s;
-        s = ((HSPalette)value).name;
+        if(value != null)
+        	s = ((HSPalette)value).name;
+        else
+        	s = "NONE";
         
         setText(s);
 
