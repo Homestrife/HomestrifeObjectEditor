@@ -23,6 +23,7 @@ public class TerrainObjectHold extends HSObjectHold {
     public int blockstun;
     public HSVect2D force;
     public boolean trips;
+    public boolean resetHits;
     
     public TerrainObjectHold()
     {
@@ -40,6 +41,7 @@ public class TerrainObjectHold extends HSObjectHold {
         blockstun = 0;
         force = new HSVect2D();
         trips = false;
+        resetHits = false;
     }
     
     @Override

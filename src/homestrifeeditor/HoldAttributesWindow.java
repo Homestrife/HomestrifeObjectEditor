@@ -37,7 +37,7 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
 	
 	private static int windowWidth = 800;
     private static int windowHeightGeneral = 600;
-    private static int windowHeightTerrain = 360;
+    private static int windowHeightTerrain = 410;
     private static int windowBorderBuffer = 10;
     
     private static int gridWidth = 650;
@@ -62,7 +62,9 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
     
     private JSpinner forceXSpinner;         private static String forceXTooltip = "<html>When another physics object is struck by one of this object's<br>attack boxes, its X velocity is set to this value.</html>";
     private JSpinner forceYSpinner;         private static String forceYTooltip = "<html>When another physics object is struck by one of this object's<br>attack boxes, its Y velocity is set to this value.</html>";
-    private JCheckBox tripsCheck;           private static String tripsTooltip = "<html>If checked, another fighter will fall prone if struck by one of this object's attack boxes.</html>";
+    private JCheckBox tripsCheck;           private static String tripsTooltip = "<html>If checked, another fighter will fall prone if struck by one of<br>this object's attack boxes.</html>";
+    
+    private JCheckBox resetHitsCheck;        private static String resetHitsTooltip = "<html>If checked, further attack boxes in this animation will strike<br>objects that have already been struck.</html>";
     
     private JComboBox<?> blockabilityCombo;    private static String blockabilityTooltip = "<html>Unblockable: This object's attack boxes cannot be blocked.<br>High: This object's attack boxes must be blocked while standing or jumping.<br>Low: This object's attack boxes must be blocked while crouching or jumping.<br>Mid: This object's attack boxes can be blocked while crouching, standing, or jumping.</html>";
     private JCheckBox directionBlockCheck;  private static String directionBlockTooltip = "<html>If checked, another figher must be facing in the opposite<br>direction that this object is facing in order to block this<br>object's attack boxes.<br>Normally, whether this object's attack boxes must be blocked while<br>facing left or right is determined by which side of the defending<br>fighter this object is on, regardless of which way this object is facing.</html>";
@@ -227,14 +229,21 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             tripsCheck.setToolTipText(tripsTooltip);
             tripsCheck.setActionCommand("fieldChanged");
             tripsCheck.addActionListener(this);
+            
+            JLabel resetHitsLabel = new JLabel("Reset Hits");
+            resetHitsLabel.setToolTipText(tripsTooltip);
+            resetHitsCheck = new JCheckBox("", toHold.resetHits);
+            resetHitsCheck.setToolTipText(tripsTooltip);
+            resetHitsCheck.setActionCommand("fieldChanged");
+            resetHitsCheck.addActionListener(this);
         
             hitSoundsButton = new JButton("Hit Sounds...");
             hitSoundsButton.setToolTipText(hitSoundsTooltip);
             hitSoundsButton.setActionCommand("hitSoundsButton");
             hitSoundsButton.addActionListener(this);
 
-            terrainInterface = new JPanel(new GridLayout(5, gridColumns, gridHorizontalGap, gridVerticalGap));
-            terrainInterface.setSize(gridWidth, gridRowHeight * 5);
+            terrainInterface = new JPanel(new GridLayout(6, gridColumns, gridHorizontalGap, gridVerticalGap));
+            terrainInterface.setSize(gridWidth, gridRowHeight * 6);
             terrainInterface.setBorder(new TitledBorder("Attack Box Attributes"));
             terrainInterface.add(damageLabel);
             terrainInterface.add(damageSpinner);
@@ -250,12 +259,16 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             terrainInterface.add(forceYSpinner);
             terrainInterface.add(tripsLabel);
             terrainInterface.add(tripsCheck);
+            terrainInterface.add(resetHitsLabel);
+            terrainInterface.add(resetHitsCheck);
             terrainInterface.add(directionBlockLabel);
             terrainInterface.add(directionBlockCheck);
             terrainInterface.add(reverseBlockLabel);
             terrainInterface.add(reverseBlockCheck);
             terrainInterface.add(new JLabel(""));
             terrainInterface.add(hitSoundsButton);
+            terrainInterface.add(new JLabel(""));
+            terrainInterface.add(new JLabel(""));
             setTerrainInterfaceEnabled();
 
             holdAttributesPane.add(terrainInterface);
@@ -320,6 +333,7 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             ((TerrainObjectHold)hold).force.x = (float)forceXSpinner.getValue();
             ((TerrainObjectHold)hold).force.y = (float)forceYSpinner.getValue();
             ((TerrainObjectHold)hold).trips = tripsCheck.isSelected();
+            ((TerrainObjectHold)hold).resetHits = resetHitsCheck.isSelected();
             ((TerrainObjectHold)hold).blockability = (Blockability)blockabilityCombo.getSelectedItem();
             ((TerrainObjectHold)hold).horizontalDirectionBasedBlock = directionBlockCheck.isSelected();
             ((TerrainObjectHold)hold).reversedHorizontalBlock = reverseBlockCheck.isSelected();
