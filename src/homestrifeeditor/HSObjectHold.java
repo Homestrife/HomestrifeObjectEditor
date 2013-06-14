@@ -15,6 +15,7 @@ public class HSObjectHold {
     public HSObjectHold nextHold;
     public ArrayList<HSTexture> textures;
     public ArrayList<HSAudio> audioList;
+    public ArrayList<SpawnObject> spawnObjects;
     public int duration;
     public int id;
     public int nextHoldId;
@@ -25,6 +26,7 @@ public class HSObjectHold {
         nextHold = null;
         textures = new ArrayList<HSTexture>();
         audioList = new ArrayList<HSAudio>();
+        spawnObjects = new ArrayList<SpawnObject>();
         duration = 4;
         id = 0;
         nextHoldId = 0;

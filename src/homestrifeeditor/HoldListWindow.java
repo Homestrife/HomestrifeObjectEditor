@@ -749,6 +749,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                 NodeList holdSecs = hold.getChildNodes();
                 Node textures = null;
                 Node audioList = null;
+                Node spawnObjects = null;
                 Node attackBoxes = null;
                 Node hurtBoxes = null;
                 Node hitAudioList = null;
@@ -758,6 +759,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
 
                     if(holdSec.getNodeName().compareTo("Textures") == 0) textures = holdSec;
                     if(holdSec.getNodeName().compareTo("AudioList") == 0) audioList = holdSec;
+                    if(holdSec.getNodeName().compareTo("SpawnObjects") == 0) spawnObjects = holdSec;
                     if(holdSec.getNodeName().compareTo("AttackBoxes") == 0) attackBoxes = holdSec;
                     if(holdSec.getNodeName().compareTo("HurtBoxes") == 0) hurtBoxes = holdSec;
                     if(holdSec.getNodeName().compareTo("HitAudioList") == 0) hitAudioList = holdSec;
@@ -810,6 +812,31 @@ public class HoldListWindow extends JFrame implements ActionListener {
                         if(audioAttributes.getNamedItem("percentage") != null) aud.percentage = Integer.parseInt(audioAttributes.getNamedItem("percentage").getNodeValue());
                         
                         loadHold.audioList.add(aud);
+                    }
+                }
+                
+                //get spawn objects
+                if(spawnObjects != null)
+                {
+                    NodeList spawnObjectsList = spawnObjects.getChildNodes();
+                    for(int j = 0; j < spawnObjectsList.getLength(); j++)
+                    {
+                        if(spawnObjectsList.item(j).getNodeName().compareTo("SpawnObject") != 0) { continue; }
+                        NamedNodeMap spawnObjectAttributes = spawnObjectsList.item(j).getAttributes();
+                        
+                        String filePath = "";
+                        if(spawnObjectAttributes.getNamedItem("audioFilePath") != null) filePath = createAbsolutePath(spawnObjectAttributes.getNamedItem("definitionFilePath").getNodeValue());
+                        SpawnObject sob = new SpawnObject(filePath);
+                        if(spawnObjectAttributes.getNamedItem("delay") != null) sob.delay = Integer.parseInt(spawnObjectAttributes.getNamedItem("delay").getNodeValue());
+                        if(spawnObjectAttributes.getNamedItem("number") != null) sob.number = Integer.parseInt(spawnObjectAttributes.getNamedItem("number").getNodeValue());
+                        if(spawnObjectAttributes.getNamedItem("parentOffsetX") != null) sob.parentOffset.x = Float.parseFloat(spawnObjectAttributes.getNamedItem("parentOffsetX").getNodeValue());
+                        if(spawnObjectAttributes.getNamedItem("parentOffsetY") != null) sob.parentOffset.y = Float.parseFloat(spawnObjectAttributes.getNamedItem("parentOffsetY").getNodeValue());
+                        if(spawnObjectAttributes.getNamedItem("velocityX") != null) sob.vel.x = Float.parseFloat(spawnObjectAttributes.getNamedItem("velocityX").getNodeValue());
+                        if(spawnObjectAttributes.getNamedItem("velocityY") != null) sob.vel.y = Float.parseFloat(spawnObjectAttributes.getNamedItem("velocityY").getNodeValue());
+                        if(spawnObjectAttributes.getNamedItem("followParent") != null) sob.followParent = Boolean.parseBoolean(spawnObjectAttributes.getNamedItem("followParent").getNodeValue());
+                        if(spawnObjectAttributes.getNamedItem("collideParent") != null) sob.collideParent = Boolean.parseBoolean(spawnObjectAttributes.getNamedItem("collideParent").getNodeValue());
+                        
+                        loadHold.spawnObjects.add(sob);
                     }
                 }
                 
@@ -1539,6 +1566,26 @@ public class HoldListWindow extends JFrame implements ActionListener {
                         audioList.appendChild(audio);
                     }
                     hold.appendChild(audioList);
+                }
+                
+                //get spawn objects
+                if(!h.spawnObjects.isEmpty())
+                {
+                    Element spawnObjects = doc.createElement("SpawnObjects");
+                    for(SpawnObject s : h.spawnObjects)
+                    {
+                        Element spawnObject = doc.createElement("SpawnObject");
+                        spawnObject.setAttribute("delay", "" + s.delay);
+                        spawnObject.setAttribute("number", "" + s.number);
+                        spawnObject.setAttribute("parentOffsetX", "" + s.parentOffset.x);
+                        spawnObject.setAttribute("parentOffsetY", "" + s.parentOffset.y);
+                        spawnObject.setAttribute("velocityX", "" + s.vel.x);
+                        spawnObject.setAttribute("velocityY", "" + s.vel.y);
+                        spawnObject.setAttribute("followParent", "" + s.followParent);
+                        spawnObject.setAttribute("collideParent", "" + s.collideParent);
+                        spawnObjects.appendChild(spawnObject);
+                    }
+                    hold.appendChild(spawnObjects);
                 }
                 
                 holds.appendChild(hold);

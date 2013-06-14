@@ -36,7 +36,7 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
 	private static final long serialVersionUID = 1L;
 	
 	private static int windowWidth = 800;
-    private static int windowHeightGeneral = 600;
+    private static int windowHeightGeneral = 650;
     private static int windowHeightTerrain = 410;
     private static int windowBorderBuffer = 10;
     
@@ -53,6 +53,7 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
     private JSpinner durationSpinner;       private static String durationTooltip = "<html>How many frames this hold lasts. The game runs at 60 frames per second.</html>";
     private JComboBox<?> nextHoldCombo;        private static String nextHoldTooltip = "<html>Which hold this object should switch to once this hold's duration expires.<br>If this is set to NONE, the engine will determine the next hold some other way.</html>";
     private JButton holdSoundsButton;       private static String holdSoundsTooltip = "<html>Add/Edit sounds that occur in this hold</html>";
+    private JButton spawnObjectsButton;     private static String spawnObjectsTooltip = "<html>Add/Edit objects that are spawned in this hold</html>";
     
     private JCheckBox changeAttackBoxAttributesCheck; private static String changeAttackBoxAttributesTooltip = "<html>If this is unchecked, this hold will inherit the attack<br/>attributes of any hold that has this hold as its<br/>next hold.</html>";
     
@@ -134,8 +135,13 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         holdSoundsButton.setActionCommand("holdSoundsButton");
         holdSoundsButton.addActionListener(this);
         
-        JPanel graphicInterface = new JPanel(new GridLayout(2, gridColumns, gridHorizontalGap, gridVerticalGap));
-        graphicInterface.setSize(gridWidth, gridRowHeight * 2);
+        spawnObjectsButton = new JButton("Spawn Objects...");
+        spawnObjectsButton.setToolTipText(spawnObjectsTooltip);
+        spawnObjectsButton.setActionCommand("spawnObjectsButton");
+        spawnObjectsButton.addActionListener(this);
+        
+        JPanel graphicInterface = new JPanel(new GridLayout(3, gridColumns, gridHorizontalGap, gridVerticalGap));
+        graphicInterface.setSize(gridWidth, gridRowHeight * 3);
         graphicInterface.setBorder(new TitledBorder("General Attributes"));
         graphicInterface.add(nameLabel);
         graphicInterface.add(nameField);
@@ -145,6 +151,10 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         graphicInterface.add(nextHoldCombo);
         graphicInterface.add(new JLabel(""));
         graphicInterface.add(holdSoundsButton);
+        graphicInterface.add(new JLabel(""));
+        graphicInterface.add(spawnObjectsButton);
+        graphicInterface.add(new JLabel(""));
+        graphicInterface.add(new JLabel(""));
         
         JPanel holdAttributesPane = new JPanel();
         holdAttributesPane.setLayout(new BoxLayout(holdAttributesPane, BoxLayout.Y_AXIS));
@@ -356,6 +366,12 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         window.setVisible(true);
     }
     
+    private void spawnObjectsButtonPressed()
+    {
+        SpawnObjectsWindow window = new SpawnObjectsWindow(this, hold);
+        window.setVisible(true);
+    }
+    
     private void okButtonPressed()
     {
         applyChanges();
@@ -395,6 +411,7 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         switch(e.getActionCommand())
         {
             case "holdSoundsButton": holdSoundsButtonPressed(); break;
+            case "spawnObjectsButton": spawnObjectsButtonPressed(); break;
             case "okButton": okButtonPressed(); break;
             case "closeButton": closeButtonPressed(); break;
             case "applyButton": applyButtonPressed(); break;
