@@ -68,6 +68,11 @@ public class PalettesWindow extends JFrame implements ActionListener, ItemListen
         }
         paletteCombo.addItemListener(this);
         
+        JButton newPaletteButton = new JButton("New...");
+        newPaletteButton.addActionListener(this);
+        newPaletteButton.setActionCommand("newButton");
+        newPaletteButton.setEnabled(false);
+        
         JButton loadPaletteButton = new JButton("Load...");
         loadPaletteButton.addActionListener(this);
         loadPaletteButton.setActionCommand("loadButton");
@@ -83,6 +88,7 @@ public class PalettesWindow extends JFrame implements ActionListener, ItemListen
         paletteInterface.setSize(gridWidth, gridRowHeight);
         paletteInterface.add(paletteLabel);
         paletteInterface.add(paletteCombo);
+        paletteInterface.add(newPaletteButton);
         paletteInterface.add(loadPaletteButton);
         paletteInterface.add(clearPaletteButton);
         
@@ -162,6 +168,10 @@ public class PalettesWindow extends JFrame implements ActionListener, ItemListen
         applyChanges();
     }
     
+    private void newButtonPressed() {
+    	
+    }
+    
     private void loadButtonPressed()
     {
         JFileChooser fc = new JFileChooser();
@@ -198,6 +208,7 @@ public class PalettesWindow extends JFrame implements ActionListener, ItemListen
             case "okButton": okButtonPressed(); break;
             case "closeButton": closeButtonPressed(); break;
             case "applyButton": applyButtonPressed(); break;
+            case "newButton": newButtonPressed(); break;
             case "loadButton": loadButtonPressed(); break;
             case "clearButton": clearButtonPressed(); break;
         }
