@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Comparator;
 
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JComponent;
@@ -60,6 +61,8 @@ public class HoldListWindow extends JFrame implements ActionListener {
     public HSObject currentlyLoadedObject;
     
     public String workingDirectory;
+    
+    private JMenu palettesMenu;
     
     //File chooser is declared at the class level so that it remembers last folder location..
     public static JFileChooser fileChooser;
@@ -229,8 +232,12 @@ public class HoldListWindow extends JFrame implements ActionListener {
         palettes.setActionCommand("palettes");
         object.add(objectAttributes);
         object.add(eventHolds);
-        object.add(palettes);
+        //object.add(palettes);
         menuBar.add(object);
+        
+        palettesMenu = new JMenu("Palettes");
+        menuBar.add(palettesMenu);
+        updatePalettesMenu();        
         
         help = new JMenu("Help");
         helpContent = new JMenuItem("Help Content");
@@ -326,6 +333,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         holdListPane.loadObjectHolds(currentlyLoadedObject);
         textureHitboxPane.resetScrollBars();
         textureHitboxPane.setCorrectTerrainBox();
+        updatePalettesMenu();
     }
     
     public void newGraphic()
@@ -335,6 +343,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         HSObjectHold newHold = new HSObjectHold();
         currentlyLoadedObject.holds.add(newHold);
         newObject();
+        updatePalettesMenu();
     }
     
     public void newTerrain()
@@ -344,6 +353,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         TerrainObjectHold newHold = new TerrainObjectHold();
         currentlyLoadedObject.holds.add(newHold);
         newObject();
+        updatePalettesMenu();
     }
     
     public void newPhysicsObject()
@@ -353,6 +363,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         PhysicsObjectHold newHold = new PhysicsObjectHold();
         currentlyLoadedObject.holds.add(newHold);
         newObject();
+        updatePalettesMenu();
     }
     
     public void newFighter()
@@ -363,6 +374,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         currentlyLoadedObject.holds.add(newHold);
         
         newObject();
+        updatePalettesMenu();
     }
     
     private void generate()
@@ -570,6 +582,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
             newObject();
             
             workingDirectory = file.getParent();
+            updatePalettesMenu();
         }
         catch(ParserConfigurationException e)
         {
@@ -1105,6 +1118,8 @@ public class HoldListWindow extends JFrame implements ActionListener {
             
             setCurrentlyLoadedObject(loadObject);
             newObject();
+            
+            updatePalettesMenu();
         }
         catch(ParserConfigurationException e)
         {
@@ -1670,6 +1685,36 @@ public class HoldListWindow extends JFrame implements ActionListener {
     	}
         PalettesWindow window = new PalettesWindow(this);
         window.setVisible(true);
+    }
+    int curPal;
+    public void updatePalettesMenu() {
+    	palettesMenu.removeAll();
+		JMenuItem menuItem;
+    	if(currentlyLoadedObject == null || currentlyLoadedObject.palettes.size() == 0) {
+    		palettesMenu.add(new JMenuItem("NONE"));
+    	}
+    	else {
+	    	curPal = 0;
+	    	for(HSPalette hsp : currentlyLoadedObject.palettes) {
+	    		//Set each palette menu item to load the correct palette when clicked
+	    		menuItem = new JMenuItem(new AbstractAction(hsp.name) {
+					private static final long serialVersionUID = 1L;
+					int palNum = curPal;
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+				        currentlyLoadedObject.curPalette = palNum;
+				        textureHitboxPane.reloadTextures();	
+					}
+				});
+	    		palettesMenu.add(menuItem);
+	    		curPal++;
+	    	}
+    	}
+    	palettesMenu.add(new JSeparator());
+    	menuItem = new JMenuItem("Edit Palettes");
+    	menuItem.setActionCommand("palettes");
+    	menuItem.addActionListener(this);
+    	palettesMenu.add(menuItem);
     }
     
     @Override
