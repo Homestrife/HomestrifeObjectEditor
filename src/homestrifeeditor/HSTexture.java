@@ -4,9 +4,6 @@
  */
 package homestrifeeditor;
 
-import java.awt.image.BufferedImage;
-import javax.swing.ImageIcon;
-
 /**
  *
  * @author Darlos9D

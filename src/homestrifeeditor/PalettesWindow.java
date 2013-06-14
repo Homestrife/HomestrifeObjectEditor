@@ -19,14 +19,15 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
 
 /**
  *
  * @author Darlos9D
  */
 public class PalettesWindow extends JFrame implements ActionListener, ItemListener {
-    private static int windowWidth = 720;
+	private static final long serialVersionUID = 1L;
+	
+	private static int windowWidth = 720;
     private static int windowHeight = 140;
     private static int windowBorderBuffer = 10;
     
@@ -38,7 +39,7 @@ public class PalettesWindow extends JFrame implements ActionListener, ItemListen
     
     private HoldListWindow parent;
     
-    private JComboBox<?> paletteCombo;
+    private JComboBox<Object> paletteCombo;
     
     private JButton applyButton;
     private JLabel pathLabel;

@@ -25,7 +25,9 @@ import javax.swing.event.ChangeListener;
  * @author Darlos9D
  */
 public class TextureAttributesWindow extends JFrame implements ActionListener, ChangeListener {
-    private static int windowWidth = 150;
+	private static final long serialVersionUID = 1L;
+	
+	private static int windowWidth = 150;
     private static int windowHeight = 140;
     private static int windowBorderBuffer = 10;
     

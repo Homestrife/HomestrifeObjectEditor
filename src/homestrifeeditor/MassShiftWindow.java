@@ -6,7 +6,6 @@ package homestrifeeditor;
 
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
@@ -25,7 +24,9 @@ import javax.swing.event.ChangeListener;
  * @author Darlos9D
  */
 public class MassShiftWindow extends JFrame implements ActionListener, ChangeListener {
-    private static int windowWidth = 150;
+	private static final long serialVersionUID = 1L;
+	
+	private static int windowWidth = 150;
     private static int windowHeight = 140;
     private static int windowBorderBuffer = 10;
     

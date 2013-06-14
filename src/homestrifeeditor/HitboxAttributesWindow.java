@@ -17,7 +17,6 @@ import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -26,7 +25,9 @@ import javax.swing.event.ChangeListener;
  * @author Darlos9D
  */
 public class HitboxAttributesWindow extends JFrame implements ActionListener, ChangeListener {
-    private static int windowWidth = 300;
+	private static final long serialVersionUID = 1L;
+	
+	private static int windowWidth = 300;
     private static int windowHeight = 140;
     private static int windowBorderBuffer = 10;
     

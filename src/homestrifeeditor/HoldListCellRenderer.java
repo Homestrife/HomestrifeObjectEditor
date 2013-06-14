@@ -16,7 +16,9 @@ import javax.swing.JList;
  * @author Darlos9D
  */
 public class HoldListCellRenderer extends JLabel implements ListCellRenderer<Object> {
-    @Override
+	private static final long serialVersionUID = 1L;
+
+	@Override
     public Component getListCellRendererComponent(
         JList<?> list,           // the list
         Object value,            // value to display
