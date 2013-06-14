@@ -101,11 +101,27 @@ public class FighterEventHolds {
     public FighterHold attackLightDownGround;
     public FighterHold attackLightUpGround;
     public FighterHold attackLightForwardGround;
+    public FighterHold attackLightQCFGround;
     public FighterHold attackLightNeutralAir;
     public FighterHold attackLightDownAir;
     public FighterHold attackLightUpAir;
     public FighterHold attackLightForwardAir;
     public FighterHold attackLightBackwardAir;
+    public FighterHold attackLightQCFAir;
+    
+    public FighterHold attackHeavyNeutralGround;
+    public FighterHold attackHeavyDownGround;
+    public FighterHold attackHeavyUpGround;
+    public FighterHold attackHeavyForwardGround;
+    public FighterHold attackHeavyQCFGround;
+    public FighterHold attackHeavyNeutralAir;
+    public FighterHold attackHeavyDownAir;
+    public FighterHold attackHeavyUpAir;
+    public FighterHold attackHeavyForwardAir;
+    public FighterHold attackHeavyBackwardAir;
+    public FighterHold attackHeavyQCFAir;
+    
+    public FighterHold knockout;
     
     public FighterEventHolds()
     {
@@ -190,10 +206,26 @@ public class FighterEventHolds {
         attackLightDownGround = null;
         attackLightUpGround = null;
         attackLightForwardGround = null;
+        attackLightQCFGround = null;
         attackLightNeutralAir = null;
         attackLightDownAir = null;
         attackLightUpAir = null;
         attackLightForwardAir = null;
         attackLightBackwardAir = null;
+        attackLightQCFAir = null;
+    
+        attackHeavyNeutralGround = null;
+        attackHeavyDownGround = null;
+        attackHeavyUpGround = null;
+        attackHeavyForwardGround = null;
+        attackHeavyQCFGround = null;
+        attackHeavyNeutralAir = null;
+        attackHeavyDownAir = null;
+        attackHeavyUpAir = null;
+        attackHeavyForwardAir = null;
+        attackHeavyBackwardAir = null;
+        attackHeavyQCFAir = null;
+        
+        knockout = null;
     }
 }

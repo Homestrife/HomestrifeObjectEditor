@@ -563,10 +563,26 @@ public class HoldListWindow extends JFrame implements ActionListener {
                             if(directoryName.compareTo("atklt_fwd") == 0) { ((Fighter)newObject).fighterEventHolds.attackLightForwardGround = (FighterHold)newHold; }
                             if(directoryName.compareTo("atklt_up") == 0) { ((Fighter)newObject).fighterEventHolds.attackLightUpGround = (FighterHold)newHold; }
                             if(directoryName.compareTo("atklt_air") == 0) { ((Fighter)newObject).fighterEventHolds.attackLightNeutralAir = (FighterHold)newHold; }
+                            if(directoryName.compareTo("special_fwdlt") == 0) { ((Fighter)newObject).fighterEventHolds.attackLightQCFGround = (FighterHold)newHold; }
                             if(directoryName.compareTo("atklt_airdwn") == 0) { ((Fighter)newObject).fighterEventHolds.attackLightDownAir = (FighterHold)newHold; }
                             if(directoryName.compareTo("atklt_airfwd") == 0) { ((Fighter)newObject).fighterEventHolds.attackLightForwardAir = (FighterHold)newHold; }
                             if(directoryName.compareTo("atklt_airup") == 0) { ((Fighter)newObject).fighterEventHolds.attackLightUpAir = (FighterHold)newHold; }
                             if(directoryName.compareTo("atklt_airback") == 0) { ((Fighter)newObject).fighterEventHolds.attackLightBackwardAir = (FighterHold)newHold; }
+                            if(directoryName.compareTo("special_airfwdlt") == 0) { ((Fighter)newObject).fighterEventHolds.attackLightQCFAir = (FighterHold)newHold; }
+                            
+                            if(directoryName.compareTo("atkhvy") == 0) { ((Fighter)newObject).fighterEventHolds.attackHeavyNeutralGround = (FighterHold)newHold; }
+                            if(directoryName.compareTo("atkhvy_dwn") == 0) { ((Fighter)newObject).fighterEventHolds.attackHeavyDownGround = (FighterHold)newHold; }
+                            if(directoryName.compareTo("atkhvy_fwd") == 0) { ((Fighter)newObject).fighterEventHolds.attackHeavyForwardGround = (FighterHold)newHold; }
+                            if(directoryName.compareTo("atkhvy_up") == 0) { ((Fighter)newObject).fighterEventHolds.attackHeavyUpGround = (FighterHold)newHold; }
+                            if(directoryName.compareTo("atkhvy_air") == 0) { ((Fighter)newObject).fighterEventHolds.attackHeavyNeutralAir = (FighterHold)newHold; }
+                            if(directoryName.compareTo("special_fwdhvy") == 0) { ((Fighter)newObject).fighterEventHolds.attackHeavyQCFGround = (FighterHold)newHold; }
+                            if(directoryName.compareTo("atkhvy_airdwn") == 0) { ((Fighter)newObject).fighterEventHolds.attackHeavyDownAir = (FighterHold)newHold; }
+                            if(directoryName.compareTo("atkhvy_airfwd") == 0) { ((Fighter)newObject).fighterEventHolds.attackHeavyForwardAir = (FighterHold)newHold; }
+                            if(directoryName.compareTo("atkhvy_airup") == 0) { ((Fighter)newObject).fighterEventHolds.attackHeavyUpAir = (FighterHold)newHold; }
+                            if(directoryName.compareTo("atkhvy_airback") == 0) { ((Fighter)newObject).fighterEventHolds.attackHeavyBackwardAir = (FighterHold)newHold; }
+                            if(directoryName.compareTo("special_airfwdhvy") == 0) { ((Fighter)newObject).fighterEventHolds.attackHeavyQCFAir = (FighterHold)newHold; }
+                            
+                            if(directoryName.compareTo("ko") == 0) { ((Fighter)newObject).fighterEventHolds.knockout = (FighterHold)newHold; }
                         }
                     }
                     else
@@ -748,6 +764,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                 NodeList holdSecs = hold.getChildNodes();
                 Node textures = null;
                 Node audioList = null;
+                Node spawnObjects = null;
                 Node attackBoxes = null;
                 Node hurtBoxes = null;
                 Node hitAudioList = null;
@@ -757,6 +774,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
 
                     if(holdSec.getNodeName().compareTo("Textures") == 0) textures = holdSec;
                     if(holdSec.getNodeName().compareTo("AudioList") == 0) audioList = holdSec;
+                    if(holdSec.getNodeName().compareTo("SpawnObjects") == 0) spawnObjects = holdSec;
                     if(holdSec.getNodeName().compareTo("AttackBoxes") == 0) attackBoxes = holdSec;
                     if(holdSec.getNodeName().compareTo("HurtBoxes") == 0) hurtBoxes = holdSec;
                     if(holdSec.getNodeName().compareTo("HitAudioList") == 0) hitAudioList = holdSec;
@@ -812,6 +830,31 @@ public class HoldListWindow extends JFrame implements ActionListener {
                     }
                 }
                 
+                //get spawn objects
+                if(spawnObjects != null)
+                {
+                    NodeList spawnObjectsList = spawnObjects.getChildNodes();
+                    for(int j = 0; j < spawnObjectsList.getLength(); j++)
+                    {
+                        if(spawnObjectsList.item(j).getNodeName().compareTo("SpawnObject") != 0) { continue; }
+                        NamedNodeMap spawnObjectAttributes = spawnObjectsList.item(j).getAttributes();
+                        
+                        String filePath = "";
+                        if(spawnObjectAttributes.getNamedItem("audioFilePath") != null) filePath = createAbsolutePath(spawnObjectAttributes.getNamedItem("definitionFilePath").getNodeValue());
+                        SpawnObject sob = new SpawnObject(filePath);
+                        if(spawnObjectAttributes.getNamedItem("delay") != null) sob.delay = Integer.parseInt(spawnObjectAttributes.getNamedItem("delay").getNodeValue());
+                        if(spawnObjectAttributes.getNamedItem("number") != null) sob.number = Integer.parseInt(spawnObjectAttributes.getNamedItem("number").getNodeValue());
+                        if(spawnObjectAttributes.getNamedItem("parentOffsetX") != null) sob.parentOffset.x = Float.parseFloat(spawnObjectAttributes.getNamedItem("parentOffsetX").getNodeValue());
+                        if(spawnObjectAttributes.getNamedItem("parentOffsetY") != null) sob.parentOffset.y = Float.parseFloat(spawnObjectAttributes.getNamedItem("parentOffsetY").getNodeValue());
+                        if(spawnObjectAttributes.getNamedItem("velocityX") != null) sob.vel.x = Float.parseFloat(spawnObjectAttributes.getNamedItem("velocityX").getNodeValue());
+                        if(spawnObjectAttributes.getNamedItem("velocityY") != null) sob.vel.y = Float.parseFloat(spawnObjectAttributes.getNamedItem("velocityY").getNodeValue());
+                        if(spawnObjectAttributes.getNamedItem("followParent") != null) sob.followParent = Boolean.parseBoolean(spawnObjectAttributes.getNamedItem("followParent").getNodeValue());
+                        if(spawnObjectAttributes.getNamedItem("collideParent") != null) sob.collideParent = Boolean.parseBoolean(spawnObjectAttributes.getNamedItem("collideParent").getNodeValue());
+                        
+                        loadHold.spawnObjects.add(sob);
+                    }
+                }
+                
                 if(loadHold.IsTerrainObjectHold())
                 {
                     TerrainObjectHold toHold = (TerrainObjectHold)loadHold;
@@ -827,6 +870,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                     if(holdAttributes.getNamedItem("horizontalDirectionBasedBlock") != null) toHold.horizontalDirectionBasedBlock = Boolean.parseBoolean(holdAttributes.getNamedItem("horizontalDirectionBasedBlock").getNodeValue());
                     if(holdAttributes.getNamedItem("reversedHorizontalBlock") != null) toHold.reversedHorizontalBlock = Boolean.parseBoolean(holdAttributes.getNamedItem("reversedHorizontalBlock").getNodeValue());
                     if(holdAttributes.getNamedItem("trips") != null) toHold.trips = Boolean.parseBoolean(holdAttributes.getNamedItem("trips").getNodeValue());
+                    if(holdAttributes.getNamedItem("resetHits") != null) toHold.resetHits = Boolean.parseBoolean(holdAttributes.getNamedItem("resetHits").getNodeValue());
                     
                     //get attack boxes
                     if(attackBoxes != null)
@@ -1098,6 +1142,8 @@ public class HoldListWindow extends JFrame implements ActionListener {
                     fighter.fighterEventHolds.attackLightUpGround = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("attackLightUpGround").getNodeValue()));
                 if(eventHoldsAttributes.getNamedItem("attackLightForwardGround") != null)
                     fighter.fighterEventHolds.attackLightForwardGround = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("attackLightForwardGround").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("attackLightQCFGround") != null)
+                    fighter.fighterEventHolds.attackLightQCFGround = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("attackLightQCFGround").getNodeValue()));
                 if(eventHoldsAttributes.getNamedItem("attackLightNeutralAir") != null)
                     fighter.fighterEventHolds.attackLightNeutralAir = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("attackLightNeutralAir").getNodeValue()));
                 if(eventHoldsAttributes.getNamedItem("attackLightDownAir") != null)
@@ -1108,6 +1154,35 @@ public class HoldListWindow extends JFrame implements ActionListener {
                     fighter.fighterEventHolds.attackLightForwardAir = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("attackLightForwardAir").getNodeValue()));
                 if(eventHoldsAttributes.getNamedItem("attackLightBackwardAir") != null)
                     fighter.fighterEventHolds.attackLightBackwardAir = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("attackLightBackwardAir").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("attackLightQCFAir") != null)
+                    fighter.fighterEventHolds.attackLightQCFAir = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("attackLightQCFAir").getNodeValue()));
+                
+                if(eventHoldsAttributes.getNamedItem("attackHeavyNeutralGround") != null)
+                    fighter.fighterEventHolds.attackHeavyNeutralGround = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("attackHeavyNeutralGround").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("attackHeavyDownGround") != null)
+                    fighter.fighterEventHolds.attackHeavyDownGround = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("attackHeavyDownGround").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("attackHeavyUpGround") != null)
+                    fighter.fighterEventHolds.attackHeavyUpGround = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("attackHeavyUpGround").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("attackHeavyForwardGround") != null)
+                    fighter.fighterEventHolds.attackHeavyForwardGround = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("attackHeavyForwardGround").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("attackHeavyQCFGround") != null)
+                    fighter.fighterEventHolds.attackHeavyQCFGround = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("attackHeavyQCFGround").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("attackHeavyNeutralAir") != null)
+                    fighter.fighterEventHolds.attackHeavyNeutralAir = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("attackHeavyNeutralAir").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("attackHeavyDownAir") != null)
+                    fighter.fighterEventHolds.attackHeavyDownAir = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("attackHeavyDownAir").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("attackHeavyUpAir") != null)
+                    fighter.fighterEventHolds.attackHeavyUpAir = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("attackHeavyUpAir").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("attackHeavyForwardAir") != null)
+                    fighter.fighterEventHolds.attackHeavyForwardAir = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("attackHeavyForwardAir").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("attackHeavyBackwardAir") != null)
+                    fighter.fighterEventHolds.attackHeavyBackwardAir = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("attackHeavyBackwardAir").getNodeValue()));
+                if(eventHoldsAttributes.getNamedItem("attackHeavyQCFAir") != null)
+                    fighter.fighterEventHolds.attackHeavyQCFAir = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("attackHeavyQCFAir").getNodeValue()));
+                
+                if(eventHoldsAttributes.getNamedItem("knockout") != null)
+                    fighter.fighterEventHolds.knockout = (FighterHold)getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("knockout").getNodeValue()));
+                
             }
             
             //finally, get next holds
@@ -1370,11 +1445,27 @@ public class HoldListWindow extends JFrame implements ActionListener {
                 if(fighter.fighterEventHolds.attackLightDownGround != null) { eventHolds.setAttribute("attackLightDownGround", "" + fighter.fighterEventHolds.attackLightDownGround.id); }
                 if(fighter.fighterEventHolds.attackLightUpGround != null) { eventHolds.setAttribute("attackLightUpGround", "" + fighter.fighterEventHolds.attackLightUpGround.id); }
                 if(fighter.fighterEventHolds.attackLightForwardGround != null) { eventHolds.setAttribute("attackLightForwardGround", "" + fighter.fighterEventHolds.attackLightForwardGround.id); }
+                if(fighter.fighterEventHolds.attackLightQCFGround != null) { eventHolds.setAttribute("attackLightQCFGround", "" + fighter.fighterEventHolds.attackLightQCFGround.id); }
                 if(fighter.fighterEventHolds.attackLightNeutralAir != null) { eventHolds.setAttribute("attackLightNeutralAir", "" + fighter.fighterEventHolds.attackLightNeutralAir.id); }
                 if(fighter.fighterEventHolds.attackLightDownAir != null) { eventHolds.setAttribute("attackLightDownAir", "" + fighter.fighterEventHolds.attackLightDownAir.id); }
                 if(fighter.fighterEventHolds.attackLightUpAir != null) { eventHolds.setAttribute("attackLightUpAir", "" + fighter.fighterEventHolds.attackLightUpAir.id); }
                 if(fighter.fighterEventHolds.attackLightForwardAir != null) { eventHolds.setAttribute("attackLightForwardAir", "" + fighter.fighterEventHolds.attackLightForwardAir.id); }
                 if(fighter.fighterEventHolds.attackLightBackwardAir != null) { eventHolds.setAttribute("attackLightBackwardAir", "" + fighter.fighterEventHolds.attackLightBackwardAir.id); }
+                if(fighter.fighterEventHolds.attackLightQCFAir != null) { eventHolds.setAttribute("attackLightQCFAir", "" + fighter.fighterEventHolds.attackLightQCFAir.id); }
+                
+                if(fighter.fighterEventHolds.attackHeavyNeutralGround != null) { eventHolds.setAttribute("attackHeavyNeutralGround", "" + fighter.fighterEventHolds.attackHeavyNeutralGround.id); }
+                if(fighter.fighterEventHolds.attackHeavyDownGround != null) { eventHolds.setAttribute("attackHeavyDownGround", "" + fighter.fighterEventHolds.attackHeavyDownGround.id); }
+                if(fighter.fighterEventHolds.attackHeavyUpGround != null) { eventHolds.setAttribute("attackHeavyUpGround", "" + fighter.fighterEventHolds.attackHeavyUpGround.id); }
+                if(fighter.fighterEventHolds.attackHeavyForwardGround != null) { eventHolds.setAttribute("attackHeavyForwardGround", "" + fighter.fighterEventHolds.attackHeavyForwardGround.id); }
+                if(fighter.fighterEventHolds.attackHeavyQCFGround != null) { eventHolds.setAttribute("attackHeavyQCFGround", "" + fighter.fighterEventHolds.attackHeavyQCFGround.id); }
+                if(fighter.fighterEventHolds.attackHeavyNeutralAir != null) { eventHolds.setAttribute("attackHeavyNeutralAir", "" + fighter.fighterEventHolds.attackHeavyNeutralAir.id); }
+                if(fighter.fighterEventHolds.attackHeavyDownAir != null) { eventHolds.setAttribute("attackHeavyDownAir", "" + fighter.fighterEventHolds.attackHeavyDownAir.id); }
+                if(fighter.fighterEventHolds.attackHeavyUpAir != null) { eventHolds.setAttribute("attackHeavyUpAir", "" + fighter.fighterEventHolds.attackHeavyUpAir.id); }
+                if(fighter.fighterEventHolds.attackHeavyForwardAir != null) { eventHolds.setAttribute("attackHeavyForwardAir", "" + fighter.fighterEventHolds.attackHeavyForwardAir.id); }
+                if(fighter.fighterEventHolds.attackHeavyBackwardAir != null) { eventHolds.setAttribute("attackHeavyBackwardAir", "" + fighter.fighterEventHolds.attackHeavyBackwardAir.id); }
+                if(fighter.fighterEventHolds.attackHeavyQCFAir != null) { eventHolds.setAttribute("attackHeavyQCFAir", "" + fighter.fighterEventHolds.attackHeavyQCFAir.id); }
+                
+                if(fighter.fighterEventHolds.knockout != null) { eventHolds.setAttribute("knockout", "" + fighter.fighterEventHolds.knockout.id); }
             } //End Is Fighter
             
             object.appendChild(eventHolds);
@@ -1406,6 +1497,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                     hold.setAttribute("horizontalDirectionBasedBlock", "" + th.horizontalDirectionBasedBlock);
                     hold.setAttribute("reversedHorizontalBlock", "" + th.reversedHorizontalBlock);
                     hold.setAttribute("trips", "" + th.trips);
+                    hold.setAttribute("resetHits", "" + th.resetHits);
                     
                     //get attack boxes
                     if(!th.attackBoxes.isEmpty())
@@ -1502,6 +1594,26 @@ public class HoldListWindow extends JFrame implements ActionListener {
                         audioList.appendChild(audio);
                     }
                     hold.appendChild(audioList);
+                }
+                
+                //get spawn objects
+                if(!h.spawnObjects.isEmpty())
+                {
+                    Element spawnObjects = doc.createElement("SpawnObjects");
+                    for(SpawnObject s : h.spawnObjects)
+                    {
+                        Element spawnObject = doc.createElement("SpawnObject");
+                        spawnObject.setAttribute("delay", "" + s.delay);
+                        spawnObject.setAttribute("number", "" + s.number);
+                        spawnObject.setAttribute("parentOffsetX", "" + s.parentOffset.x);
+                        spawnObject.setAttribute("parentOffsetY", "" + s.parentOffset.y);
+                        spawnObject.setAttribute("velocityX", "" + s.vel.x);
+                        spawnObject.setAttribute("velocityY", "" + s.vel.y);
+                        spawnObject.setAttribute("followParent", "" + s.followParent);
+                        spawnObject.setAttribute("collideParent", "" + s.collideParent);
+                        spawnObjects.appendChild(spawnObject);
+                    }
+                    hold.appendChild(spawnObjects);
                 }
                 
                 holds.appendChild(hold);

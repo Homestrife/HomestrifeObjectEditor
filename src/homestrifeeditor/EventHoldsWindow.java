@@ -128,11 +128,27 @@ public class EventHoldsWindow extends JFrame implements ActionListener, ItemList
     private JComboBox attackLightDownGround;
     private JComboBox attackLightUpGround;
     private JComboBox attackLightForwardGround;
+    private JComboBox attackLightQCFGround;
     private JComboBox attackLightNeutralAir;
     private JComboBox attackLightDownAir;
     private JComboBox attackLightUpAir;
     private JComboBox attackLightForwardAir;
     private JComboBox attackLightBackwardAir;
+    private JComboBox attackLightQCFAir;
+    
+    private JComboBox attackHeavyNeutralGround;
+    private JComboBox attackHeavyDownGround;
+    private JComboBox attackHeavyUpGround;
+    private JComboBox attackHeavyForwardGround;
+    private JComboBox attackHeavyQCFGround;
+    private JComboBox attackHeavyNeutralAir;
+    private JComboBox attackHeavyDownAir;
+    private JComboBox attackHeavyUpAir;
+    private JComboBox attackHeavyForwardAir;
+    private JComboBox attackHeavyBackwardAir;
+    private JComboBox attackHeavyQCFAir;
+    
+    private JComboBox knockout;
     
     private JButton applyButton;
     
@@ -386,6 +402,8 @@ public class EventHoldsWindow extends JFrame implements ActionListener, ItemList
             attackLightUpGround = createHoldComboBox(holdComboRenderer, allHoldsPlusNull, fighter.fighterEventHolds.attackLightUpGround);
             JLabel attackLightForwardGroundLabel = new JLabel("Light Forward");
             attackLightForwardGround = createHoldComboBox(holdComboRenderer, allHoldsPlusNull, fighter.fighterEventHolds.attackLightForwardGround);
+            JLabel attackLightQCFGroundLabel = new JLabel("Light QCF");
+            attackLightQCFGround = createHoldComboBox(holdComboRenderer, allHoldsPlusNull, fighter.fighterEventHolds.attackLightQCFGround);
             JLabel attackLightNeutralAirLabel = new JLabel("Light Neutral");
             attackLightNeutralAir = createHoldComboBox(holdComboRenderer, allHoldsPlusNull, fighter.fighterEventHolds.attackLightNeutralAir);
             JLabel attackLightDownAirLabel = new JLabel("Light Down");
@@ -396,6 +414,34 @@ public class EventHoldsWindow extends JFrame implements ActionListener, ItemList
             attackLightForwardAir = createHoldComboBox(holdComboRenderer, allHoldsPlusNull, fighter.fighterEventHolds.attackLightForwardAir);
             JLabel attackLightBackwardAirLabel = new JLabel("Light Backward");
             attackLightBackwardAir = createHoldComboBox(holdComboRenderer, allHoldsPlusNull, fighter.fighterEventHolds.attackLightBackwardAir);
+            JLabel attackLightQCFAirLabel = new JLabel("Light QCF");
+            attackLightQCFAir = createHoldComboBox(holdComboRenderer, allHoldsPlusNull, fighter.fighterEventHolds.attackLightQCFAir);
+            
+            JLabel attackHeavyNeutralGroundLabel = new JLabel("Heavy Neutral");
+            attackHeavyNeutralGround = createHoldComboBox(holdComboRenderer, allHoldsPlusNull, fighter.fighterEventHolds.attackHeavyNeutralGround);
+            JLabel attackHeavyDownGroundLabel = new JLabel("Heavy Down");
+            attackHeavyDownGround = createHoldComboBox(holdComboRenderer, allHoldsPlusNull, fighter.fighterEventHolds.attackHeavyDownGround);
+            JLabel attackHeavyUpGroundLabel = new JLabel("Heavy Up");
+            attackHeavyUpGround = createHoldComboBox(holdComboRenderer, allHoldsPlusNull, fighter.fighterEventHolds.attackHeavyUpGround);
+            JLabel attackHeavyForwardGroundLabel = new JLabel("Heavy Forward");
+            attackHeavyForwardGround = createHoldComboBox(holdComboRenderer, allHoldsPlusNull, fighter.fighterEventHolds.attackHeavyForwardGround);
+            JLabel attackHeavyQCFGroundLabel = new JLabel("Heavy QCF");
+            attackHeavyQCFGround = createHoldComboBox(holdComboRenderer, allHoldsPlusNull, fighter.fighterEventHolds.attackHeavyQCFGround);
+            JLabel attackHeavyNeutralAirLabel = new JLabel("Heavy Neutral");
+            attackHeavyNeutralAir = createHoldComboBox(holdComboRenderer, allHoldsPlusNull, fighter.fighterEventHolds.attackHeavyNeutralAir);
+            JLabel attackHeavyDownAirLabel = new JLabel("Heavy Down");
+            attackHeavyDownAir = createHoldComboBox(holdComboRenderer, allHoldsPlusNull, fighter.fighterEventHolds.attackHeavyDownAir);
+            JLabel attackHeavyUpAirLabel = new JLabel("Heavy Up");
+            attackHeavyUpAir = createHoldComboBox(holdComboRenderer, allHoldsPlusNull, fighter.fighterEventHolds.attackHeavyUpAir);
+            JLabel attackHeavyForwardAirLabel = new JLabel("Heavy Forward");
+            attackHeavyForwardAir = createHoldComboBox(holdComboRenderer, allHoldsPlusNull, fighter.fighterEventHolds.attackHeavyForwardAir);
+            JLabel attackHeavyBackwardAirLabel = new JLabel("Heavy Backward");
+            attackHeavyBackwardAir = createHoldComboBox(holdComboRenderer, allHoldsPlusNull, fighter.fighterEventHolds.attackHeavyBackwardAir);
+            JLabel attackHeavyQCFAirLabel = new JLabel("Heavy QCF");
+            attackHeavyQCFAir = createHoldComboBox(holdComboRenderer, allHoldsPlusNull, fighter.fighterEventHolds.attackHeavyQCFAir);
+            
+            JLabel knockoutLabel = new JLabel("Knockout");
+            knockout = createHoldComboBox(holdComboRenderer, allHoldsPlusNull, fighter.fighterEventHolds.knockout);
             
             JPanel groundMoveInterface = new JPanel(new GridLayout(7, gridColumns, gridHorizontalGap, gridVerticalGap));
             groundMoveInterface.setSize(gridWidth, gridRowHeight * 7);
@@ -579,22 +625,44 @@ public class EventHoldsWindow extends JFrame implements ActionListener, ItemList
 //            
 //            eventHoldPane.add(airStunInterface);
             
-            JPanel groundNormalInterface = new JPanel(new GridLayout(2, gridColumns, gridHorizontalGap, gridVerticalGap));
-            groundNormalInterface.setSize(gridWidth, gridRowHeight * 2);
+            JPanel groundNormalInterface = new JPanel(new GridLayout(5, gridColumns, gridHorizontalGap, gridVerticalGap));
+            groundNormalInterface.setSize(gridWidth, gridRowHeight * 5);
             groundNormalInterface.setBorder(new TitledBorder("Ground Normal Attack Events"));
+            
             groundNormalInterface.add(attackLightNeutralGroundLabel);
             groundNormalInterface.add(attackLightNeutralGround);
+            
             groundNormalInterface.add(attackLightDownGroundLabel);
             groundNormalInterface.add(attackLightDownGround);
+            
             groundNormalInterface.add(attackLightUpGroundLabel);
             groundNormalInterface.add(attackLightUpGround);
+            
             groundNormalInterface.add(attackLightForwardGroundLabel);
             groundNormalInterface.add(attackLightForwardGround);
             
+            groundNormalInterface.add(attackLightQCFGroundLabel);
+            groundNormalInterface.add(attackLightQCFGround);
+            
+            groundNormalInterface.add(attackHeavyNeutralGroundLabel);
+            groundNormalInterface.add(attackHeavyNeutralGround);
+            
+            groundNormalInterface.add(attackHeavyDownGroundLabel);
+            groundNormalInterface.add(attackHeavyDownGround);
+            
+            groundNormalInterface.add(attackHeavyUpGroundLabel);
+            groundNormalInterface.add(attackHeavyUpGround);
+            
+            groundNormalInterface.add(attackHeavyForwardGroundLabel);
+            groundNormalInterface.add(attackHeavyForwardGround);
+            
+            groundNormalInterface.add(attackHeavyQCFGroundLabel);
+            groundNormalInterface.add(attackHeavyQCFGround);
+            
             eventHoldPane.add(groundNormalInterface);
             
-            JPanel airNormalInterface = new JPanel(new GridLayout(3, gridColumns, gridHorizontalGap, gridVerticalGap));
-            airNormalInterface.setSize(gridWidth, gridRowHeight * 3);
+            JPanel airNormalInterface = new JPanel(new GridLayout(6, gridColumns, gridHorizontalGap, gridVerticalGap));
+            airNormalInterface.setSize(gridWidth, gridRowHeight * 6);
             airNormalInterface.setBorder(new TitledBorder("Air Normal Attack Events"));
             airNormalInterface.add(attackLightNeutralAirLabel);
             airNormalInterface.add(attackLightNeutralAir);
@@ -606,10 +674,32 @@ public class EventHoldsWindow extends JFrame implements ActionListener, ItemList
             airNormalInterface.add(attackLightForwardAir);
             airNormalInterface.add(attackLightBackwardAirLabel);
             airNormalInterface.add(attackLightBackwardAir);
-            airNormalInterface.add(new JLabel(""));
-            airNormalInterface.add(new JLabel(""));
+            airNormalInterface.add(attackLightQCFAirLabel);
+            airNormalInterface.add(attackLightQCFAir);
+            airNormalInterface.add(attackHeavyNeutralAirLabel);
+            airNormalInterface.add(attackHeavyNeutralAir);
+            airNormalInterface.add(attackHeavyDownAirLabel);
+            airNormalInterface.add(attackHeavyDownAir);
+            airNormalInterface.add(attackHeavyUpAirLabel);
+            airNormalInterface.add(attackHeavyUpAir);
+            airNormalInterface.add(attackHeavyForwardAirLabel);
+            airNormalInterface.add(attackHeavyForwardAir);
+            airNormalInterface.add(attackHeavyBackwardAirLabel);
+            airNormalInterface.add(attackHeavyBackwardAir);
+            airNormalInterface.add(attackHeavyQCFAirLabel);
+            airNormalInterface.add(attackHeavyQCFAir);
             
             eventHoldPane.add(airNormalInterface);
+            
+            JPanel otherInterface = new JPanel(new GridLayout(1, gridColumns, gridHorizontalGap, gridVerticalGap));
+            otherInterface.setSize(gridWidth, gridRowHeight * 1);
+            otherInterface.setBorder(new TitledBorder("Other Events"));
+            otherInterface.add(knockoutLabel);
+            otherInterface.add(knockout);
+            otherInterface.add(new JLabel(""));
+            otherInterface.add(new JLabel(""));
+            
+            eventHoldPane.add(otherInterface);
         }
         
         JScrollPane eventHoldScrollPane = new JScrollPane(eventHoldPane);
@@ -730,11 +820,27 @@ public class EventHoldsWindow extends JFrame implements ActionListener, ItemList
             ((Fighter)hsObject).fighterEventHolds.attackLightDownGround = attackLightDownGround.getSelectedIndex() == 0 ? null : (FighterHold)attackLightDownGround.getSelectedItem();
             ((Fighter)hsObject).fighterEventHolds.attackLightUpGround = attackLightUpGround.getSelectedIndex() == 0 ? null : (FighterHold)attackLightUpGround.getSelectedItem();
             ((Fighter)hsObject).fighterEventHolds.attackLightForwardGround = attackLightForwardGround.getSelectedIndex() == 0 ? null : (FighterHold)attackLightForwardGround.getSelectedItem();
+            ((Fighter)hsObject).fighterEventHolds.attackLightQCFGround = attackLightQCFGround.getSelectedIndex() == 0 ? null : (FighterHold)attackLightQCFGround.getSelectedItem();
             ((Fighter)hsObject).fighterEventHolds.attackLightNeutralAir = attackLightNeutralAir.getSelectedIndex() == 0 ? null : (FighterHold)attackLightNeutralAir.getSelectedItem();
             ((Fighter)hsObject).fighterEventHolds.attackLightDownAir = attackLightDownAir.getSelectedIndex() == 0 ? null : (FighterHold)attackLightDownAir.getSelectedItem();
             ((Fighter)hsObject).fighterEventHolds.attackLightUpAir = attackLightUpAir.getSelectedIndex() == 0 ? null : (FighterHold)attackLightUpAir.getSelectedItem();
             ((Fighter)hsObject).fighterEventHolds.attackLightForwardAir = attackLightForwardAir.getSelectedIndex() == 0 ? null : (FighterHold)attackLightForwardAir.getSelectedItem();
             ((Fighter)hsObject).fighterEventHolds.attackLightBackwardAir = attackLightBackwardAir.getSelectedIndex() == 0 ? null : (FighterHold)attackLightBackwardAir.getSelectedItem();
+            ((Fighter)hsObject).fighterEventHolds.attackLightQCFAir = attackLightQCFAir.getSelectedIndex() == 0 ? null : (FighterHold)attackLightQCFAir.getSelectedItem();
+            
+            ((Fighter)hsObject).fighterEventHolds.attackHeavyNeutralGround = attackHeavyNeutralGround.getSelectedIndex() == 0 ? null : (FighterHold)attackHeavyNeutralGround.getSelectedItem();
+            ((Fighter)hsObject).fighterEventHolds.attackHeavyDownGround = attackHeavyDownGround.getSelectedIndex() == 0 ? null : (FighterHold)attackHeavyDownGround.getSelectedItem();
+            ((Fighter)hsObject).fighterEventHolds.attackHeavyUpGround = attackHeavyUpGround.getSelectedIndex() == 0 ? null : (FighterHold)attackHeavyUpGround.getSelectedItem();
+            ((Fighter)hsObject).fighterEventHolds.attackHeavyForwardGround = attackHeavyForwardGround.getSelectedIndex() == 0 ? null : (FighterHold)attackHeavyForwardGround.getSelectedItem();
+            ((Fighter)hsObject).fighterEventHolds.attackHeavyQCFGround = attackHeavyQCFGround.getSelectedIndex() == 0 ? null : (FighterHold)attackHeavyQCFGround.getSelectedItem();
+            ((Fighter)hsObject).fighterEventHolds.attackHeavyNeutralAir = attackHeavyNeutralAir.getSelectedIndex() == 0 ? null : (FighterHold)attackHeavyNeutralAir.getSelectedItem();
+            ((Fighter)hsObject).fighterEventHolds.attackHeavyDownAir = attackHeavyDownAir.getSelectedIndex() == 0 ? null : (FighterHold)attackHeavyDownAir.getSelectedItem();
+            ((Fighter)hsObject).fighterEventHolds.attackHeavyUpAir = attackHeavyUpAir.getSelectedIndex() == 0 ? null : (FighterHold)attackHeavyUpAir.getSelectedItem();
+            ((Fighter)hsObject).fighterEventHolds.attackHeavyForwardAir = attackHeavyForwardAir.getSelectedIndex() == 0 ? null : (FighterHold)attackHeavyForwardAir.getSelectedItem();
+            ((Fighter)hsObject).fighterEventHolds.attackHeavyBackwardAir = attackHeavyBackwardAir.getSelectedIndex() == 0 ? null : (FighterHold)attackHeavyBackwardAir.getSelectedItem();
+            ((Fighter)hsObject).fighterEventHolds.attackHeavyQCFAir = attackHeavyQCFAir.getSelectedIndex() == 0 ? null : (FighterHold)attackHeavyQCFAir.getSelectedItem();
+            
+            ((Fighter)hsObject).fighterEventHolds.knockout = knockout.getSelectedIndex() == 0 ? null : (FighterHold)knockout.getSelectedItem();
         }
         
         parent.repaint();
