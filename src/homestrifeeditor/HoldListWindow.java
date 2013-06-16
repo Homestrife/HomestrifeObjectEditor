@@ -825,7 +825,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                         NamedNodeMap spawnObjectAttributes = spawnObjectsList.item(j).getAttributes();
                         
                         String filePath = "";
-                        if(spawnObjectAttributes.getNamedItem("audioFilePath") != null) filePath = createAbsolutePath(spawnObjectAttributes.getNamedItem("definitionFilePath").getNodeValue());
+                        if(spawnObjectAttributes.getNamedItem("definitionFilePath") != null) filePath = createAbsolutePath(spawnObjectAttributes.getNamedItem("definitionFilePath").getNodeValue());
                         SpawnObject sob = new SpawnObject(filePath);
                         if(spawnObjectAttributes.getNamedItem("delay") != null) sob.delay = Integer.parseInt(spawnObjectAttributes.getNamedItem("delay").getNodeValue());
                         if(spawnObjectAttributes.getNamedItem("number") != null) sob.number = Integer.parseInt(spawnObjectAttributes.getNamedItem("number").getNodeValue());
@@ -965,6 +965,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                 if(objectAttributes.getNamedItem("friction") != null) tObject.friction = Float.parseFloat(objectAttributes.getNamedItem("friction").getNodeValue());
                 if(objectAttributes.getNamedItem("health") != null) tObject.health = Integer.parseInt(objectAttributes.getNamedItem("health").getNodeValue());
                 if(objectAttributes.getNamedItem("takesTerrainDamage") != null) tObject.takesTerrainDamage = Boolean.parseBoolean(objectAttributes.getNamedItem("takesTerrainDamage").getNodeValue());
+                if(objectAttributes.getNamedItem("fragile") != null) tObject.fragile = Boolean.parseBoolean(objectAttributes.getNamedItem("fragile").getNodeValue());
                 
                 //get terrain box
                 HSBox terrainBox = new HSBox();
@@ -1285,6 +1286,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                 object.setAttribute("friction", "" + tObject.friction);
                 object.setAttribute("health", "" + tObject.health);
                 object.setAttribute("takesTerrainDamage", "" + tObject.takesTerrainDamage);
+                object.setAttribute("fragile", "" + tObject.fragile);
                 object.setAttribute("canBeJumpedThrough", "" + tObject.canBeJumpedThrough);
                 
                 //get TerrainObject terrain box
@@ -1575,6 +1577,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                     for(SpawnObject s : h.spawnObjects)
                     {
                         Element spawnObject = doc.createElement("SpawnObject");
+                        spawnObject.setAttribute("definitionFilePath", createRelativePath(s.defFilePath));
                         spawnObject.setAttribute("delay", "" + s.delay);
                         spawnObject.setAttribute("number", "" + s.number);
                         spawnObject.setAttribute("parentOffsetX", "" + s.parentOffset.x);

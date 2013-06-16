@@ -52,6 +52,7 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
     private JFrame parent;
     private Object object;
     private String mode;
+    private boolean loading;
     
     public DefaultListModel<HSAudio> soundListModel;
     public JList<HSAudio> soundList;
@@ -70,6 +71,7 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
         parent = theParent;
         object = theObject;
         mode = theMode;
+        loading = false;
         
         if(mode.compareTo("hold") == 0)
         {
@@ -256,6 +258,7 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
         }
         
         int index = soundList.getSelectedIndex();
+        soundList.clearSelection();
         
         HSAudio newAudio = new HSAudio(file.getPath());
         
@@ -275,10 +278,12 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
         if(index >= 0)
         {
             soundListModel.add(index, newAudio);
+            soundList.setSelectedIndex(index);
         }
         else
         {
             soundListModel.addElement(newAudio);
+            soundList.setSelectedIndex(soundListModel.getSize() - 1);
         }
     }
     
@@ -330,6 +335,8 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
     
     private void unloadSoundData()
     {
+        loading = true;
+        
         soundFile.setText("N/A");
         changeSoundButton.setEnabled(false);
         delaySpinner.setValue(0);
@@ -337,10 +344,14 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
         exclusiveCheckBox.setEnabled(false);
         percentageSpinner.setEnabled(false);
         percentageCheckBox.setEnabled(false);
+        
+        loading = false;
     }
     
     private void loadSoundData(HSAudio sound)
     {
+        loading = true;
+        
         File file = new File(sound.filePath);
 
         soundFile.setText(file.getName());
@@ -363,6 +374,8 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
         
         percentageCheckBox.setSelected(sound.usePercentage);
         percentageCheckBox.setEnabled(true);
+        
+        loading = false;
     }
     
     private void changeSound()
@@ -391,7 +404,9 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
     
     private void delayChanged()
     {
+        if(loading) { return; }
         int index = soundList.getSelectedIndex();
+        if(index == -1) { return; }
         HSAudio sound = (HSAudio)soundListModel.get(index);
         
         if(sound != null)
@@ -402,7 +417,9 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
     
     private void changeExclusive()
     {
+        if(loading) { return; }
         int index = soundList.getSelectedIndex();
+        if(index == -1) { return; }
         HSAudio sound = (HSAudio)soundListModel.get(index);
         
         if(sound != null)
@@ -413,7 +430,9 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
     
     private void percentageChanged()
     {
+        if(loading) { return; }
         int index = soundList.getSelectedIndex();
+        if(index == -1) { return; }
         HSAudio sound = (HSAudio)soundListModel.get(index);
         
         if(sound != null)
@@ -424,7 +443,9 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
     
     private void changeUsePercentage()
     {
+        if(loading) { return; }
         int index = soundList.getSelectedIndex();
+        if(index == -1) { return; }
         HSAudio sound = (HSAudio)soundListModel.get(index);
         
         if(sound != null)
@@ -453,11 +474,8 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
     {
         if (e.getValueIsAdjusting() == false)
         {
-            if (soundList.getSelectedIndex() == -1)
-            {
-                unloadSoundData();
-            }
-            else
+            unloadSoundData();
+            if (soundList.getSelectedIndex() >= 0)
             {
                 loadSoundData((HSAudio)soundList.getSelectedValue());
             }
@@ -479,23 +497,7 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
     @Override
     public void mousePressed(MouseEvent e)
     {
-        if(e.getClickCount() != 2) { return; }
         
-        switch(e.getComponent().getName())
-        {
-            case "holdList":
-                int index = soundList.locationToIndex(e.getPoint());
-
-                if(index == -1) { return; }
-
-                if(!soundList.getCellBounds(index, index).contains(e.getPoint())) { return; }
-
-                HSAudio sound = (HSAudio)soundListModel.get(index);
-                soundList.ensureIndexIsVisible(index);
-                
-                //createHoldAttributesWindow(hold);
-                break;
-        }
     }
     
     @Override

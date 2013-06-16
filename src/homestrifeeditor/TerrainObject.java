@@ -18,6 +18,7 @@ public class TerrainObject extends HSObject {
     public float bounce;
     public float friction;
     public boolean takesTerrainDamage;
+    public boolean fragile;
     public TerrainEventHolds terrainEventHolds;
     
     public TerrainObject()
@@ -32,6 +33,7 @@ public class TerrainObject extends HSObject {
         bounce = 0;
         friction = 1;
         takesTerrainDamage = false;
+        fragile = false;
         terrainEventHolds = new TerrainEventHolds();
     }
     

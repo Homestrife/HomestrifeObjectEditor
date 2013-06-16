@@ -56,6 +56,7 @@ public class ObjectAttributesWindow extends JFrame implements ActionListener, Ch
     private JSpinner bounceSpinner;
     private JSpinner frictionSpinner;
     private JCheckBox takesTerrainDamageCheck;
+    private JCheckBox fragileCheck;                     private static String fragileTooltip = "<html>Whether or not this object is destroyed upon ANY impact.</html>";
     
     private JSpinner massSpinner;
     private JCheckBox fallsCheck;
@@ -144,6 +145,11 @@ public class ObjectAttributesWindow extends JFrame implements ActionListener, Ch
             takesTerrainDamageCheck.setActionCommand("fieldChanged");
             takesTerrainDamageCheck.addActionListener(this);
             //
+            JLabel fragileLabel = new JLabel("Fragile");
+            fragileCheck = new JCheckBox("", tObject.fragile);
+            fragileCheck.setActionCommand("fieldChanged");
+            fragileCheck.addActionListener(this);
+            
             JButton getHitSounds = new JButton("Sounds on Hit...");
             getHitSounds.setActionCommand("onHit");
             getHitSounds.addActionListener(this);
@@ -159,8 +165,8 @@ public class ObjectAttributesWindow extends JFrame implements ActionListener, Ch
             terrainInterface.add(takesTerrainDamageCheck);
             terrainInterface.add(frictionLabel);
             terrainInterface.add(frictionSpinner);
-            terrainInterface.add(new JLabel(""));
-            terrainInterface.add(new JLabel(""));
+            terrainInterface.add(fragileLabel);
+            terrainInterface.add(fragileCheck);
             terrainInterface.add(new JLabel(""));
             terrainInterface.add(getHitSounds);
 
@@ -325,6 +331,7 @@ public class ObjectAttributesWindow extends JFrame implements ActionListener, Ch
             ((TerrainObject)hsObject).bounce = (float)bounceSpinner.getValue();
             ((TerrainObject)hsObject).friction = (float)frictionSpinner.getValue();
             ((TerrainObject)hsObject).takesTerrainDamage = takesTerrainDamageCheck.isSelected();
+            ((TerrainObject)hsObject).fragile = fragileCheck.isSelected();
         }
         
         if(hsObject.IsPhysicsObject())

@@ -51,6 +51,7 @@ public class SpawnObjectsWindow extends JFrame implements ActionListener, ListSe
     */
     private JFrame parent;
     private Object object;
+    private boolean loading;
     
     public DefaultListModel<SpawnObject> spawnListModel;
     public JList<SpawnObject> spawnList;
@@ -72,6 +73,7 @@ public class SpawnObjectsWindow extends JFrame implements ActionListener, ListSe
     {
         parent = theParent;
         object = theObject;
+        loading = false;
         
         setTitle("Spawn Objects - " + ((HSObjectHold)object).name);
         
@@ -322,6 +324,7 @@ public class SpawnObjectsWindow extends JFrame implements ActionListener, ListSe
         }
         
         int index = spawnList.getSelectedIndex();
+        spawnList.clearSelection();
         
         SpawnObject newObject = new SpawnObject(file.getPath());
         
@@ -330,10 +333,12 @@ public class SpawnObjectsWindow extends JFrame implements ActionListener, ListSe
         if(index >= 0)
         {
             spawnListModel.add(index, newObject);
+            spawnList.setSelectedIndex(index);
         }
         else
         {
             spawnListModel.addElement(newObject);
+            spawnList.setSelectedIndex(spawnListModel.getSize() - 1);
         }
     }
     
@@ -374,6 +379,8 @@ public class SpawnObjectsWindow extends JFrame implements ActionListener, ListSe
     
     private void unloadObjectData()
     {
+        loading = true;
+        
         objectFile.setText("N/A");
         changeObjectButton.setEnabled(false);
         delaySpinner.setValue(0);
@@ -390,10 +397,14 @@ public class SpawnObjectsWindow extends JFrame implements ActionListener, ListSe
         velYSpinner.setEnabled(false);
         followParentCheck.setEnabled(false);
         collideParentCheck.setEnabled(false);
+        
+        loading = false;
     }
     
     private void loadObjectData(SpawnObject spawnObject)
     {
+        loading = true;
+        
         File file = new File(spawnObject.defFilePath);
 
         objectFile.setText(file.getName());
@@ -415,6 +426,8 @@ public class SpawnObjectsWindow extends JFrame implements ActionListener, ListSe
         followParentCheck.setEnabled(true);
         collideParentCheck.setSelected(spawnObject.collideParent);
         collideParentCheck.setEnabled(true);
+        
+        loading = false;
     }
     
     private void changeObject()
@@ -443,7 +456,10 @@ public class SpawnObjectsWindow extends JFrame implements ActionListener, ListSe
     
     private void valueChanged()
     {
+        if(loading) { return; }
+        
         int index = spawnList.getSelectedIndex();
+        if(index == -1) { return; }
         SpawnObject spawnObject = (SpawnObject)spawnListModel.get(index);
         
         if(spawnObject != null)
@@ -477,11 +493,8 @@ public class SpawnObjectsWindow extends JFrame implements ActionListener, ListSe
     {
         if (e.getValueIsAdjusting() == false)
         {
-            if (spawnList.getSelectedIndex() == -1)
-            {
-                unloadObjectData();
-            }
-            else
+            unloadObjectData();
+            if (spawnList.getSelectedIndex() >= 0)
             {
                 loadObjectData((SpawnObject)spawnList.getSelectedValue());
             }
@@ -503,23 +516,7 @@ public class SpawnObjectsWindow extends JFrame implements ActionListener, ListSe
     @Override
     public void mousePressed(MouseEvent e)
     {
-        if(e.getClickCount() != 2) { return; }
         
-        switch(e.getComponent().getName())
-        {
-            case "holdList":
-                int index = spawnList.locationToIndex(e.getPoint());
-
-                if(index == -1) { return; }
-
-                if(!spawnList.getCellBounds(index, index).contains(e.getPoint())) { return; }
-
-                SpawnObject spawnObject = (SpawnObject)spawnListModel.get(index);
-                spawnList.ensureIndexIsVisible(index);
-                
-                //createHoldAttributesWindow(hold);
-                break;
-        }
     }
     
     @Override
