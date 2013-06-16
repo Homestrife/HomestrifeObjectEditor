@@ -38,6 +38,7 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
 	private static int windowWidth = 800;
     private static int windowHeightGeneral = 650;
     private static int windowHeightTerrain = 410;
+    private static int windowHeightFighter = 810;
     private static int windowBorderBuffer = 10;
     
     private static int gridWidth = 650;
@@ -72,7 +73,24 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
     private JCheckBox reverseBlockCheck;    private static String reverseBlockTooltip = "<html>If checked, another fighter must face the direction opposite<br>of what they would normally need to in order to block this object's attack boxes.</html>";
     private JButton hitSoundsButton;        private static String hitSoundsTooltip = "<html>Add/Edit sounds that occur upon an attack box collision</html>";
     
+    private JCheckBox changeCancelsCheck;   private static String changeCancelsTooltip = "<html>If this is unchecked, this hold will inhereit the cancels<br>of any hold that has this hold as its next hold.</html>";
+    private JComboBox<Cancel> dashCancelCombo; private static String cancelTooltip = "<html>Any Time: This action can be cancelled into at any time.<br>After Hit or Block: This action can be cancelled into after striking a hurt box.<br>After Hit: This action can ben cancelled into after striking a hurt box without being blocked.<br>After Block: This action can be cancelled into after striking a hurt box and beinb blocked.<br>Never: This action can never be cancelled into.</html>";
+    private JComboBox<Cancel> jumpCancelCombo;
+    private JComboBox<Cancel> lightNeutralCancelCombo;
+    private JComboBox<Cancel> lightForwardCancelCombo;
+    private JComboBox<Cancel> lightUpCancelCombo;
+    private JComboBox<Cancel> lightDownCancelCombo;
+    private JComboBox<Cancel> lightBackwardCancelCombo;
+    private JComboBox<Cancel> lightQCFCancelCombo;
+    private JComboBox<Cancel> heavyNeutralCancelCombo;
+    private JComboBox<Cancel> heavyForwardCancelCombo;
+    private JComboBox<Cancel> heavyUpCancelCombo;
+    private JComboBox<Cancel> heavyDownCancelCombo;
+    private JComboBox<Cancel> heavyBackwardCancelCombo;
+    private JComboBox<Cancel> heavyQCFCancelCombo;
+    
     private JPanel terrainInterface;
+    private JPanel fighterInterface;
     
     private JButton applyButton;
     
@@ -284,6 +302,171 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             holdAttributesPane.add(terrainInterface);
         }
         
+        if(hold.IsFighterHold())
+        {
+            setSize(windowWidth, windowHeightFighter);
+            
+            FighterHold fHold = (FighterHold)hold;
+            
+            changeCancelsCheck = new JCheckBox("Change cancels this hold", fHold.changeCancels);
+            changeCancelsCheck.setToolTipText(changeCancelsTooltip);
+            changeCancelsCheck.setActionCommand("changeCancelsChanged");
+            changeCancelsCheck.addActionListener(this);
+            
+            JPanel changeCancelsInterface = new JPanel(new GridLayout(1, gridColumns, gridHorizontalGap, gridVerticalGap));
+            changeCancelsInterface.setSize(gridWidth, gridRowHeight);
+            changeCancelsInterface.add(changeCancelsCheck);
+            
+            holdAttributesPane.add(changeCancelsInterface);
+            
+            JLabel dashCancelLabel = new JLabel("Dash");
+            dashCancelLabel.setToolTipText(cancelTooltip);
+            dashCancelCombo = new JComboBox<Cancel>(Cancel.values());
+            dashCancelCombo.setToolTipText(cancelTooltip);
+            dashCancelCombo.setSelectedItem(fHold.cancels.dash);
+            dashCancelCombo.setActionCommand("fieldChanged");
+            dashCancelCombo.addItemListener(this);
+            
+            JLabel jumpCancelLabel = new JLabel("Jump");
+            jumpCancelLabel.setToolTipText(cancelTooltip);
+            jumpCancelCombo = new JComboBox<Cancel>(Cancel.values());
+            jumpCancelCombo.setToolTipText(cancelTooltip);
+            jumpCancelCombo.setSelectedItem(fHold.cancels.jump);
+            jumpCancelCombo.setActionCommand("fieldChanged");
+            jumpCancelCombo.addItemListener(this);
+            
+            JLabel lightNeutralCancelLabel = new JLabel("Light Neutral");
+            lightNeutralCancelLabel.setToolTipText(cancelTooltip);
+            lightNeutralCancelCombo = new JComboBox<Cancel>(Cancel.values());
+            lightNeutralCancelCombo.setToolTipText(cancelTooltip);
+            lightNeutralCancelCombo.setSelectedItem(fHold.cancels.lightNeutral);
+            lightNeutralCancelCombo.setActionCommand("fieldChanged");
+            lightNeutralCancelCombo.addItemListener(this);
+            
+            JLabel lightForwardCancelLabel = new JLabel("Light Forward");
+            lightForwardCancelLabel.setToolTipText(cancelTooltip);
+            lightForwardCancelCombo = new JComboBox<Cancel>(Cancel.values());
+            lightForwardCancelCombo.setToolTipText(cancelTooltip);
+            lightForwardCancelCombo.setSelectedItem(fHold.cancels.lightForward);
+            lightForwardCancelCombo.setActionCommand("fieldChanged");
+            lightForwardCancelCombo.addItemListener(this);
+            
+            JLabel lightUpCancelLabel = new JLabel("Light Up");
+            lightUpCancelLabel.setToolTipText(cancelTooltip);
+            lightUpCancelCombo = new JComboBox<Cancel>(Cancel.values());
+            lightUpCancelCombo.setToolTipText(cancelTooltip);
+            lightUpCancelCombo.setSelectedItem(fHold.cancels.lightUp);
+            lightUpCancelCombo.setActionCommand("fieldChanged");
+            lightUpCancelCombo.addItemListener(this);
+            
+            JLabel lightDownCancelLabel = new JLabel("Light Down");
+            lightDownCancelLabel.setToolTipText(cancelTooltip);
+            lightDownCancelCombo = new JComboBox<Cancel>(Cancel.values());
+            lightDownCancelCombo.setToolTipText(cancelTooltip);
+            lightDownCancelCombo.setSelectedItem(fHold.cancels.lightDown);
+            lightDownCancelCombo.setActionCommand("fieldChanged");
+            lightDownCancelCombo.addItemListener(this);
+            
+            JLabel lightBackwardCancelLabel = new JLabel("Light Backward");
+            lightBackwardCancelLabel.setToolTipText(cancelTooltip);
+            lightBackwardCancelCombo = new JComboBox<Cancel>(Cancel.values());
+            lightBackwardCancelCombo.setToolTipText(cancelTooltip);
+            lightBackwardCancelCombo.setSelectedItem(fHold.cancels.lightBackward);
+            lightBackwardCancelCombo.setActionCommand("fieldChanged");
+            lightBackwardCancelCombo.addItemListener(this);
+            
+            JLabel lightQCFCancelLabel = new JLabel("Light QCF");
+            lightQCFCancelLabel.setToolTipText(cancelTooltip);
+            lightQCFCancelCombo = new JComboBox<Cancel>(Cancel.values());
+            lightQCFCancelCombo.setToolTipText(cancelTooltip);
+            lightQCFCancelCombo.setSelectedItem(fHold.cancels.lightQCF);
+            lightQCFCancelCombo.setActionCommand("fieldChanged");
+            lightQCFCancelCombo.addItemListener(this);
+            
+            JLabel heavyNeutralCancelLabel = new JLabel("Heavy Neutral");
+            heavyNeutralCancelLabel.setToolTipText(cancelTooltip);
+            heavyNeutralCancelCombo = new JComboBox<Cancel>(Cancel.values());
+            heavyNeutralCancelCombo.setToolTipText(cancelTooltip);
+            heavyNeutralCancelCombo.setSelectedItem(fHold.cancels.heavyNeutral);
+            heavyNeutralCancelCombo.setActionCommand("fieldChanged");
+            heavyNeutralCancelCombo.addItemListener(this);
+            
+            JLabel heavyForwardCancelLabel = new JLabel("Heavy Forward");
+            heavyForwardCancelLabel.setToolTipText(cancelTooltip);
+            heavyForwardCancelCombo = new JComboBox<Cancel>(Cancel.values());
+            heavyForwardCancelCombo.setToolTipText(cancelTooltip);
+            heavyForwardCancelCombo.setSelectedItem(fHold.cancels.heavyForward);
+            heavyForwardCancelCombo.setActionCommand("fieldChanged");
+            heavyForwardCancelCombo.addItemListener(this);
+            
+            JLabel heavyUpCancelLabel = new JLabel("Heavy Up");
+            heavyUpCancelLabel.setToolTipText(cancelTooltip);
+            heavyUpCancelCombo = new JComboBox<Cancel>(Cancel.values());
+            heavyUpCancelCombo.setToolTipText(cancelTooltip);
+            heavyUpCancelCombo.setSelectedItem(fHold.cancels.heavyUp);
+            heavyUpCancelCombo.setActionCommand("fieldChanged");
+            heavyUpCancelCombo.addItemListener(this);
+            
+            JLabel heavyDownCancelLabel = new JLabel("Heavy Down");
+            heavyDownCancelLabel.setToolTipText(cancelTooltip);
+            heavyDownCancelCombo = new JComboBox<Cancel>(Cancel.values());
+            heavyDownCancelCombo.setToolTipText(cancelTooltip);
+            heavyDownCancelCombo.setSelectedItem(fHold.cancels.heavyDown);
+            heavyDownCancelCombo.setActionCommand("fieldChanged");
+            heavyDownCancelCombo.addItemListener(this);
+            
+            JLabel heavyBackwardCancelLabel = new JLabel("Heavy Backward");
+            heavyBackwardCancelLabel.setToolTipText(cancelTooltip);
+            heavyBackwardCancelCombo = new JComboBox<Cancel>(Cancel.values());
+            heavyBackwardCancelCombo.setToolTipText(cancelTooltip);
+            heavyBackwardCancelCombo.setSelectedItem(fHold.cancels.heavyBackward);
+            heavyBackwardCancelCombo.setActionCommand("fieldChanged");
+            heavyBackwardCancelCombo.addItemListener(this);
+            
+            JLabel heavyQCFCancelLabel = new JLabel("Heavy QCF");
+            heavyQCFCancelLabel.setToolTipText(cancelTooltip);
+            heavyQCFCancelCombo = new JComboBox<Cancel>(Cancel.values());
+            heavyQCFCancelCombo.setToolTipText(cancelTooltip);
+            heavyQCFCancelCombo.setSelectedItem(fHold.cancels.heavyQCF);
+            heavyQCFCancelCombo.setActionCommand("fieldChanged");
+            heavyQCFCancelCombo.addItemListener(this);
+            
+            fighterInterface = new JPanel(new GridLayout(7, gridColumns, gridHorizontalGap, gridVerticalGap));
+            fighterInterface.setSize(gridWidth, gridRowHeight * 7);
+            fighterInterface.setBorder(new TitledBorder("Cancels"));
+            fighterInterface.add(dashCancelLabel);
+            fighterInterface.add(dashCancelCombo);
+            fighterInterface.add(jumpCancelLabel);
+            fighterInterface.add(jumpCancelCombo);
+            fighterInterface.add(lightNeutralCancelLabel);
+            fighterInterface.add(lightNeutralCancelCombo);
+            fighterInterface.add(lightForwardCancelLabel);
+            fighterInterface.add(lightForwardCancelCombo);
+            fighterInterface.add(lightUpCancelLabel);
+            fighterInterface.add(lightUpCancelCombo);
+            fighterInterface.add(lightDownCancelLabel);
+            fighterInterface.add(lightDownCancelCombo);
+            fighterInterface.add(lightBackwardCancelLabel);
+            fighterInterface.add(lightBackwardCancelCombo);
+            fighterInterface.add(lightQCFCancelLabel);
+            fighterInterface.add(lightQCFCancelCombo);
+            fighterInterface.add(heavyNeutralCancelLabel);
+            fighterInterface.add(heavyNeutralCancelCombo);
+            fighterInterface.add(heavyForwardCancelLabel);
+            fighterInterface.add(heavyForwardCancelCombo);
+            fighterInterface.add(heavyUpCancelLabel);
+            fighterInterface.add(heavyUpCancelCombo);
+            fighterInterface.add(heavyDownCancelLabel);
+            fighterInterface.add(heavyDownCancelCombo);
+            fighterInterface.add(heavyBackwardCancelLabel);
+            fighterInterface.add(heavyBackwardCancelCombo);
+            fighterInterface.add(heavyQCFCancelLabel);
+            fighterInterface.add(heavyQCFCancelCombo);
+            setFighterInterfaceEnabled();
+
+            holdAttributesPane.add(fighterInterface);
+        }
+        
         JButton okButton = new JButton("OK");
         okButton.setActionCommand("okButton");
         okButton.addActionListener(this);
@@ -321,6 +504,22 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         }
     }
     
+    private void setFighterInterfaceEnabled()
+    {
+        if(hold.IsFighterHold())
+        {
+            FighterHold fHold = (FighterHold)hold;
+            
+            fighterInterface.setEnabled(changeCancelsCheck.isSelected());
+            
+            Component[] components = fighterInterface.getComponents();
+            for(int i = 0; i < components.length; i++)
+            {
+                components[i].setEnabled(changeCancelsCheck.isSelected());
+            }
+        }
+    }
+    
     public void applyChanges()
     {
         hold.name = nameField.getText();
@@ -347,6 +546,25 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             ((TerrainObjectHold)hold).blockability = (Blockability)blockabilityCombo.getSelectedItem();
             ((TerrainObjectHold)hold).horizontalDirectionBasedBlock = directionBlockCheck.isSelected();
             ((TerrainObjectHold)hold).reversedHorizontalBlock = reverseBlockCheck.isSelected();
+        }
+        
+        if(hold.IsFighterHold())
+        {
+            ((FighterHold)hold).changeCancels = changeCancelsCheck.isSelected();
+            ((FighterHold)hold).cancels.dash = (Cancel)dashCancelCombo.getSelectedItem();
+            ((FighterHold)hold).cancels.jump = (Cancel)jumpCancelCombo.getSelectedItem();
+            ((FighterHold)hold).cancels.lightNeutral = (Cancel)lightNeutralCancelCombo.getSelectedItem();
+            ((FighterHold)hold).cancels.lightForward = (Cancel)lightForwardCancelCombo.getSelectedItem();
+            ((FighterHold)hold).cancels.lightUp = (Cancel)lightUpCancelCombo.getSelectedItem();
+            ((FighterHold)hold).cancels.lightDown = (Cancel)lightDownCancelCombo.getSelectedItem();
+            ((FighterHold)hold).cancels.lightBackward = (Cancel)lightBackwardCancelCombo.getSelectedItem();
+            ((FighterHold)hold).cancels.lightQCF = (Cancel)lightQCFCancelCombo.getSelectedItem();
+            ((FighterHold)hold).cancels.heavyNeutral = (Cancel)heavyNeutralCancelCombo.getSelectedItem();
+            ((FighterHold)hold).cancels.heavyForward = (Cancel)heavyForwardCancelCombo.getSelectedItem();
+            ((FighterHold)hold).cancels.heavyUp = (Cancel)heavyUpCancelCombo.getSelectedItem();
+            ((FighterHold)hold).cancels.heavyDown = (Cancel)heavyDownCancelCombo.getSelectedItem();
+            ((FighterHold)hold).cancels.heavyBackward = (Cancel)heavyBackwardCancelCombo.getSelectedItem();
+            ((FighterHold)hold).cancels.heavyQCF = (Cancel)heavyQCFCancelCombo.getSelectedItem();
         }
         
         parent.repaint();
@@ -399,6 +617,12 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         fieldChanged();
     }
     
+    private void changeCancelsChanged()
+    {
+        setFighterInterfaceEnabled();
+        fieldChanged();
+    }
+    
     private void hitSoundsButtonPressed()
     {
         SoundsWindow window = new SoundsWindow(this, hold, "hit");
@@ -417,6 +641,7 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             case "applyButton": applyButtonPressed(); break;
             case "fieldChanged": fieldChanged(); break;
             case "changeAttackBoxAttributesChanged": changeAttackBoxAttributesChanged(); break;
+            case "changeCancelsChanged": changeCancelsChanged(); break;
             case "hitSoundsButton": hitSoundsButtonPressed(); break;
         }
     }

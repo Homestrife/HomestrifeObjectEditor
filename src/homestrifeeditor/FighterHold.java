@@ -9,9 +9,14 @@ package homestrifeeditor;
  * @author Darlos9D
  */
 public class FighterHold extends PhysicsObjectHold {
+    Cancels cancels;
+    boolean changeCancels;
+    
     public FighterHold()
     {
         super();
+        
+        cancels = new Cancels();
     }
     
     @Override

@@ -942,6 +942,22 @@ public class HoldListWindow extends JFrame implements ActionListener {
                 if(loadHold.IsFighterHold())
                 {
                     FighterHold fHold = (FighterHold)loadHold;
+                    
+                    if(holdAttributes.getNamedItem("changeCancels") != null) fHold.changeCancels = Boolean.parseBoolean(holdAttributes.getNamedItem("changeCancels").getNodeValue());
+                    if(holdAttributes.getNamedItem("dashCancel") != null) fHold.cancels.dash = Cancel.valueOf(holdAttributes.getNamedItem("dashCancel").getNodeValue());
+                    if(holdAttributes.getNamedItem("jumpCancel") != null) fHold.cancels.jump = Cancel.valueOf(holdAttributes.getNamedItem("jumpCancel").getNodeValue());
+                    if(holdAttributes.getNamedItem("lightNeutralCancel") != null) fHold.cancels.lightNeutral = Cancel.valueOf(holdAttributes.getNamedItem("lightNeutralCancel").getNodeValue());
+                    if(holdAttributes.getNamedItem("lightForwardCancel") != null) fHold.cancels.lightForward = Cancel.valueOf(holdAttributes.getNamedItem("lightForwardCancel").getNodeValue());
+                    if(holdAttributes.getNamedItem("lightUpCancel") != null) fHold.cancels.lightUp = Cancel.valueOf(holdAttributes.getNamedItem("lightUpCancel").getNodeValue());
+                    if(holdAttributes.getNamedItem("lightDownCancel") != null) fHold.cancels.lightDown = Cancel.valueOf(holdAttributes.getNamedItem("lightDownCancel").getNodeValue());
+                    if(holdAttributes.getNamedItem("lightBackwardCancel") != null) fHold.cancels.lightBackward = Cancel.valueOf(holdAttributes.getNamedItem("lightBackwardCancel").getNodeValue());
+                    if(holdAttributes.getNamedItem("lightQCFCancel") != null) fHold.cancels.lightQCF = Cancel.valueOf(holdAttributes.getNamedItem("lightQCFCancel").getNodeValue());
+                    if(holdAttributes.getNamedItem("heavyNeutralCancel") != null) fHold.cancels.heavyNeutral = Cancel.valueOf(holdAttributes.getNamedItem("heavyNeutralCancel").getNodeValue());
+                    if(holdAttributes.getNamedItem("heavyForwardCancel") != null) fHold.cancels.heavyForward = Cancel.valueOf(holdAttributes.getNamedItem("heavyForwardCancel").getNodeValue());
+                    if(holdAttributes.getNamedItem("heavyUpCancel") != null) fHold.cancels.heavyUp = Cancel.valueOf(holdAttributes.getNamedItem("heavyUpCancel").getNodeValue());
+                    if(holdAttributes.getNamedItem("heavyDownCancel") != null) fHold.cancels.heavyDown = Cancel.valueOf(holdAttributes.getNamedItem("heavyDownCancel").getNodeValue());
+                    if(holdAttributes.getNamedItem("heavyBackwardCancel") != null) fHold.cancels.heavyBackward = Cancel.valueOf(holdAttributes.getNamedItem("heavyBackwardCancel").getNodeValue());
+                    if(holdAttributes.getNamedItem("heavyQCFCancel") != null) fHold.cancels.heavyQCF = Cancel.valueOf(holdAttributes.getNamedItem("heavyQCFCancel").getNodeValue());
                 }
                 
                 loadObject.holds.add(loadHold);
@@ -1563,6 +1579,22 @@ public class HoldListWindow extends JFrame implements ActionListener {
                 {
                     //get FighterHold attributes
                     FighterHold fh = (FighterHold)h;
+                    
+                    hold.setAttribute("changeCancels", "" + fh.changeCancels);
+                    hold.setAttribute("dashCancel", "" + fh.cancels.dash);
+                    hold.setAttribute("jumpCancel", "" + fh.cancels.jump);
+                    hold.setAttribute("lightNeutralCancel", "" + fh.cancels.lightNeutral);
+                    hold.setAttribute("lightForwardCancel", "" + fh.cancels.lightForward);
+                    hold.setAttribute("lightUpCancel", "" + fh.cancels.lightUp);
+                    hold.setAttribute("lightDownCancel", "" + fh.cancels.lightDown);
+                    hold.setAttribute("lightBackwardCancel", "" + fh.cancels.lightBackward);
+                    hold.setAttribute("lightQCFCancel", "" + fh.cancels.lightQCF);
+                    hold.setAttribute("heavyNeutralCancel", "" + fh.cancels.heavyNeutral);
+                    hold.setAttribute("heavyForwardCancel", "" + fh.cancels.heavyForward);
+                    hold.setAttribute("heavyUpCancel", "" + fh.cancels.heavyUp);
+                    hold.setAttribute("heavyDownCancel", "" + fh.cancels.heavyDown);
+                    hold.setAttribute("heavyBackwardCancel", "" + fh.cancels.heavyBackward);
+                    hold.setAttribute("heavyQCFCancel", "" + fh.cancels.heavyQCF);
                 }
                 
                 //get textures
