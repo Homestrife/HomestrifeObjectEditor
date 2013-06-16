@@ -10,8 +10,6 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-
-import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 
@@ -59,7 +57,11 @@ public class HSTextureLabel extends JLabel implements MouseListener, MouseMotion
     
     public void loadIcon()
     {
-        icon = TGAReader.loadTGA(texture.filePath, parent.parent.parent.currentlyLoadedObject.palettes[parent.parent.parent.currentlyLoadedObject.curPalette].palFilePath);
+    	if(parent.parent.parent.currentlyLoadedObject.palettes.size() > 0)
+    		icon = TGAReader.loadTGA(texture.filePath, parent.parent.parent.currentlyLoadedObject.palettes.get(parent.parent.parent.currentlyLoadedObject.curPalette).palFilePath);
+    	else
+    		icon = TGAReader.loadTGA(texture.filePath, "");
+    		
         setIcon(icon);
         setText("");
         setName("texture");

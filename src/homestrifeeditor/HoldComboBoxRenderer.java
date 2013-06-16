@@ -13,10 +13,12 @@ import javax.swing.ListCellRenderer;
  *
  * @author Darlos9D
  */
-public class HoldComboBoxRenderer extends JLabel implements ListCellRenderer {
-    @Override
+public class HoldComboBoxRenderer extends JLabel implements ListCellRenderer<Object> {
+	private static final long serialVersionUID = 1L;
+
+	@Override
     public Component getListCellRendererComponent(
-                                       JList list,
+                                       JList<?> list,
                                        Object value,
                                        int index,
                                        boolean isSelected,

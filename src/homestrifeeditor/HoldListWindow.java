@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Comparator;
 
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JComponent;
@@ -60,6 +61,8 @@ public class HoldListWindow extends JFrame implements ActionListener {
     public HSObject currentlyLoadedObject;
     
     public String workingDirectory;
+    
+    private JMenu palettesMenu;
     
     //File chooser is declared at the class level so that it remembers last folder location..
     public static JFileChooser fileChooser;
@@ -229,8 +232,12 @@ public class HoldListWindow extends JFrame implements ActionListener {
         palettes.setActionCommand("palettes");
         object.add(objectAttributes);
         object.add(eventHolds);
-        object.add(palettes);
+        //object.add(palettes);
         menuBar.add(object);
+        
+        palettesMenu = new JMenu("Palettes");
+        menuBar.add(palettesMenu);
+        updatePalettesMenu();        
         
         help = new JMenu("Help");
         helpContent = new JMenuItem("Help Content");
@@ -326,6 +333,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         holdListPane.loadObjectHolds(currentlyLoadedObject);
         textureHitboxPane.resetScrollBars();
         textureHitboxPane.setCorrectTerrainBox();
+        updatePalettesMenu();
     }
     
     public void newGraphic()
@@ -335,6 +343,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         HSObjectHold newHold = new HSObjectHold();
         currentlyLoadedObject.holds.add(newHold);
         newObject();
+        updatePalettesMenu();
     }
     
     public void newTerrain()
@@ -344,6 +353,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         TerrainObjectHold newHold = new TerrainObjectHold();
         currentlyLoadedObject.holds.add(newHold);
         newObject();
+        updatePalettesMenu();
     }
     
     public void newPhysicsObject()
@@ -353,6 +363,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         PhysicsObjectHold newHold = new PhysicsObjectHold();
         currentlyLoadedObject.holds.add(newHold);
         newObject();
+        updatePalettesMenu();
     }
     
     public void newFighter()
@@ -363,6 +374,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         currentlyLoadedObject.holds.add(newHold);
         
         newObject();
+        updatePalettesMenu();
     }
     
     private void generate()
@@ -433,8 +445,10 @@ public class HoldListWindow extends JFrame implements ActionListener {
                     String type = Files.probeContentType(p.toPath());
                     if(type != null || !p.getName().endsWith(".hsp")) { continue; }
                     //if the type is null but the file ends with .hsp then it's PROBABLY a homestrife palette
-                    
-                    newObject.palettes[paletteIndex].palFilePath = p.getAbsolutePath();
+                    HSPalette pal = new HSPalette();
+                    pal.palFilePath = p.getAbsolutePath();
+                    newObject.palettes.add(pal);
+                    //newObject.palettes[paletteIndex].palFilePath = p.getAbsolutePath();
                     
                     paletteIndex++;
                     
@@ -468,7 +482,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                     else { newHold = new HSObjectHold(); }
                     
                     //see if we can actually load the file as a texture
-                    ImageIcon icon = TGAReader.loadTGA(h.getAbsolutePath(), newObject.palettes[0].palFilePath);
+                    ImageIcon icon = TGAReader.loadTGA(h.getAbsolutePath(), newObject.palettes.size() > 0 ? newObject.palettes.get(0).palFilePath : "");
                     
                     if(icon == null) { continue; } //whoops
                     
@@ -584,6 +598,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
             newObject();
             
             workingDirectory = file.getParent();
+            updatePalettesMenu();
         }
         catch(ParserConfigurationException e)
         {
@@ -940,6 +955,16 @@ public class HoldListWindow extends JFrame implements ActionListener {
             if(objectAttributes.getNamedItem("lifetime") != null) loadObject.lifetime = Integer.parseInt(objectAttributes.getNamedItem("lifetime").getNodeValue());
             
             //get palettes
+            for(int i=1;;i++) {
+            	if(objectAttributes.getNamedItem("palette" + i + "FilePath") == null) {
+            		break;
+            	}
+            	HSPalette pal = new HSPalette();
+            	pal.palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette" + i + "FilePath").getNodeValue());
+            	pal.name = "Palette " + i;
+            	loadObject.palettes.add(pal);
+            }
+            /*
             if(objectAttributes.getNamedItem("palette1FilePath") != null) loadObject.palettes[0].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette1FilePath").getNodeValue());
             if(objectAttributes.getNamedItem("palette2FilePath") != null) loadObject.palettes[1].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette2FilePath").getNodeValue());
             if(objectAttributes.getNamedItem("palette3FilePath") != null) loadObject.palettes[2].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette3FilePath").getNodeValue());
@@ -950,6 +975,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
             if(objectAttributes.getNamedItem("palette8FilePath") != null) loadObject.palettes[7].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette8FilePath").getNodeValue());
             if(objectAttributes.getNamedItem("palette9FilePath") != null) loadObject.palettes[8].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette9FilePath").getNodeValue());
             if(objectAttributes.getNamedItem("palette10FilePath") != null) loadObject.palettes[9].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette10FilePath").getNodeValue());
+            */
             
             //get hs object event holds
             if(eventHoldsAttributes.getNamedItem("lifetimeDeath") != null)
@@ -1168,6 +1194,8 @@ public class HoldListWindow extends JFrame implements ActionListener {
             
             setCurrentlyLoadedObject(loadObject);
             newObject();
+            
+            updatePalettesMenu();
         }
         catch(ParserConfigurationException e)
         {
@@ -1773,10 +1801,41 @@ public class HoldListWindow extends JFrame implements ActionListener {
         PalettesWindow window = new PalettesWindow(this);
         window.setVisible(true);
     }
+    int curPal;
+    public void updatePalettesMenu() {
+    	palettesMenu.removeAll();
+		JMenuItem menuItem;
+    	if(currentlyLoadedObject == null || currentlyLoadedObject.palettes.size() == 0) {
+    		palettesMenu.add(new JMenuItem("NONE"));
+    	}
+    	else {
+	    	curPal = 0;
+	    	for(HSPalette hsp : currentlyLoadedObject.palettes) {
+	    		//Set each palette menu item to load the correct palette when clicked
+	    		menuItem = new JMenuItem(new AbstractAction(hsp.name) {
+					private static final long serialVersionUID = 1L;
+					int palNum = curPal;
+					@Override
+					public void actionPerformed(ActionEvent arg0) {
+				        currentlyLoadedObject.curPalette = palNum;
+				        textureHitboxPane.reloadTextures();	
+					}
+				});
+	    		palettesMenu.add(menuItem);
+	    		curPal++;
+	    	}
+    	}
+    	palettesMenu.add(new JSeparator());
+    	menuItem = new JMenuItem("Edit Palettes");
+    	menuItem.setActionCommand("palettes");
+    	menuItem.addActionListener(this);
+    	palettesMenu.add(menuItem);
+    }
     
     @Override
     public void actionPerformed(ActionEvent e)
     {
+    	System.out.println(e.getActionCommand());
         switch(e.getActionCommand())
         {
             case "newGraphic": newGraphic(); break;

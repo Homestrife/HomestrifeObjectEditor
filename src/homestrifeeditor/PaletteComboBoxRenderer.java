@@ -13,10 +13,12 @@ import javax.swing.ListCellRenderer;
  *
  * @author Darlos9D
  */
-public class PaletteComboBoxRenderer extends JLabel implements ListCellRenderer {
-    @Override
+public class PaletteComboBoxRenderer extends JLabel implements ListCellRenderer<Object> {
+	private static final long serialVersionUID = 1L;
+
+	@Override
     public Component getListCellRendererComponent(
-                                       JList list,
+                                       JList<?> list,
                                        Object value,
                                        int index,
                                        boolean isSelected,
@@ -31,7 +33,10 @@ public class PaletteComboBoxRenderer extends JLabel implements ListCellRenderer 
         
         
         String s;
-        s = ((HSPalette)value).name;
+        if(value != null)
+        	s = ((HSPalette)value).name;
+        else
+        	s = "NONE";
         
         setText(s);
 

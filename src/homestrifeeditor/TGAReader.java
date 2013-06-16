@@ -107,6 +107,7 @@ public class TGAReader {
             imageType = (byte)file.read(); //find out what kind of image file this is
             if(imageType != 9 && imageType != 10)
             {
+            	file.close();
                 return null; //this needs to be RLE, either indexed or truecolor
             }
         	boolean useInternalPalette = imageType == 9 && palFilePath.isEmpty();
@@ -131,11 +132,13 @@ public class TGAReader {
             bytesPerPixel = (byte)((int)pixelDepth/8); //get the size of each pixel in bytes
             if((imageType == 9 && pixelDepth != 8) || (imageType == 10 && pixelDepth != 24))
             {
+            	file.close();
                 return null; //only allowed configurations are: index with 8-bit, or truecolor with 24 bit
             }
             imageDescriptor = (byte)file.read(); //get the image descriptor, and pull some data from it
             if((imageDescriptor & ATTRIBUTE_BITS) > 0)
             {
+            	file.close();
                 return null; //no attributes should be defined
             }
             if((imageDescriptor & TOP_ALIGN) == 0)

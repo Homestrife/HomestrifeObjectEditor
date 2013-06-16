@@ -85,6 +85,7 @@ public class HSBoxLabel extends JLabel implements MouseListener, MouseMotionList
     	this(l.parent, l.box);
     	setBounds(l.getBounds());
     	box = new HSBox(box);
+    	setName(l.getName());
     }
     
     private void setResizeBoxes()

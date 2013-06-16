@@ -15,7 +15,7 @@ public class HSObject {
     public ArrayList<HSObjectHold> holds;
     public int lifetime;
     public HSObjectEventHolds hsObjectEventHolds;
-    public HSPalette[] palettes;
+    public ArrayList<HSPalette> palettes;
     public int curPalette;
     
     public HSObject()
@@ -24,12 +24,14 @@ public class HSObject {
         holds = new ArrayList<HSObjectHold>();
         lifetime = 0;
         hsObjectEventHolds = new HSObjectEventHolds();
-        palettes = new HSPalette[20];
+        palettes = new ArrayList<HSPalette>();
+        /*
         for(int i = 0; i < palettes.length; i++)
         {
             palettes[i] = new HSPalette();
             palettes[i].name = "Palette " + (i + 1);
         }
+        */
         curPalette = 0;
     }
     

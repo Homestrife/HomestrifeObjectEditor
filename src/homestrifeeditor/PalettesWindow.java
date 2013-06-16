@@ -19,14 +19,15 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
 
 /**
  *
  * @author Darlos9D
  */
 public class PalettesWindow extends JFrame implements ActionListener, ItemListener {
-    private static int windowWidth = 720;
+	private static final long serialVersionUID = 1L;
+	
+	private static int windowWidth = 720;
     private static int windowHeight = 140;
     private static int windowBorderBuffer = 10;
     
@@ -38,7 +39,7 @@ public class PalettesWindow extends JFrame implements ActionListener, ItemListen
     
     private HoldListWindow parent;
     
-    private JComboBox paletteCombo;
+    private JComboBox<Object> paletteCombo;
     
     private JButton applyButton;
     private JLabel pathLabel;
@@ -58,10 +59,20 @@ public class PalettesWindow extends JFrame implements ActionListener, ItemListen
     private void createWindowContents()
     {
         JLabel paletteLabel = new JLabel("Current Palette");
-        paletteCombo = new JComboBox(parent.currentlyLoadedObject.palettes);
+        paletteCombo = new JComboBox<Object>(parent.currentlyLoadedObject.palettes.toArray());
         paletteCombo.setRenderer(new PaletteComboBoxRenderer());
-        paletteCombo.setSelectedIndex(parent.currentlyLoadedObject.curPalette);
+        if(paletteCombo.getItemCount() > 0) {
+        	paletteCombo.setSelectedIndex(parent.currentlyLoadedObject.curPalette);
+        }
+        else {
+        	
+        }
         paletteCombo.addItemListener(this);
+        
+        JButton newPaletteButton = new JButton("New...");
+        newPaletteButton.addActionListener(this);
+        newPaletteButton.setActionCommand("newButton");
+        newPaletteButton.setEnabled(false);
         
         JButton loadPaletteButton = new JButton("Load...");
         loadPaletteButton.addActionListener(this);
@@ -78,6 +89,7 @@ public class PalettesWindow extends JFrame implements ActionListener, ItemListen
         paletteInterface.setSize(gridWidth, gridRowHeight);
         paletteInterface.add(paletteLabel);
         paletteInterface.add(paletteCombo);
+        paletteInterface.add(newPaletteButton);
         paletteInterface.add(loadPaletteButton);
         paletteInterface.add(clearPaletteButton);
         
@@ -113,7 +125,11 @@ public class PalettesWindow extends JFrame implements ActionListener, ItemListen
     
     private void setPathLabelText()
     {
-        if(((HSPalette)paletteCombo.getSelectedItem()).palFilePath.isEmpty())
+    	if(paletteCombo.getItemCount() == 0)
+        {
+            pathLabel.setText("NO FILE SELECTED");
+        }
+    	else if(((HSPalette)paletteCombo.getSelectedItem()).palFilePath.isEmpty())
         {
             pathLabel.setText("NO FILE SELECTED");
         }
@@ -153,6 +169,10 @@ public class PalettesWindow extends JFrame implements ActionListener, ItemListen
         applyChanges();
     }
     
+    private void newButtonPressed() {
+    	
+    }
+    
     private void loadButtonPressed()
     {
         JFileChooser fc = new JFileChooser();
@@ -189,6 +209,7 @@ public class PalettesWindow extends JFrame implements ActionListener, ItemListen
             case "okButton": okButtonPressed(); break;
             case "closeButton": closeButtonPressed(); break;
             case "applyButton": applyButtonPressed(); break;
+            case "newButton": newButtonPressed(); break;
             case "loadButton": loadButtonPressed(); break;
             case "clearButton": clearButtonPressed(); break;
         }
