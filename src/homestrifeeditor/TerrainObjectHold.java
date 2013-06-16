@@ -19,6 +19,8 @@ public class TerrainObjectHold extends HSObjectHold {
     public boolean horizontalDirectionBasedBlock;
     public boolean reversedHorizontalBlock;
     public int damage;
+    public int ownHitstop;
+    public int victimHitstop;
     public int hitstun;
     public int blockstun;
     public HSVect2D force;
@@ -37,6 +39,8 @@ public class TerrainObjectHold extends HSObjectHold {
         horizontalDirectionBasedBlock = false;
         reversedHorizontalBlock = false;
         damage = 0;
+        ownHitstop = 0;
+        victimHitstop = 0;
         hitstun = 0;
         blockstun = 0;
         force = new HSVect2D();

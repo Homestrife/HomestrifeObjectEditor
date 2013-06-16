@@ -38,7 +38,7 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
 	private static int windowWidth = 800;
     private static int windowHeightGeneral = 650;
     private static int windowHeightTerrain = 410;
-    private static int windowHeightFighter = 810;
+    private static int windowHeightFighter = 865;
     private static int windowBorderBuffer = 10;
     
     private static int gridWidth = 650;
@@ -59,8 +59,10 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
     private JCheckBox changeAttackBoxAttributesCheck; private static String changeAttackBoxAttributesTooltip = "<html>If this is unchecked, this hold will inherit the attack<br/>attributes of any hold that has this hold as its<br/>next hold.</html>";
     
     private JSpinner damageSpinner;         private static String damageTooltip = "<html>How much damage is done to another object with hurt boxes,<br>should one of this objects attack boxes collide with one of them.</html>";
-    private JSpinner hitstunSpinner;        private static String hitstunTooltip = "<html>How many frames another fighter is rendered inactive<br>when struck by one of this object's attack boxes.</html>";
-    private JSpinner blockstunSpinner;      private static String blockstunTooltip = "<html>How many frames another fighter is rendered inactive<br>when struck by one of this object's attack boxes while blocking.</html>";
+    private JSpinner ownHitstopSpinner;     private static String ownHitstopTooltip = "<html>How many frames this object is frozen when it strikes<br>something else. This is usually the same amount as victim hitstop.</html>";
+    private JSpinner victimHitstopSpinner;  private static String victimHitstopTooltip = "<html>How many frames another object is frozen when struck<br>by this object. This is usually the same amount as own hitstop.</html>";
+    private JSpinner hitstunSpinner;        private static String hitstunTooltip = "<html>How many frames another fighter is rendered out-of-control<br>when struck by one of this object's attack boxes.</html>";
+    private JSpinner blockstunSpinner;      private static String blockstunTooltip = "<html>How many frames another fighter is rendered out-of-control<br>when struck by one of this object's attack boxes while blocking.</html>";
     
     private JSpinner forceXSpinner;         private static String forceXTooltip = "<html>When another physics object is struck by one of this object's<br>attack boxes, its X velocity is set to this value.</html>";
     private JSpinner forceYSpinner;         private static String forceYTooltip = "<html>When another physics object is struck by one of this object's<br>attack boxes, its Y velocity is set to this value.</html>";
@@ -221,12 +223,28 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             damageSpinner.setToolTipText(damageTooltip);
             damageSpinner.setValue(toHold.damage);
             damageSpinner.addChangeListener(this);
+            
+            JLabel ownHitstopLabel = new JLabel("Own Hit Stop");
+            ownHitstopLabel.setToolTipText(ownHitstopTooltip);
+            ownHitstopSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 99999, 1));
+            ownHitstopSpinner.setToolTipText(ownHitstopTooltip);
+            ownHitstopSpinner.setValue(toHold.ownHitstop);
+            ownHitstopSpinner.addChangeListener(this);
+            
+            JLabel victimHitstopLabel = new JLabel("Victim Hit Stop");
+            victimHitstopLabel.setToolTipText(victimHitstopTooltip);
+            victimHitstopSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 99999, 1));
+            victimHitstopSpinner.setToolTipText(victimHitstopTooltip);
+            victimHitstopSpinner.setValue(toHold.victimHitstop);
+            victimHitstopSpinner.addChangeListener(this);
+            
             JLabel hitstunLabel = new JLabel("Hit Stun");
             hitstunLabel.setToolTipText(hitstunTooltip);
             hitstunSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 99999, 1));
             hitstunSpinner.setToolTipText(hitstunTooltip);
             hitstunSpinner.setValue(toHold.hitstun);
             hitstunSpinner.addChangeListener(this);
+            
             JLabel blockstunLabel = new JLabel("Block Stun");
             blockstunLabel.setToolTipText(blockstunTooltip);
             blockstunSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 99999, 1));
@@ -270,11 +288,15 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             hitSoundsButton.setActionCommand("hitSoundsButton");
             hitSoundsButton.addActionListener(this);
 
-            terrainInterface = new JPanel(new GridLayout(6, gridColumns, gridHorizontalGap, gridVerticalGap));
-            terrainInterface.setSize(gridWidth, gridRowHeight * 6);
+            terrainInterface = new JPanel(new GridLayout(7, gridColumns, gridHorizontalGap, gridVerticalGap));
+            terrainInterface.setSize(gridWidth, gridRowHeight * 7);
             terrainInterface.setBorder(new TitledBorder("Attack Box Attributes"));
             terrainInterface.add(damageLabel);
             terrainInterface.add(damageSpinner);
+            terrainInterface.add(ownHitstopLabel);
+            terrainInterface.add(ownHitstopSpinner);
+            terrainInterface.add(victimHitstopLabel);
+            terrainInterface.add(victimHitstopSpinner);
             terrainInterface.add(hitstunLabel);
             terrainInterface.add(hitstunSpinner);
             terrainInterface.add(blockabilityLabel);
@@ -537,6 +559,8 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         {
             ((TerrainObjectHold)hold).changeAttackBoxAttributes = changeAttackBoxAttributesCheck.isSelected();
             ((TerrainObjectHold)hold).damage = (int)damageSpinner.getValue();
+            ((TerrainObjectHold)hold).ownHitstop = (int)ownHitstopSpinner.getValue();
+            ((TerrainObjectHold)hold).victimHitstop = (int)victimHitstopSpinner.getValue();
             ((TerrainObjectHold)hold).hitstun = (int)hitstunSpinner.getValue();
             ((TerrainObjectHold)hold).blockstun = (int)blockstunSpinner.getValue();
             ((TerrainObjectHold)hold).force.x = (float)forceXSpinner.getValue();
