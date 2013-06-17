@@ -81,6 +81,10 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
         {
             setTitle("Hit Sounds - " + ((HSObjectHold)object).name);
         }
+        else if(mode.compareTo("blocked") == 0)
+        {
+            setTitle("Blocked Sounds - " + ((HSObjectHold)object).name);
+        }
         else if(mode.compareTo("onHit") == 0) {
         	setTitle("On Hit Sounds - " + ((HSObject)object).name);
         }
@@ -110,6 +114,13 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
         else if(mode.compareTo("hit") == 0)
         {
             for (HSAudio a : ((TerrainObjectHold)object).hitAudioList)
+            {
+                soundListModel.addElement(a);
+            }
+        }
+        else if(mode.compareTo("blocked") == 0)
+        {
+            for (HSAudio a : ((TerrainObjectHold)object).blockedAudioList)
             {
                 soundListModel.addElement(a);
             }
@@ -270,6 +281,10 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
         {
             ((TerrainObjectHold)object).hitAudioList.add(newAudio);
         }
+        else if(mode.compareTo("blocked") == 0)
+        {
+            ((TerrainObjectHold)object).blockedAudioList.add(newAudio);
+        }
         else if(mode.compareTo("onHit") == 0)
         {
             ((TerrainObject)object).onHitSounds.add(newAudio);
@@ -297,6 +312,10 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
         else if(mode.compareTo("hit") == 0)
         {
             ((TerrainObjectHold)object).hitAudioList.remove(audio);
+        }
+        else if(mode.compareTo("blocked") == 0)
+        {
+            ((TerrainObjectHold)object).blockedAudioList.remove(audio);
         }
         else if(mode.compareTo("onHit") == 0)
         {

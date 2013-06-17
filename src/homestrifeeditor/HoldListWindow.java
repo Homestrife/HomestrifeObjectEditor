@@ -768,6 +768,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                 Node attackBoxes = null;
                 Node hurtBoxes = null;
                 Node hitAudioList = null;
+                Node blockedAudioList = null;
                 for(int j = 0; j < holdSecs.getLength(); j++)
                 {
                     Node holdSec = holdSecs.item(j);
@@ -778,6 +779,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                     if(holdSec.getNodeName().compareTo("AttackBoxes") == 0) attackBoxes = holdSec;
                     if(holdSec.getNodeName().compareTo("HurtBoxes") == 0) hurtBoxes = holdSec;
                     if(holdSec.getNodeName().compareTo("HitAudioList") == 0) hitAudioList = holdSec;
+                    if(holdSec.getNodeName().compareTo("BlockedAudioList") == 0) blockedAudioList = holdSec;
                 }
                 
                 //get hold attributes
@@ -932,6 +934,27 @@ public class HoldListWindow extends JFrame implements ActionListener {
                             if(hitAudioAttributes.getNamedItem("percentage") != null) aud.percentage = Integer.parseInt(hitAudioAttributes.getNamedItem("percentage").getNodeValue());
 
                             toHold.hitAudioList.add(aud);
+                        }
+                    }
+                    
+                    //get blocked sounds
+                    if(blockedAudioList != null)
+                    {
+                        NodeList blockedAudioListList = blockedAudioList.getChildNodes();
+                        for(int j = 0; j < blockedAudioListList.getLength(); j++)
+                        {
+                            if(blockedAudioListList.item(j).getNodeName().compareTo("BlockedAudio") != 0) { continue; }
+                            NamedNodeMap blockedAudioAttributes = blockedAudioListList.item(j).getAttributes();
+
+                            String filePath = "";
+                            if(blockedAudioAttributes.getNamedItem("blockedAudioFilePath") != null) filePath = createAbsolutePath(blockedAudioAttributes.getNamedItem("blockedAudioFilePath").getNodeValue());
+                            HSAudio aud = new HSAudio(filePath);
+                            if(blockedAudioAttributes.getNamedItem("delay") != null) aud.delay = Integer.parseInt(blockedAudioAttributes.getNamedItem("delay").getNodeValue());
+                            if(blockedAudioAttributes.getNamedItem("exclusive") != null) aud.exclusive = Boolean.parseBoolean(blockedAudioAttributes.getNamedItem("exclusive").getNodeValue());
+                            if(blockedAudioAttributes.getNamedItem("usePercentage") != null) aud.usePercentage = Boolean.parseBoolean(blockedAudioAttributes.getNamedItem("usePercentage").getNodeValue());
+                            if(blockedAudioAttributes.getNamedItem("percentage") != null) aud.percentage = Integer.parseInt(blockedAudioAttributes.getNamedItem("percentage").getNodeValue());
+
+                            toHold.blockedAudioList.add(aud);
                         }
                     }
                 }
@@ -1570,6 +1593,23 @@ public class HoldListWindow extends JFrame implements ActionListener {
                             hitAudioList.appendChild(hitAudio);
                         }
                         hold.appendChild(hitAudioList);
+                    }
+                    
+                    //get blocked sounds
+                    if(!th.blockedAudioList.isEmpty())
+                    {
+                        Element blockedAudioList = doc.createElement("BlockedAudioList");
+                        for(HSAudio a : th.blockedAudioList)
+                        {
+                            Element blockedAudio = doc.createElement("BlockedAudio");
+                            blockedAudio.setAttribute("delay", "" + a.delay);
+                            blockedAudio.setAttribute("blockedAudioFilePath", createRelativePath(a.filePath));
+                            blockedAudio.setAttribute("exclusive", "" + a.exclusive);
+                            blockedAudio.setAttribute("percentage", "" + a.percentage);
+                            blockedAudio.setAttribute("usePercentage", "" + a.usePercentage);
+                            blockedAudioList.appendChild(blockedAudio);
+                        }
+                        hold.appendChild(blockedAudioList);
                     }
                 }
                 

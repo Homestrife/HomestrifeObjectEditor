@@ -37,7 +37,7 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
 	
 	private static int windowWidth = 800;
     private static int windowHeightGeneral = 650;
-    private static int windowHeightTerrain = 410;
+    private static int windowHeightTerrain = 465;
     private static int windowHeightFighter = 865;
     private static int windowBorderBuffer = 10;
     
@@ -74,6 +74,7 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
     private JCheckBox directionBlockCheck;  private static String directionBlockTooltip = "<html>If checked, another figher must be facing in the opposite<br>direction that this object is facing in order to block this<br>object's attack boxes.<br>Normally, whether this object's attack boxes must be blocked while<br>facing left or right is determined by which side of the defending<br>fighter this object is on, regardless of which way this object is facing.</html>";
     private JCheckBox reverseBlockCheck;    private static String reverseBlockTooltip = "<html>If checked, another fighter must face the direction opposite<br>of what they would normally need to in order to block this object's attack boxes.</html>";
     private JButton hitSoundsButton;        private static String hitSoundsTooltip = "<html>Add/Edit sounds that occur upon an attack box collision</html>";
+    private JButton blockedSoundsButton;        private static String blockedSoundsTooltip = "<html>Add/Edit sounds that occur upon an attack being blocked</html>";
     
     private JCheckBox changeCancelsCheck;   private static String changeCancelsTooltip = "<html>If this is unchecked, this hold will inhereit the cancels<br>of any hold that has this hold as its next hold.</html>";
     private JComboBox<Cancel> dashCancelCombo; private static String cancelTooltip = "<html>Any Time: This action can be cancelled into at any time.<br>After Hit or Block: This action can be cancelled into after striking a hurt box.<br>After Hit: This action can ben cancelled into after striking a hurt box without being blocked.<br>After Block: This action can be cancelled into after striking a hurt box and beinb blocked.<br>Never: This action can never be cancelled into.</html>";
@@ -287,6 +288,11 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             hitSoundsButton.setToolTipText(hitSoundsTooltip);
             hitSoundsButton.setActionCommand("hitSoundsButton");
             hitSoundsButton.addActionListener(this);
+        
+            blockedSoundsButton = new JButton("Blocked Sounds...");
+            blockedSoundsButton.setToolTipText(blockedSoundsTooltip);
+            blockedSoundsButton.setActionCommand("blockedSoundsButton");
+            blockedSoundsButton.addActionListener(this);
 
             terrainInterface = new JPanel(new GridLayout(7, gridColumns, gridHorizontalGap, gridVerticalGap));
             terrainInterface.setSize(gridWidth, gridRowHeight * 7);
@@ -318,7 +324,7 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             terrainInterface.add(new JLabel(""));
             terrainInterface.add(hitSoundsButton);
             terrainInterface.add(new JLabel(""));
-            terrainInterface.add(new JLabel(""));
+            terrainInterface.add(blockedSoundsButton);
             setTerrainInterfaceEnabled();
 
             holdAttributesPane.add(terrainInterface);
@@ -653,6 +659,12 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         window.setVisible(true);
     }
     
+    private void blockedSoundsButtonPressed()
+    {
+        SoundsWindow window = new SoundsWindow(this, hold, "blocked");
+        window.setVisible(true);
+    }
+    
     @Override
     public void actionPerformed(ActionEvent e)
     {
@@ -667,6 +679,7 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             case "changeAttackBoxAttributesChanged": changeAttackBoxAttributesChanged(); break;
             case "changeCancelsChanged": changeCancelsChanged(); break;
             case "hitSoundsButton": hitSoundsButtonPressed(); break;
+            case "blockedSoundsButton": blockedSoundsButtonPressed(); break;
         }
     }
     

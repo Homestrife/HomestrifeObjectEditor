@@ -14,6 +14,7 @@ public class TerrainObjectHold extends HSObjectHold {
     public ArrayList<HSBox> attackBoxes;
     public ArrayList<HSBox> hurtBoxes;
     public ArrayList<HSAudio> hitAudioList;
+    public ArrayList<HSAudio> blockedAudioList;
     public boolean changeAttackBoxAttributes;
     public Blockability blockability;
     public boolean horizontalDirectionBasedBlock;
@@ -34,6 +35,7 @@ public class TerrainObjectHold extends HSObjectHold {
         attackBoxes = new ArrayList<HSBox>();
         hurtBoxes = new ArrayList<HSBox>();
         hitAudioList = new ArrayList<HSAudio>();
+        blockedAudioList = new ArrayList<HSAudio>();
         changeAttackBoxAttributes = false;
         blockability = Blockability.MID;
         horizontalDirectionBasedBlock = false;
