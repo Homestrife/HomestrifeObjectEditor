@@ -626,6 +626,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
     
     private String createAbsolutePath(String relPath)
     {
+    	//TODO: Unix Path Support
         //break the working directory and relative path down into pieces
         String[] workingDirectoryPieces = workingDirectory.split("\\\\");
         String[] relPathPieces = relPath.split("\\\\");
@@ -802,6 +803,8 @@ public class HoldListWindow extends JFrame implements ActionListener {
                         
                         String filePath = "";
                         if(textureAttributes.getNamedItem("textureFilePath") != null) filePath = createAbsolutePath(textureAttributes.getNamedItem("textureFilePath").getNodeValue());
+                        filePath = filePath.replace('/', File.separatorChar);
+                        filePath = filePath.replace('\\', File.separatorChar);
                         HSTexture tex = new HSTexture(filePath);
                         if(textureAttributes.getNamedItem("depth") != null) tex.depth = Integer.parseInt(textureAttributes.getNamedItem("depth").getNodeValue());
                         if(textureAttributes.getNamedItem("offsetX") != null) tex.offset.x = Float.parseFloat(textureAttributes.getNamedItem("offsetX").getNodeValue());
@@ -822,6 +825,8 @@ public class HoldListWindow extends JFrame implements ActionListener {
                         
                         String filePath = "";
                         if(audioAttributes.getNamedItem("audioFilePath") != null) filePath = createAbsolutePath(audioAttributes.getNamedItem("audioFilePath").getNodeValue());
+                        filePath = filePath.replace('/', File.separatorChar);
+                        filePath = filePath.replace('\\', File.separatorChar);
                         HSAudio aud = new HSAudio(filePath);
                         if(audioAttributes.getNamedItem("delay") != null) aud.delay = Integer.parseInt(audioAttributes.getNamedItem("delay").getNodeValue());
                         if(audioAttributes.getNamedItem("exclusive") != null) aud.exclusive = Boolean.parseBoolean(audioAttributes.getNamedItem("exclusive").getNodeValue());
@@ -843,6 +848,8 @@ public class HoldListWindow extends JFrame implements ActionListener {
                         
                         String filePath = "";
                         if(spawnObjectAttributes.getNamedItem("definitionFilePath") != null) filePath = createAbsolutePath(spawnObjectAttributes.getNamedItem("definitionFilePath").getNodeValue());
+                        filePath = filePath.replace('/', File.separatorChar);
+                        filePath = filePath.replace('\\', File.separatorChar);
                         SpawnObject sob = new SpawnObject(filePath);
                         if(spawnObjectAttributes.getNamedItem("delay") != null) sob.delay = Integer.parseInt(spawnObjectAttributes.getNamedItem("delay").getNodeValue());
                         if(spawnObjectAttributes.getNamedItem("number") != null) sob.number = Integer.parseInt(spawnObjectAttributes.getNamedItem("number").getNodeValue());
@@ -927,6 +934,8 @@ public class HoldListWindow extends JFrame implements ActionListener {
 
                             String filePath = "";
                             if(hitAudioAttributes.getNamedItem("hitAudioFilePath") != null) filePath = createAbsolutePath(hitAudioAttributes.getNamedItem("hitAudioFilePath").getNodeValue());
+                            filePath = filePath.replace('/', File.separatorChar);
+                            filePath = filePath.replace('\\', File.separatorChar);
                             HSAudio aud = new HSAudio(filePath);
                             if(hitAudioAttributes.getNamedItem("delay") != null) aud.delay = Integer.parseInt(hitAudioAttributes.getNamedItem("delay").getNodeValue());
                             if(hitAudioAttributes.getNamedItem("exclusive") != null) aud.exclusive = Boolean.parseBoolean(hitAudioAttributes.getNamedItem("exclusive").getNodeValue());
@@ -948,6 +957,8 @@ public class HoldListWindow extends JFrame implements ActionListener {
 
                             String filePath = "";
                             if(blockedAudioAttributes.getNamedItem("blockedAudioFilePath") != null) filePath = createAbsolutePath(blockedAudioAttributes.getNamedItem("blockedAudioFilePath").getNodeValue());
+                            filePath = filePath.replace('/', File.separatorChar);
+                            filePath = filePath.replace('\\', File.separatorChar);
                             HSAudio aud = new HSAudio(filePath);
                             if(blockedAudioAttributes.getNamedItem("delay") != null) aud.delay = Integer.parseInt(blockedAudioAttributes.getNamedItem("delay").getNodeValue());
                             if(blockedAudioAttributes.getNamedItem("exclusive") != null) aud.exclusive = Boolean.parseBoolean(blockedAudioAttributes.getNamedItem("exclusive").getNodeValue());
@@ -1002,21 +1013,11 @@ public class HoldListWindow extends JFrame implements ActionListener {
             	}
             	HSPalette pal = new HSPalette();
             	pal.palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette" + i + "FilePath").getNodeValue());
-            	pal.name = "Palette " + i;
+            	pal.palFilePath = pal.palFilePath.replace('/', File.separatorChar);
+            	pal.palFilePath = pal.palFilePath.replace('\\', File.separatorChar);
+                pal.name = "Palette " + i;
             	loadObject.palettes.add(pal);
             }
-            /*
-            if(objectAttributes.getNamedItem("palette1FilePath") != null) loadObject.palettes[0].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette1FilePath").getNodeValue());
-            if(objectAttributes.getNamedItem("palette2FilePath") != null) loadObject.palettes[1].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette2FilePath").getNodeValue());
-            if(objectAttributes.getNamedItem("palette3FilePath") != null) loadObject.palettes[2].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette3FilePath").getNodeValue());
-            if(objectAttributes.getNamedItem("palette4FilePath") != null) loadObject.palettes[3].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette4FilePath").getNodeValue());
-            if(objectAttributes.getNamedItem("palette5FilePath") != null) loadObject.palettes[4].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette5FilePath").getNodeValue());
-            if(objectAttributes.getNamedItem("palette6FilePath") != null) loadObject.palettes[5].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette6FilePath").getNodeValue());
-            if(objectAttributes.getNamedItem("palette7FilePath") != null) loadObject.palettes[6].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette7FilePath").getNodeValue());
-            if(objectAttributes.getNamedItem("palette8FilePath") != null) loadObject.palettes[7].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette8FilePath").getNodeValue());
-            if(objectAttributes.getNamedItem("palette9FilePath") != null) loadObject.palettes[8].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette9FilePath").getNodeValue());
-            if(objectAttributes.getNamedItem("palette10FilePath") != null) loadObject.palettes[9].palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette10FilePath").getNodeValue());
-            */
             
             //get hs object event holds
             if(eventHoldsAttributes.getNamedItem("lifetimeDeath") != null)
@@ -1254,6 +1255,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
     
     private String createRelativePath(String absPath)
     {
+    	//TODO: Unix Paths
         //break the working directory and absolute path down into pieces
         String[] workingDirectoryPieces = workingDirectory.split("\\\\");
         String[] absPathPieces = absPath.split("\\\\");
