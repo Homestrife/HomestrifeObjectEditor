@@ -640,7 +640,6 @@ public class HoldListWindow extends JFrame implements ActionListener {
 		} 
 	    return absolute;
     	/*
-    	//TODO: Unix Path Support
         //break the working directory and relative path down into pieces
         String[] workingDirectoryPieces = workingDirectory.split("\\\\");
         String[] relPathPieces = relPath.split("\\\\");
@@ -1276,7 +1275,6 @@ public class HoldListWindow extends JFrame implements ActionListener {
     	String path = new File(workingDirectory).toURI().relativize(new File(absPath).toURI()).getPath();
     	path = path.replace(File.separatorChar, '\\');
     	return path;
-    	//TODO: Unix Paths
         //break the working directory and absolute path down into pieces
         /*
     	String[] workingDirectoryPieces = workingDirectory.split("\\\\");
