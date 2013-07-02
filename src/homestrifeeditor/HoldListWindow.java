@@ -10,6 +10,7 @@ import java.awt.KeyboardFocusManager;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.util.Comparator;
 
@@ -626,6 +627,19 @@ public class HoldListWindow extends JFrame implements ActionListener {
     
     private String createAbsolutePath(String relPath)
     {
+    	relPath = relPath.replace('\\', File.separatorChar);
+    	relPath = relPath.replace('/', File.separatorChar);
+    	if(!workingDirectory.endsWith(File.separator)) workingDirectory += File.separator;
+    	File a = new File(workingDirectory);
+	    File b = new File(a, relPath);
+	    String absolute = "";
+		try {
+			absolute = b.getCanonicalPath();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+	    return absolute;
+    	/*
     	//TODO: Unix Path Support
         //break the working directory and relative path down into pieces
         String[] workingDirectoryPieces = workingDirectory.split("\\\\");
@@ -659,6 +673,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         }
         
         return absolutePath;
+        */
     }
     
     private void open()
@@ -1255,9 +1270,16 @@ public class HoldListWindow extends JFrame implements ActionListener {
     
     private String createRelativePath(String absPath)
     {
+    	absPath = absPath.replace('\\', File.separatorChar);
+    	absPath = absPath.replace('/', File.separatorChar);
+    	if(!workingDirectory.endsWith(File.separator)) workingDirectory += File.separator;
+    	String path = new File(workingDirectory).toURI().relativize(new File(absPath).toURI()).getPath();
+    	path = path.replace(File.separatorChar, '\\');
+    	return path;
     	//TODO: Unix Paths
         //break the working directory and absolute path down into pieces
-        String[] workingDirectoryPieces = workingDirectory.split("\\\\");
+        /*
+    	String[] workingDirectoryPieces = workingDirectory.split("\\\\");
         String[] absPathPieces = absPath.split("\\\\");
         
         //first, make sure they share the same drive
@@ -1296,6 +1318,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         }
         
         return relativePath;
+        */
     }
     
     private void createDefinitionFile()
@@ -1707,7 +1730,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource source = new DOMSource(doc);
-            StreamResult result = new StreamResult(new File(workingDirectory + "\\" + currentlyLoadedObject.name + ".xml"));
+            StreamResult result = new StreamResult(new File(workingDirectory + File.separatorChar + currentlyLoadedObject.name + ".xml"));
             transformer.transform(source, result);
         }
         catch(ParserConfigurationException e)
