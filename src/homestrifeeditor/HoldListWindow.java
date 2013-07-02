@@ -1357,14 +1357,19 @@ public class HoldListWindow extends JFrame implements ActionListener {
             //get HSObject attributes
             object.setAttribute("name", currentlyLoadedObject.name);
             object.setAttribute("lifetime", "" + currentlyLoadedObject.lifetime);
-            int palNum = 1;
+            
+            Element palElement = doc.createElement("Palettes");
             for(HSPalette p : currentlyLoadedObject.palettes)
             {
                 if(p.palFilePath.isEmpty()) { continue; }
+            	Element singlePalElement = doc.createElement("Palette");
                 
-                object.setAttribute("palette" + palNum + "FilePath", createRelativePath(p.palFilePath));
-                palNum++;
+            	singlePalElement.setAttribute("name", p.name);
+            	singlePalElement.setAttribute("path", createRelativePath(p.palFilePath));
+            	
+                palElement.appendChild(singlePalElement);
             }
+            object.appendChild(palElement);
             
             //get HSObject event holds
             if(currentlyLoadedObject.hsObjectEventHolds.lifetimeDeath != null) { eventHolds.setAttribute("lifetimeDeath", "" + currentlyLoadedObject.hsObjectEventHolds.lifetimeDeath.id); }
