@@ -58,7 +58,7 @@ public class HSTextureLabel extends JLabel implements MouseListener, MouseMotion
     public void loadIcon()
     {
     	if(parent.parent.parent.currentlyLoadedObject.palettes.size() > 0)
-    		icon = TGAReader.loadTGA(texture.filePath, parent.parent.parent.currentlyLoadedObject.palettes.get(parent.parent.parent.currentlyLoadedObject.curPalette).palFilePath);
+    		icon = TGAReader.loadTGA(texture.filePath, parent.parent.parent.currentlyLoadedObject.palettes.get(parent.parent.parent.currentlyLoadedObject.curPalette).path);
     	else
     		icon = TGAReader.loadTGA(texture.filePath, "");
     		

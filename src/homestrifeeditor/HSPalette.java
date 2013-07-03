@@ -10,11 +10,11 @@ package homestrifeeditor;
  */
 public class HSPalette {
     public String name;
-    public String palFilePath;
+    public String path;
     
     public HSPalette()
     {
         name = "";
-        palFilePath = "";
+        path = "";
     }
 }

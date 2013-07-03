@@ -129,13 +129,13 @@ public class PalettesWindow extends JFrame implements ActionListener, ItemListen
         {
             pathLabel.setText("NO FILE SELECTED");
         }
-    	else if(((HSPalette)paletteCombo.getSelectedItem()).palFilePath.isEmpty())
+    	else if(((HSPalette)paletteCombo.getSelectedItem()).path.isEmpty())
         {
             pathLabel.setText("NO FILE SELECTED");
         }
         else
         {
-            pathLabel.setText(((HSPalette)paletteCombo.getSelectedItem()).palFilePath);
+            pathLabel.setText(((HSPalette)paletteCombo.getSelectedItem()).path);
         }
     }
     
@@ -185,13 +185,13 @@ public class PalettesWindow extends JFrame implements ActionListener, ItemListen
             return;
         }
         
-        ((HSPalette)paletteCombo.getSelectedItem()).palFilePath = file.getPath();
+        ((HSPalette)paletteCombo.getSelectedItem()).path = file.getPath();
         setPathLabelText();
     }
     
     private void clearButtonPressed()
     {
-        ((HSPalette)paletteCombo.getSelectedItem()).palFilePath = "";
+        ((HSPalette)paletteCombo.getSelectedItem()).path = "";
         setPathLabelText();
     }
     

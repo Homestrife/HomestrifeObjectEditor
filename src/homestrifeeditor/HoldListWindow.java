@@ -114,7 +114,6 @@ public class HoldListWindow extends JFrame implements ActionListener {
         JMenu object;
         JMenuItem objectAttributes;
         JMenuItem eventHolds;
-        JMenuItem palettes;
         JMenu help;
         JMenuItem helpContent;
         JMenuItem about;
@@ -224,16 +223,12 @@ public class HoldListWindow extends JFrame implements ActionListener {
         object = new JMenu("Object");
         objectAttributes = new JMenuItem("Attributes");
         eventHolds = new JMenuItem("Event Holds");
-        palettes = new JMenuItem("Palettes");
         objectAttributes.addActionListener(this);
         eventHolds.addActionListener(this);
-        palettes.addActionListener(this);
         objectAttributes.setActionCommand("objectAttributes");
         eventHolds.setActionCommand("eventHolds");
-        palettes.setActionCommand("palettes");
         object.add(objectAttributes);
         object.add(eventHolds);
-        //object.add(palettes);
         menuBar.add(object);
         
         palettesMenu = new JMenu("Palettes");
@@ -447,7 +442,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                     if(type != null || !p.getName().endsWith(".hsp")) { continue; }
                     //if the type is null but the file ends with .hsp then it's PROBABLY a homestrife palette
                     HSPalette pal = new HSPalette();
-                    pal.palFilePath = p.getAbsolutePath();
+                    pal.path = p.getAbsolutePath();
                     newObject.palettes.add(pal);
                     //newObject.palettes[paletteIndex].palFilePath = p.getAbsolutePath();
                     
@@ -483,7 +478,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                     else { newHold = new HSObjectHold(); }
                     
                     //see if we can actually load the file as a texture
-                    ImageIcon icon = TGAReader.loadTGA(h.getAbsolutePath(), newObject.palettes.size() > 0 ? newObject.palettes.get(0).palFilePath : "");
+                    ImageIcon icon = TGAReader.loadTGA(h.getAbsolutePath(), newObject.palettes.size() > 0 ? newObject.palettes.get(0).path : "");
                     
                     if(icon == null) { continue; } //whoops
                     
@@ -1028,9 +1023,9 @@ public class HoldListWindow extends JFrame implements ActionListener {
             		break;
             	}
             	HSPalette pal = new HSPalette();
-            	pal.palFilePath = createAbsolutePath(objectAttributes.getNamedItem("palette" + i + "FilePath").getNodeValue());
-            	pal.palFilePath = pal.palFilePath.replace('/', File.separatorChar);
-            	pal.palFilePath = pal.palFilePath.replace('\\', File.separatorChar);
+            	pal.path = createAbsolutePath(objectAttributes.getNamedItem("palette" + i + "FilePath").getNodeValue());
+            	pal.path = pal.path.replace('/', File.separatorChar);
+            	pal.path = pal.path.replace('\\', File.separatorChar);
                 pal.name = "Palette " + i;
             	loadObject.palettes.add(pal);
             }
@@ -1043,9 +1038,9 @@ public class HoldListWindow extends JFrame implements ActionListener {
 	                Node palette = palettesList.item(i);
 	                
 	                HSPalette pal = new HSPalette();
-	            	pal.palFilePath = createAbsolutePath(palette.getAttributes().getNamedItem("path").getNodeValue());
-	            	pal.palFilePath = pal.palFilePath.replace('/', File.separatorChar);
-	            	pal.palFilePath = pal.palFilePath.replace('\\', File.separatorChar);
+	            	pal.path = createAbsolutePath(palette.getAttributes().getNamedItem("path").getNodeValue());
+	            	pal.path = pal.path.replace('/', File.separatorChar);
+	            	pal.path = pal.path.replace('\\', File.separatorChar);
 	                pal.name = palette.getAttributes().getNamedItem("name").getNodeValue();
 	            	loadObject.palettes.add(pal);
 	            }
@@ -1382,11 +1377,11 @@ public class HoldListWindow extends JFrame implements ActionListener {
             Element palElement = doc.createElement("Palettes");
             for(HSPalette p : currentlyLoadedObject.palettes)
             {
-                if(p.palFilePath.isEmpty()) { continue; }
+                if(p.path.isEmpty()) { continue; }
             	Element singlePalElement = doc.createElement("Palette");
                 
             	singlePalElement.setAttribute("name", p.name);
-            	singlePalElement.setAttribute("path", createRelativePath(p.palFilePath));
+            	singlePalElement.setAttribute("path", createRelativePath(p.path));
             	
                 palElement.appendChild(singlePalElement);
             }
