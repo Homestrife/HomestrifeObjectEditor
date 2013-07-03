@@ -4,220 +4,360 @@
  */
 package homestrifeeditor;
 
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
-import javax.swing.BoxLayout;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTextField;
+import javax.swing.JToolBar;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /**
  *
  * @author Darlos9D
  */
-public class PalettesWindow extends JFrame implements ActionListener, ItemListener {
+public class PalettesWindow extends JFrame implements ActionListener, ListSelectionListener, MouseListener, ChangeListener {
 	private static final long serialVersionUID = 1L;
 	
-	private static int windowWidth = 720;
-    private static int windowHeight = 140;
-    private static int windowBorderBuffer = 10;
-    
-    private static int gridWidth = 700;
-    private static int gridRowHeight = 45;
-    private static int gridColumns = 4;
+	private static int windowWidth = 400;
+    private static int windowHeight = 200;
+    /*
+    private static int gridWidth = 650;
+    private static int gridRowHeight = 20;
+    private static int gridColumns = 2;
     private static int gridHorizontalGap = 10;
     private static int gridVerticalGap = 5;
+    */
+    private Object object;
+    private JFrame parent;
+    private boolean loading;
     
-    private HoldListWindow parent;
+    public DefaultListModel<HSPalette> paletteListModel;
+    public JList<HSPalette> paletteList;
     
-    private JComboBox<Object> paletteCombo;
+    private JToolBar paletteListToolBar;
     
-    private JButton applyButton;
-    private JLabel pathLabel;
+    private JLabel paletteFile;
+    private JButton changePaletteButton;    	private static String changePaletteTooltip = "<html>Load a palette from the hard drive.</html>";
+    private JTextField paletteNameTextBox;    	private static String paletteNameTooltip = "<html>The name of the palette</html>";
     
-    public PalettesWindow(HoldListWindow theParent)
+    
+    public PalettesWindow(JFrame theParent, Object obj)
     {
+    	object = obj;
         parent = theParent;
+        loading = false;
         
         setTitle("Palettes");
         setSize(windowWidth, windowHeight);
         setLocationRelativeTo(null);
-        this.setResizable(false);
         
         createWindowContents();
     }
     
     private void createWindowContents()
     {
-        JLabel paletteLabel = new JLabel("Current Palette");
-        paletteCombo = new JComboBox<Object>(parent.currentlyLoadedObject.palettes.toArray());
-        paletteCombo.setRenderer(new PaletteComboBoxRenderer());
-        if(paletteCombo.getItemCount() > 0) {
-        	paletteCombo.setSelectedIndex(parent.currentlyLoadedObject.curPalette);
-        }
-        else {
-        	
-        }
-        paletteCombo.addItemListener(this);
+        JLabel paletteListLabel = new JLabel("Palette List");
+        paletteListModel = new DefaultListModel<HSPalette>();
+        paletteList = new JList<HSPalette>(paletteListModel);
+        paletteList.setName("paletteList");
+        paletteList.addListSelectionListener(this);
+        paletteList.addMouseListener(this);
         
-        JButton newPaletteButton = new JButton("New...");
-        newPaletteButton.addActionListener(this);
-        newPaletteButton.setActionCommand("newButton");
-        newPaletteButton.setEnabled(false);
+        JScrollPane holdListScrollPane = new JScrollPane(paletteList);
         
-        JButton loadPaletteButton = new JButton("Load...");
-        loadPaletteButton.addActionListener(this);
-        loadPaletteButton.setActionCommand("loadButton");
+        JButton addPaletteButton = new JButton("+");
+        addPaletteButton.setActionCommand("addPalette");
+        addPaletteButton.setToolTipText("Add New Palette");
+        addPaletteButton.addActionListener(this);
         
-        JButton clearPaletteButton = new JButton("Clear");
-        clearPaletteButton.addActionListener(this);
-        clearPaletteButton.setActionCommand("clearButton");
+        JButton removePaletteButton = new JButton("-");
+        removePaletteButton.setActionCommand("removePalette");
+        removePaletteButton.setToolTipText("Remove Selected Palette(s)");
+        removePaletteButton.addActionListener(this);
         
-        pathLabel = new JLabel();
-        setPathLabelText();
+        paletteListToolBar = new JToolBar();
+        paletteListToolBar.setFloatable(false);
+        paletteListToolBar.add(addPaletteButton);
+        paletteListToolBar.add(removePaletteButton);
         
-        JPanel paletteInterface = new JPanel(new GridLayout(1, gridColumns, gridHorizontalGap, gridVerticalGap));
-        paletteInterface.setSize(gridWidth, gridRowHeight);
-        paletteInterface.add(paletteLabel);
-        paletteInterface.add(paletteCombo);
-        paletteInterface.add(newPaletteButton);
-        paletteInterface.add(loadPaletteButton);
-        paletteInterface.add(clearPaletteButton);
+        JPanel paletteListPane = new JPanel();
+        paletteListPane.setLayout(new BorderLayout());
+        paletteListPane.add(paletteListLabel, BorderLayout.PAGE_START);
+        paletteListPane.add(holdListScrollPane, BorderLayout.CENTER);
+        paletteListPane.add(paletteListToolBar, BorderLayout.PAGE_END);
         
-        JPanel pathInterface = new JPanel();
-        pathInterface.setSize(gridWidth, gridRowHeight);
-        pathInterface.add(pathLabel);
+        JLabel paletteFileLabel = new JLabel("File:");
+        paletteFile = new JLabel("N/A");
         
-        JButton okButton = new JButton("OK");
-        okButton.setActionCommand("okButton");
-        okButton.addActionListener(this);
-        JButton closeButton = new JButton("Close");
-        closeButton.setActionCommand("closeButton");
-        closeButton.addActionListener(this);
-        applyButton = new JButton("Apply");
-        applyButton.setActionCommand("applyButton");
-        applyButton.addActionListener(this);
-        applyButton.setEnabled(false);
+        changePaletteButton = new JButton("Change Palette...");
+        changePaletteButton.setToolTipText(changePaletteTooltip);
+        changePaletteButton.setActionCommand("changePalette");
+        changePaletteButton.setEnabled(false);
+        changePaletteButton.addActionListener(this);
         
-        JPanel buttonPane = new JPanel(new FlowLayout(FlowLayout.TRAILING));
-        buttonPane.add(okButton);
-        buttonPane.add(closeButton);
-        buttonPane.add(applyButton);
+        paletteNameTextBox = new JTextField("");
+        paletteNameTextBox.setEnabled(false);
+        paletteNameTextBox.setActionCommand("changeName");
+        paletteNameTextBox.addActionListener(this);
         
-        JPanel palettesPane = new JPanel();
-        palettesPane.setLayout(new BoxLayout(palettesPane, BoxLayout.Y_AXIS));
-        palettesPane.setBorder(new EmptyBorder(windowBorderBuffer, windowBorderBuffer, windowBorderBuffer, windowBorderBuffer));
-        palettesPane.add(paletteInterface);
-        palettesPane.add(pathInterface);
-        palettesPane.add(buttonPane);
+        JLabel nameLabel = new JLabel("Name");
+        nameLabel.setToolTipText(paletteNameTooltip);
         
-        add(palettesPane);
+        JPanel paletteDataPane = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        
+        gbc.weightx = .1;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        paletteDataPane.add(paletteFileLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        paletteDataPane.add(paletteFile, gbc);
+        
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 2;
+        gbc.ipady = 20;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        paletteDataPane.add(changePaletteButton, gbc);
+        
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 1;
+        gbc.ipady = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        paletteDataPane.add(nameLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        gbc.gridwidth = 1;
+        gbc.ipady = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        paletteDataPane.add(paletteNameTextBox, gbc);
+        
+        JSplitPane sPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, paletteListPane, paletteDataPane);
+        sPane.setDividerLocation(100);
+        this.setContentPane(sPane);
+        
+    	for(HSPalette p : ((HSObject)object).palettes) {
+    		paletteListModel.addElement(p);
+    	}
     }
     
-    private void setPathLabelText()
+    private void addPaletteToPaletteList()
     {
-    	if(paletteCombo.getItemCount() == 0)
-        {
-            pathLabel.setText("NO FILE SELECTED");
-        }
-    	else if(((HSPalette)paletteCombo.getSelectedItem()).path.isEmpty())
-        {
-            pathLabel.setText("NO FILE SELECTED");
-        }
-        else
-        {
-            pathLabel.setText(((HSPalette)paletteCombo.getSelectedItem()).path);
-        }
-    }
-    
-    private void applyChanges()
-    {
-        parent.currentlyLoadedObject.curPalette = paletteCombo.getSelectedIndex();
-        
-        parent.textureHitboxPane.reloadTextures();
-        
-        applyButton.setEnabled(false);
-    }
-    
-    private void closeWindow()
-    {
-        this.dispose();
-    }
-    
-    private void okButtonPressed()
-    {
-        applyChanges();
-        closeWindow();
-    }
-    
-    private void closeButtonPressed()
-    {
-        closeWindow();
-    }
-    
-    private void applyButtonPressed()
-    {
-        applyChanges();
-    }
-    
-    private void newButtonPressed() {
-    	
-    }
-    
-    private void loadButtonPressed()
-    {
-        JFileChooser fc = new JFileChooser();
-        int returnVal = fc.showOpenDialog(null);
+        int returnVal = HoldListWindow.fileChooser.showOpenDialog(this);
         File file;
         
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            file = fc.getSelectedFile();
+            file = HoldListWindow.fileChooser.getSelectedFile();
         } else {
             return;
         }
         
-        ((HSPalette)paletteCombo.getSelectedItem()).path = file.getPath();
-        setPathLabelText();
+        int index = paletteList.getSelectedIndex();
+        paletteList.clearSelection();
+        
+        HSPalette newPalette = new HSPalette("New Palette", file.getPath());
+        
+        ((HSObject)object).palettes.add(newPalette);
+        
+        if(index >= 0)
+        {
+            paletteListModel.add(index, newPalette);
+            paletteList.setSelectedIndex(index);
+        }
+        else
+        {
+            paletteListModel.addElement(newPalette);
+            paletteList.setSelectedIndex(paletteListModel.getSize() - 1);
+        }
     }
     
-    private void clearButtonPressed()
+    public HSPalette removePaletteFromPaletteList(int index)
     {
-        ((HSPalette)paletteCombo.getSelectedItem()).path = "";
-        setPathLabelText();
+    	HSPalette pal = (HSPalette)paletteListModel.remove(index);
+    	((HSObject)object).palettes.remove(pal);
+        
+        return pal;
     }
     
-    private void fieldChanged()
+    public ArrayList<HSPalette> removePalettesFromPaletteList(int[] indices)
     {
-        setPathLabelText();
-        applyButton.setEnabled(true);
+        ArrayList<HSPalette> removedPalettes = new ArrayList<HSPalette>();
+        
+        Arrays.sort(indices, 0, indices.length - 1);
+        for(int i = indices.length - 1; i >= 0; i--)
+        {
+            removedPalettes.add(0, removePaletteFromPaletteList(indices[i]));
+        }
+        
+        return removedPalettes;
     }
+    
+    public ArrayList<HSPalette> removeSelectedPaletteFromPaletteList()
+    {
+        int n = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete the selected palette(s)?", "Delete Palette(s)", JOptionPane.YES_NO_OPTION);
+        
+        if(n == 0)
+        {
+            unloadPaletteData();
+            return removePalettesFromPaletteList(paletteList.getSelectedIndices());
+        }
+        else
+        {
+            return null;
+        }
+    }
+    
+    private void unloadPaletteData()
+    {
+        loading = true;
+        
+        paletteFile.setText("N/A");
+        changePaletteButton.setEnabled(false);
+        paletteNameTextBox.setText("");
+        paletteNameTextBox.setEnabled(false);
+        
+        loading = false;
+    }
+    
+    private void loadPaletteData(HSPalette pal)
+    {
+        loading = true;
+        
+        File file = new File(pal.path);
+
+        paletteFile.setText(file.getName());
+        paletteFile.setToolTipText(file.getPath());
+        changePaletteButton.setEnabled(true);
+        paletteNameTextBox.setText(pal.name);
+        
+        paletteNameTextBox.setEnabled(true);
+        
+        loading = false;
+    }
+    
+    private void changePalette()
+    {
+        int returnVal = HoldListWindow.fileChooser.showOpenDialog(this);
+        File file;
+        
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            file = HoldListWindow.fileChooser.getSelectedFile();
+        } else {
+            return;
+        }
+        
+        int index = paletteList.getSelectedIndex();
+        HSPalette pal = (HSPalette)paletteListModel.get(index);
+        
+        if(pal != null)
+        {
+            pal.path = file.getPath();
+            paletteFile.setText(file.getName());
+            paletteFile.setToolTipText(file.getPath());
+        }
+        
+        paletteList.repaint();
+    }
+    
+    private void changeName() {
+        int index = paletteList.getSelectedIndex();
+        HSPalette pal = (HSPalette)paletteListModel.get(index);
+        
+        if(pal != null)
+        {
+            pal.name = paletteNameTextBox.getText();
+        }
+        
+        paletteList.repaint();
+        ((HoldListWindow) parent).updatePalettesMenu();        
+	}    
+    
     
     @Override
     public void actionPerformed(ActionEvent e)
     {
         switch(e.getActionCommand())
         {
-            case "okButton": okButtonPressed(); break;
-            case "closeButton": closeButtonPressed(); break;
-            case "applyButton": applyButtonPressed(); break;
-            case "newButton": newButtonPressed(); break;
-            case "loadButton": loadButtonPressed(); break;
-            case "clearButton": clearButtonPressed(); break;
+            case "addPalette": addPaletteToPaletteList(); break;
+            case "removePalette": removeSelectedPaletteFromPaletteList(); break;
+            case "changePalette": changePalette(); break;
+            case "changeName": changeName(); break;
+        }
+    }
+
+	@Override
+    public void valueChanged(ListSelectionEvent e)
+    {
+        if (e.getValueIsAdjusting() == false)
+        {
+            unloadPaletteData();
+            if (paletteList.getSelectedIndex() >= 0)
+            {
+                loadPaletteData((HSPalette)paletteList.getSelectedValue());
+            }
         }
     }
     
     @Override
-    public void itemStateChanged(ItemEvent e)
+    public void mouseEntered(MouseEvent e)
     {
-        fieldChanged();
+        
+    }
+    
+    @Override
+    public void mouseExited(MouseEvent e)
+    {
+        
+    }
+    
+    @Override
+    public void mousePressed(MouseEvent e)
+    {
+        
+    }
+    
+    @Override
+    public void mouseReleased(MouseEvent e)
+    {
+        
+    }
+    
+    @Override
+    public void mouseClicked(MouseEvent e)
+    {
+        
+    }
+    
+    @Override
+    public void stateChanged(ChangeEvent e)
+    {
+    	
     }
 }

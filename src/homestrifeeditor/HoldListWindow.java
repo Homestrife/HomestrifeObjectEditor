@@ -10,10 +10,7 @@ import java.awt.KeyboardFocusManager;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Files;
-import java.util.Comparator;
-
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -1918,7 +1915,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
     		JOptionPane.showMessageDialog(this, "No Object loaded", "Whoops", JOptionPane.ERROR_MESSAGE);  
     		return;
     	}
-        PalettesWindow window = new PalettesWindow(this);
+        PalettesWindow window = new PalettesWindow(this, currentlyLoadedObject);
         window.setVisible(true);
     }
     int curPal;
