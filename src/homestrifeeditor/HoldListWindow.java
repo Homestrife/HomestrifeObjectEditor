@@ -735,6 +735,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
             NamedNodeMap compactTerrainBoxAttributes = null;
             NamedNodeMap eventHoldsAttributes = null;
             Node holds = null;
+            Node palettes = null;
             for(int i = 0; i < defSecs.getLength(); i++)
             {
                 Node defSec = defSecs.item(i);
@@ -746,6 +747,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                 if(defSec.getNodeName().compareTo("CompactTerrainBox") == 0) compactTerrainBoxAttributes = defSec.getAttributes();
                 if(defSec.getNodeName().compareTo("EventHolds") == 0) eventHoldsAttributes = defSec.getAttributes();
                 if(defSec.getNodeName().compareTo("Holds") == 0) holds = defSec;
+                if(defSec.getNodeName().compareTo("Palettes") == 0) palettes = defSec;
             }
             
             //get holds
@@ -1020,7 +1022,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
             if(objectAttributes.getNamedItem("name") != null) loadObject.name = objectAttributes.getNamedItem("name").getNodeValue();
             if(objectAttributes.getNamedItem("lifetime") != null) loadObject.lifetime = Integer.parseInt(objectAttributes.getNamedItem("lifetime").getNodeValue());
             
-            //get palettes
+            //Legacy palette loading
             for(int i=1;;i++) {
             	if(objectAttributes.getNamedItem("palette" + i + "FilePath") == null) {
             		break;
@@ -1031,6 +1033,25 @@ public class HoldListWindow extends JFrame implements ActionListener {
             	pal.palFilePath = pal.palFilePath.replace('\\', File.separatorChar);
                 pal.name = "Palette " + i;
             	loadObject.palettes.add(pal);
+            }
+            
+            //New palette loading
+            if(palettes != null) {
+	            NodeList palettesList = palettes.getChildNodes();
+	            for(int i = 0; i < palettesList.getLength(); i++)
+	            {
+	                Node palette = palettesList.item(i);
+	                
+	                HSPalette pal = new HSPalette();
+	            	pal.palFilePath = createAbsolutePath(palette.getAttributes().getNamedItem("path").getNodeValue());
+	            	pal.palFilePath = pal.palFilePath.replace('/', File.separatorChar);
+	            	pal.palFilePath = pal.palFilePath.replace('\\', File.separatorChar);
+	                pal.name = palette.getAttributes().getNamedItem("name").getNodeValue();
+	            	loadObject.palettes.add(pal);
+	            }
+            }
+            else {
+            	JOptionPane.showMessageDialog(this, "Using legacy palette loading, advise saving again to convert to new palette format", "Legacy Palette Loading", JOptionPane.WARNING_MESSAGE);
             }
             
             //get hs object event holds
