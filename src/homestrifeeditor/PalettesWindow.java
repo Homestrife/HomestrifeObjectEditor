@@ -9,6 +9,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
@@ -36,7 +38,7 @@ import javax.swing.event.ListSelectionListener;
  *
  * @author Darlos9D
  */
-public class PalettesWindow extends JFrame implements ActionListener, ListSelectionListener, MouseListener, ChangeListener {
+public class PalettesWindow extends JFrame implements KeyListener, ActionListener, ListSelectionListener, MouseListener, ChangeListener {
 	private static final long serialVersionUID = 1L;
 	
 	private static int windowWidth = 400;
@@ -120,6 +122,7 @@ public class PalettesWindow extends JFrame implements ActionListener, ListSelect
         paletteNameTextBox.setEnabled(false);
         paletteNameTextBox.setActionCommand("changeName");
         paletteNameTextBox.addActionListener(this);
+        paletteNameTextBox.addKeyListener(this);
         
         JLabel nameLabel = new JLabel("Name");
         nameLabel.setToolTipText(paletteNameTooltip);
@@ -284,6 +287,7 @@ public class PalettesWindow extends JFrame implements ActionListener, ListSelect
         }
         
         paletteList.repaint();
+        ((HoldListWindow) parent).updatePalettesMenu();    
     }
     
     private void changeName() {
@@ -360,4 +364,19 @@ public class PalettesWindow extends JFrame implements ActionListener, ListSelect
     {
     	
     }
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		changeName();
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		
+	}
 }
