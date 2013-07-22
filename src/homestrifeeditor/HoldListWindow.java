@@ -1282,16 +1282,8 @@ public class HoldListWindow extends JFrame implements ActionListener {
     
     private String createRelativePath(String absPath)
     {
-    	absPath = absPath.replace('\\', File.separatorChar);
-    	absPath = absPath.replace('/', File.separatorChar);
-    	if(!workingDirectory.endsWith(File.separator)) workingDirectory += File.separator;
-    	String path = new File(workingDirectory).toURI().relativize(new File(absPath).toURI()).getPath();
-    	path = path.replace(File.separatorChar, '\\');
-    	return path;
-        //break the working directory and absolute path down into pieces
-        /*
-    	String[] workingDirectoryPieces = workingDirectory.split("\\\\");
-        String[] absPathPieces = absPath.split("\\\\");
+    	String[] workingDirectoryPieces = workingDirectory.split(File.separator.compareTo("\\") == 0 ? "\\\\" : "/");
+        String[] absPathPieces = absPath.split(File.separator.compareTo("\\") == 0 ? "\\\\" : "/");
         
         //first, make sure they share the same drive
         if(!workingDirectoryPieces[0].equals(absPathPieces[0]))
@@ -1315,7 +1307,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         String relativePath = "";
         for(int i = 0; i < end - divergeancePoint; i++)
         {
-            relativePath += "..\\";
+            relativePath += ".." + File.separator;
         }
         
         //add the absolute path starting with the divergeance point
@@ -1323,13 +1315,12 @@ public class HoldListWindow extends JFrame implements ActionListener {
         {
             if(i > divergeancePoint)
             {
-                relativePath += "\\";
+                relativePath += File.separator;
             }
             relativePath += absPathPieces[i];
         }
         
         return relativePath;
-        */
     }
     
     private void createDefinitionFile()
