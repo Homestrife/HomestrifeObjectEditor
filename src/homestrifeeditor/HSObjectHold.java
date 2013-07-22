@@ -51,4 +51,8 @@ public class HSObjectHold {
     {
         return false;
     }
+    
+    public String toString() {
+    	return name;
+    }
 }

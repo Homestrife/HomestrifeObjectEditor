@@ -21,20 +21,28 @@ import javax.swing.JScrollPane;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
+import javax.swing.JTree;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeSelectionModel;
 
 /**
  *
  * @author Darlos9D
  */
-public class HoldListPane extends JPanel implements ActionListener, ListSelectionListener, MouseListener {
+public class HoldListPane extends JPanel implements ActionListener, TreeSelectionListener, MouseListener {
 	private static final long serialVersionUID = 1L;
 
 	public HoldListWindow parent;
     
     public DefaultListModel<HSObjectHold> holdListModel;
     public JList<HSObjectHold> holdList;
+    public JTree tree;
+    public DefaultMutableTreeNode root;
     
     private JToolBar holdListToolBar;
     
@@ -49,12 +57,19 @@ public class HoldListPane extends JPanel implements ActionListener, ListSelectio
         JLabel holdListLabel = new JLabel("Hold List");
         holdListModel = new DefaultListModel<HSObjectHold>();
         holdList = new JList<HSObjectHold>(holdListModel);
+        
+        root = new DefaultMutableTreeNode("Holds");
+        tree = new JTree(root);
+        tree.setName("holdTree");
+        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        tree.addTreeSelectionListener(this);
+        
         holdList.setName("holdList");
         holdList.setCellRenderer(new HoldListCellRenderer());
-        holdList.addListSelectionListener(this);
+        //holdList.addListSelectionListener(this);
         holdList.addMouseListener(this);
         
-        JScrollPane holdListScrollPane = new JScrollPane(holdList);
+        JScrollPane holdListScrollPane = new JScrollPane(tree);
         
         JButton addHoldButton = new JButton("+");
         addHoldButton.setActionCommand("addHold");
@@ -113,6 +128,33 @@ public class HoldListPane extends JPanel implements ActionListener, ListSelectio
     public void addHoldToHoldList(HSObjectHold hold, int index)
     {
         if(hold == null) { return; }
+        DefaultTreeModel model = ((DefaultTreeModel)tree.getModel());
+        
+        DefaultMutableTreeNode node = new DefaultMutableTreeNode(hold);
+        String[] split = hold.name.split("_");
+        String numberRemoved = "";
+        for(int i=0; i < split.length - 1; i++) {
+        	if(i != 0) numberRemoved += "_";
+        	numberRemoved += split[i];
+        }
+        
+        boolean found = false;
+        for(int i=0; i < root.getChildCount(); i++) {
+        	Object obj = model.getChild(root, i);
+        	Object userObject = ((DefaultMutableTreeNode)obj).getUserObject();
+        	if(userObject instanceof String && ((String)userObject).compareTo(numberRemoved) == 0) {
+        		model.insertNodeInto(node, (DefaultMutableTreeNode)model.getChild(root, i), ((DefaultMutableTreeNode)model.getChild(root, i)).getChildCount());
+        		found = true;
+        	}
+        }
+        if(!found) {
+        	DefaultMutableTreeNode ndmtn = new DefaultMutableTreeNode(numberRemoved);
+        	ndmtn.add(node);
+        	root.add(ndmtn);
+        }
+        model.reload();
+        tree.repaint();
+        //root.add(node);
         
         if(index >= 0)
         {
@@ -346,18 +388,17 @@ public class HoldListPane extends JPanel implements ActionListener, ListSelectio
     }
     
     @Override
-    public void valueChanged(ListSelectionEvent e)
+    public void valueChanged(TreeSelectionEvent e)
     {
-        if (e.getValueIsAdjusting() == false)
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
+        if (node == null || node.getUserObject() instanceof String)
         {
-            if (holdList.getSelectedIndex() == -1)
-            {
-                parent.textureHitboxPane.unloadHoldData();
-            }
-            else
-            {
-                parent.textureHitboxPane.loadHoldData((HSObjectHold)holdList.getSelectedValue());
-            }
+            parent.textureHitboxPane.unloadHoldData();
+        }
+        else
+        {
+            System.out.println("Loading hold");
+            parent.textureHitboxPane.loadHoldData((HSObjectHold)node.getUserObject());
         }
     }
     
@@ -380,18 +421,18 @@ public class HoldListPane extends JPanel implements ActionListener, ListSelectio
         
         switch(e.getComponent().getName())
         {
-            case "holdList":
-                int index = holdList.locationToIndex(e.getPoint());
-
-                if(index == -1) { return; }
-
-                if(!holdList.getCellBounds(index, index).contains(e.getPoint())) { return; }
-
-                HSObjectHold hold = (HSObjectHold)holdListModel.get(index);
-                holdList.ensureIndexIsVisible(index);
-                
-                createHoldAttributesWindow(hold);
-                break;
+	        case "holdList":
+	            int index = holdList.locationToIndex(e.getPoint());
+	
+	            if(index == -1) { return; }
+	
+	            if(!holdList.getCellBounds(index, index).contains(e.getPoint())) { return; }
+	
+	            HSObjectHold hold = (HSObjectHold)holdListModel.get(index);
+	            holdList.ensureIndexIsVisible(index);
+	            
+	            createHoldAttributesWindow(hold);
+	            break;
         }
     }
     
