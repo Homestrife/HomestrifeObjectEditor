@@ -53,6 +53,8 @@ public class HSObjectHold {
     }
     
     public String toString() {
+    	//String[] split = name.split("_");
+    	//return split[split.length - 1];
     	return name;
     }
 }

@@ -393,7 +393,8 @@ public class HoldListPane extends JPanel implements ActionListener, TreeSelectio
         DefaultMutableTreeNode node = (DefaultMutableTreeNode)tree.getLastSelectedPathComponent();
         if (node == null || node.getUserObject() instanceof String)
         {
-            parent.textureHitboxPane.unloadHoldData();
+        	if(parent.currentlyLoadedObject != null)
+        		parent.textureHitboxPane.unloadHoldData();
         }
         else
         {
