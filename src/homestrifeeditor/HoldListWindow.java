@@ -1847,6 +1847,22 @@ public class HoldListWindow extends JFrame implements ActionListener {
         		lastHold = hold;
         	}        	
         }
+        else {
+        	HSObjectHold lastHold = null;
+        	for(File f : files) {
+        		HSObjectHold hold = new FighterHold();
+        		hold.textures.add(new HSTexture(f.getAbsolutePath()));
+        		hold.name = f.getName().split("\\.")[0];
+        		int a = hold.nextHoldId;
+        		holdListPane.addHoldToHoldList(hold, holdListPane.holdList.getSelectedIndex());
+        		if(lastHold != null) {
+        			lastHold.nextHold = hold;
+        			lastHold.nextHoldId = hold.id;
+        		}
+        		lastHold = hold;
+        	}        	
+        	
+        }
         fileChooser.setMultiSelectionEnabled(false);
 	}
 
