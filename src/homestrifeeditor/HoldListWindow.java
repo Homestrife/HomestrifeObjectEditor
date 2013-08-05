@@ -1810,7 +1810,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         		FighterHold hold = new FighterHold();
         		hold.textures.add(new HSTexture(f.getAbsolutePath()));
         		hold.name = f.getName().split("\\.")[0];
-        		holdListPane.addHoldToHoldList(hold, holdListPane.holdList.getSelectedIndex());
+        		holdListPane.addHoldToHoldList(hold);
         		if(lastHold != null) {
         			lastHold.nextHold = hold;
         			lastHold.nextHoldId = hold.id;
@@ -1824,7 +1824,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         		PhysicsObjectHold hold = new FighterHold();
         		hold.textures.add(new HSTexture(f.getAbsolutePath()));
         		hold.name = f.getName().split("\\.")[0];
-        		holdListPane.addHoldToHoldList(hold, holdListPane.holdList.getSelectedIndex());
+        		holdListPane.addHoldToHoldList(hold);
         		if(lastHold != null) {
         			lastHold.nextHold = hold;
         			lastHold.nextHoldId = hold.id;
@@ -1839,7 +1839,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         		hold.textures.add(new HSTexture(f.getAbsolutePath()));
         		hold.name = f.getName().split("\\.")[0];
         		int a = hold.nextHoldId;
-        		holdListPane.addHoldToHoldList(hold, holdListPane.holdList.getSelectedIndex());
+        		holdListPane.addHoldToHoldList(hold);
         		if(lastHold != null) {
         			lastHold.nextHold = hold;
         			lastHold.nextHoldId = hold.id;
@@ -1973,15 +1973,15 @@ public class HoldListWindow extends JFrame implements ActionListener {
 		public boolean dispatchKeyEvent(KeyEvent e) {
 			if(e.getID() == KeyEvent.KEY_PRESSED) {
 				if ((e.getKeyCode() == KeyEvent.VK_X) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
-					if(holdListPane.holdList.isFocusOwner())
+					if(holdListPane.tree.isFocusOwner())
 						cut();	
 		        }
 				else if ((e.getKeyCode() == KeyEvent.VK_C) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
-					if(holdListPane.holdList.isFocusOwner())
+					if(holdListPane.tree.isFocusOwner())
 						copy();
 		        }
 				else if ((e.getKeyCode() == KeyEvent.VK_V) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
-					if(holdListPane.holdList.isFocusOwner())
+					if(holdListPane.tree.isFocusOwner())
 						paste();
 		        }
 				else {
