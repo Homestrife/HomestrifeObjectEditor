@@ -31,6 +31,8 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import com.sun.media.sound.ModelAbstractChannelMixer;
+
 /**
  * TODO: New button inserts on selected hold (and properly named/numbered/linked(?))
  * TODO: Changing name updates position on tree
@@ -195,6 +197,9 @@ public class HoldListPane extends JPanel implements ActionListener, TreeSelectio
     {
         setToolBarEnabled(false);
         //TODO: Remove all holds
+       root.removeAllChildren();
+
+        ((DefaultTreeModel)tree.getModel()).reload();
     }
 
     public HSObjectHold getCurrentlySelectedHold()
@@ -226,7 +231,7 @@ public class HoldListPane extends JPanel implements ActionListener, TreeSelectio
 	        	}
 	        }
 	        if(!found) {
-	        	DefaultMutableTreeNode ndmtn = new DefaultMutableTreeNode(numberRemoved);
+	        	DefaultMutableTreeNode ndmtn = new DefaultMutableTreeNode(numberRemoved.length() > 0 ? numberRemoved : hold.name);
 	        	ndmtn.add(node);
 	        	root.add(ndmtn);
 	        }
@@ -235,7 +240,6 @@ public class HoldListPane extends JPanel implements ActionListener, TreeSelectio
         	root.add(node);
         }
         model.reload();
-        tree.repaint();
     }
     
     public ArrayList<HSObjectHold> getAllChildren(DefaultMutableTreeNode node, ArrayList<HSObjectHold> holds)
