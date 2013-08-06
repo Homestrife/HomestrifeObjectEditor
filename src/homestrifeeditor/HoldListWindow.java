@@ -11,6 +11,8 @@ import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
+
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -265,7 +267,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         setTitle(BaseWindowTitle + newObject.name);
     }
     
-    public HSObjectHold[] getAllHolds()
+    public ArrayList<HSObjectHold> getAllHolds()
     {
         return holdListPane.getAllHolds();
     }
@@ -1355,7 +1357,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
             }
             
             //get the list of holds. this will set all of their IDs
-            HSObjectHold[] holdList = holdListPane.getAllHolds();
+            ArrayList<HSObjectHold> holdList = holdListPane.getAllHolds();
             Element eventHolds = doc.createElement("EventHolds");
             
             //get HSObject attributes

@@ -11,6 +11,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
+
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -121,14 +123,14 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         JLabel nextHoldLabel = new JLabel("Next Hold");
         nextHoldLabel.setToolTipText(nextHoldTooltip);
         HoldComboBoxRenderer holdComboRenderer = new HoldComboBoxRenderer();
-        HSObjectHold[] allHolds = parent.getAllHolds();
-        HSObjectHold[] allHoldsPlusNull = new HSObjectHold[allHolds.length + 1];
+        ArrayList<HSObjectHold> allHolds = parent.getAllHolds();
+        HSObjectHold[] allHoldsPlusNull = new HSObjectHold[allHolds.size() + 1];
         HSObjectHold nullHold = new HSObjectHold();
         nullHold.name = "NONE";
         allHoldsPlusNull[0] = nullHold;
-        for (int i = 0; i < allHolds.length; i++)
+        for (int i = 0; i < allHolds.size(); i++)
         {
-            allHoldsPlusNull[i + 1] = allHolds[i];
+            allHoldsPlusNull[i + 1] = allHolds.get(i);
         }
         nextHoldCombo = new JComboBox<Object>(allHoldsPlusNull);
         nextHoldCombo.setRenderer(holdComboRenderer);
