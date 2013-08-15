@@ -25,6 +25,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
+import javax.swing.tree.TreePath;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -272,9 +273,9 @@ public class HoldListWindow extends JFrame implements ActionListener {
         return holdListPane.getAllHolds();
     }
     
-    public void applyHoldChanges(HSObjectHold hold, int index)
+    public void applyHoldChanges(HSObjectHold hold, TreePath path)
     {
-        //holdListPane.applyHoldChanges(hold, index);
+        holdListPane.applyHoldChanges(hold, path);
     }
     
     public void newObject()

@@ -11,19 +11,13 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
-import java.util.Arrays;
-
 import javax.swing.JPanel;
-import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -31,11 +25,8 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import com.sun.media.sound.ModelAbstractChannelMixer;
-
 /**
  * TODO: New button inserts on selected hold (and properly named/numbered/linked(?))
- * TODO: Changing name updates position on tree
  * TODO: Dragging holds (multiple?)
  * @author Darlos9D
  */
@@ -123,107 +114,6 @@ public class HoldListPane extends JPanel implements ActionListener, TreeSelectio
         }
     }
     
-    public void addHoldToHoldList(HSObjectHold hold, int index)
-    {
-        addHoldToHoldList(hold);
-    }
-    
-    public void addHoldToHoldList(HSObjectHold hold)
-    {
-    	//Add hold at currently selected index (after)
-    	addHoldToTree(hold);
-    }
-    
-    public void addHoldToHoldList()
-    {
-        HSObjectHold newHold;
-        if(parent.currentlyLoadedObject.IsFighter())
-        {
-            newHold = new FighterHold();
-        }
-        else if(parent.currentlyLoadedObject.IsPhysicsObject())
-        {
-            newHold = new PhysicsObjectHold();
-        }
-        else if(parent.currentlyLoadedObject.IsTerrainObject())
-        {
-            newHold = new TerrainObjectHold();
-        }
-        else
-        {
-            newHold = new HSObjectHold();
-        }
-
-        addHoldToHoldList(newHold);
-    }
-    
-    public void addHoldsToHoldList(ArrayList<HSObjectHold> holds)
-    {
-        for (HSObjectHold hold : holds)
-        {
-            addHoldToHoldList(hold);
-        }
-    }
-    
-    public HSObjectHold removeHoldFromHoldList(TreePath path)
-    {
-        //TODO: Remove hold and return it
-    	
-    	//TreePath path = tree.getPathForRow(row);
-    	HSObjectHold hold = null;
-    	try {
-    		hold = (HSObjectHold)((DefaultMutableTreeNode)path.getPathComponent(path.getPathCount() - 1)).getUserObject();
-    	} catch(Exception exc) {
-    		//What is selected isn't a HSObjectHold...ignore
-    	}
-    	//root.remove(row);
-    	System.out.println(path);
-    	((DefaultTreeModel)tree.getModel()).removeNodeFromParent(((DefaultMutableTreeNode)path.getPathComponent(path.getPathCount() - 1)));
-    	
-    	//If there are no more children delete the node
-    	if(((DefaultTreeModel)tree.getModel()).getChildCount(((DefaultMutableTreeNode)path.getPathComponent(path.getPathCount() - 2))) == 0)
-    		((DefaultTreeModel)tree.getModel()).removeNodeFromParent(((DefaultMutableTreeNode)path.getPathComponent(path.getPathCount() - 2)));
-    	//Geez that's a mouthful
-    	
-        reload();
-        tree.makeVisible(path);
-    	return hold;
-    }
-    
-    public ArrayList<HSObjectHold> removeHoldsFromHoldList(TreePath[] paths)
-    {
-        ArrayList<HSObjectHold> removedHolds = new ArrayList<>();
-        
-        for(int i = paths.length - 1; i >= 0; i--)
-        {
-            removedHolds.add(0, removeHoldFromHoldList(paths[i]));
-        }
-        
-        return removedHolds;
-    }
-    
-    public ArrayList<HSObjectHold> removeSelectedHoldsFromHoldList()
-    {
-        int n = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete the selected hold(s)?", "Delete Hold(s)", JOptionPane.YES_NO_OPTION);
-        if(tree.getSelectionRows().length == 0) return null;
-        
-        //TODO: Delete selected hold and return the list that was deleted if n != 0
-        return n == 0 ? removeHoldsFromHoldList(tree.getSelectionPaths()) : null;
-    }
-    
-    public void removeAllHoldsFromList()
-    {
-        setToolBarEnabled(false);
-       root.removeAllChildren();
-
-       reload();
-    }
-
-    public HSObjectHold getCurrentlySelectedHold()
-    {
-        return (HSObjectHold)((DefaultMutableTreeNode)tree.getLastSelectedPathComponent()).getUserObject();
-    }
-    
     public void addHoldToTree(HSObjectHold hold) {
     	if(hold == null) { return; }
         DefaultTreeModel model = ((DefaultTreeModel)tree.getModel());
@@ -284,6 +174,103 @@ public class HoldListPane extends JPanel implements ActionListener, TreeSelectio
         reload();
     }
     
+    public void addHoldToHoldList(HSObjectHold hold, int index)
+    {
+        addHoldToHoldList(hold);
+    }
+    
+    public void addHoldToHoldList(HSObjectHold hold)
+    {
+    	addHoldToTree(hold);
+    }
+    
+    public void addHoldToHoldList()
+    {
+        HSObjectHold newHold;
+        if(parent.currentlyLoadedObject.IsFighter())
+        {
+            newHold = new FighterHold();
+        }
+        else if(parent.currentlyLoadedObject.IsPhysicsObject())
+        {
+            newHold = new PhysicsObjectHold();
+        }
+        else if(parent.currentlyLoadedObject.IsTerrainObject())
+        {
+            newHold = new TerrainObjectHold();
+        }
+        else
+        {
+            newHold = new HSObjectHold();
+        }
+
+        addHoldToHoldList(newHold);
+    }
+    
+    public void addHoldsToHoldList(ArrayList<HSObjectHold> holds)
+    {
+        for (HSObjectHold hold : holds)
+        {
+            addHoldToHoldList(hold);
+        }
+    }
+    
+    public HSObjectHold removeHoldFromHoldList(TreePath path)
+    {    	
+    	//TreePath path = tree.getPathForRow(row);
+    	HSObjectHold hold = null;
+    	try {
+    		hold = (HSObjectHold)((DefaultMutableTreeNode)path.getPathComponent(path.getPathCount() - 1)).getUserObject();
+    	} catch(Exception exc) {
+    		//What is selected isn't a HSObjectHold...ignore
+    	}
+    	//root.remove(row);
+    	System.out.println(path);
+    	((DefaultTreeModel)tree.getModel()).removeNodeFromParent(((DefaultMutableTreeNode)path.getPathComponent(path.getPathCount() - 1)));
+    	
+    	//If there are no more children delete the node
+    	if(((DefaultTreeModel)tree.getModel()).getChildCount(((DefaultMutableTreeNode)path.getPathComponent(path.getPathCount() - 2))) == 0)
+    		((DefaultTreeModel)tree.getModel()).removeNodeFromParent(((DefaultMutableTreeNode)path.getPathComponent(path.getPathCount() - 2)));
+    	//Geez that's a mouthful
+    	
+        reload();
+        tree.makeVisible(path);
+    	return hold;
+    }
+    
+    public ArrayList<HSObjectHold> removeHoldsFromHoldList(TreePath[] paths)
+    {
+        ArrayList<HSObjectHold> removedHolds = new ArrayList<>();
+        
+        for(int i = paths.length - 1; i >= 0; i--)
+        {
+            removedHolds.add(0, removeHoldFromHoldList(paths[i]));
+        }
+        
+        return removedHolds;
+    }
+    
+    public ArrayList<HSObjectHold> removeSelectedHoldsFromHoldList()
+    {
+        int n = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete the selected hold(s)?", "Delete Hold(s)", JOptionPane.YES_NO_OPTION);
+        if(tree.getSelectionRows().length == 0) return null;
+        
+        return n == 0 ? removeHoldsFromHoldList(tree.getSelectionPaths()) : null;
+    }
+    
+    public void removeAllHoldsFromList()
+    {
+        setToolBarEnabled(false);
+       root.removeAllChildren();
+
+       reload();
+    }
+
+    public HSObjectHold getCurrentlySelectedHold()
+    {
+        return (HSObjectHold)((DefaultMutableTreeNode)tree.getLastSelectedPathComponent()).getUserObject();
+    }
+    
     public ArrayList<HSObjectHold> getAllChildren(DefaultMutableTreeNode node, ArrayList<HSObjectHold> holds)
     {
     	if(holds == null) {
@@ -322,7 +309,7 @@ public class HoldListPane extends JPanel implements ActionListener, TreeSelectio
     
     public void applyHoldChanges(HSObjectHold hold, TreePath path)
     {
-    	//TODO: Set hold at index
+    	//I don't think this is actually needed
     }
     
     public void createHoldAttributesWindow(HSObjectHold hold, TreePath path)
