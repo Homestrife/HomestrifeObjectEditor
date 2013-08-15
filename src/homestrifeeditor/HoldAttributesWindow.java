@@ -11,6 +11,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.ArrayList;
+
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -27,6 +29,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.tree.TreePath;
 
 /**
  * The attributes of the currently selected hold
@@ -97,10 +100,13 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
     
     private JButton applyButton;
     
-    public HoldAttributesWindow(HoldListPane theParent, HSObjectHold theHold)
+    TreePath holdPath;
+    
+    public HoldAttributesWindow(HoldListPane theParent, HSObjectHold theHold, TreePath path)
     {
         parent = theParent;
         hold = theHold;
+        holdPath = path;
         
         setTitle("Hold Attributes - " + hold.name);
         setSize(windowWidth, windowHeightGeneral);
@@ -121,14 +127,14 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         JLabel nextHoldLabel = new JLabel("Next Hold");
         nextHoldLabel.setToolTipText(nextHoldTooltip);
         HoldComboBoxRenderer holdComboRenderer = new HoldComboBoxRenderer();
-        HSObjectHold[] allHolds = parent.getAllHolds();
-        HSObjectHold[] allHoldsPlusNull = new HSObjectHold[allHolds.length + 1];
+        ArrayList<HSObjectHold> allHolds = parent.getAllHolds();
+        HSObjectHold[] allHoldsPlusNull = new HSObjectHold[allHolds.size() + 1];
         HSObjectHold nullHold = new HSObjectHold();
         nullHold.name = "NONE";
         allHoldsPlusNull[0] = nullHold;
-        for (int i = 0; i < allHolds.length; i++)
+        for (int i = 0; i < allHolds.size(); i++)
         {
-            allHoldsPlusNull[i + 1] = allHolds[i];
+            allHoldsPlusNull[i + 1] = allHolds.get(i);
         }
         nextHoldCombo = new JComboBox<Object>(allHoldsPlusNull);
         nextHoldCombo.setRenderer(holdComboRenderer);
@@ -601,6 +607,11 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         
         setTitle("Hold Attributes - " + hold.name);
         applyButton.setEnabled(false);
+        
+        //Remove it then re-add it to make sure it's in the right place
+        parent.removeHoldFromHoldList(holdPath);
+        parent.addHoldToTree(hold);
+        //parent.tree.makeVisible(holdPath);
     }
     
     private void closeWindow()

@@ -11,6 +11,8 @@ import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
+
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -23,6 +25,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 import javax.swing.JSplitPane;
 import javax.swing.KeyStroke;
+import javax.swing.tree.TreePath;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -265,14 +268,14 @@ public class HoldListWindow extends JFrame implements ActionListener {
         setTitle(BaseWindowTitle + newObject.name);
     }
     
-    public HSObjectHold[] getAllHolds()
+    public ArrayList<HSObjectHold> getAllHolds()
     {
         return holdListPane.getAllHolds();
     }
     
-    public void applyHoldChanges(HSObjectHold hold, int index)
+    public void applyHoldChanges(HSObjectHold hold, TreePath path)
     {
-        holdListPane.applyHoldChanges(hold, index);
+        holdListPane.applyHoldChanges(hold, path);
     }
     
     public void newObject()
@@ -1355,7 +1358,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
             }
             
             //get the list of holds. this will set all of their IDs
-            HSObjectHold[] holdList = holdListPane.getAllHolds();
+            ArrayList<HSObjectHold> holdList = holdListPane.getAllHolds();
             Element eventHolds = doc.createElement("EventHolds");
             
             //get HSObject attributes
@@ -1810,7 +1813,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         		FighterHold hold = new FighterHold();
         		hold.textures.add(new HSTexture(f.getAbsolutePath()));
         		hold.name = f.getName().split("\\.")[0];
-        		holdListPane.addHoldToHoldList(hold, holdListPane.holdList.getSelectedIndex());
+        		holdListPane.addHoldToHoldList(hold);
         		if(lastHold != null) {
         			lastHold.nextHold = hold;
         			lastHold.nextHoldId = hold.id;
@@ -1824,7 +1827,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         		PhysicsObjectHold hold = new FighterHold();
         		hold.textures.add(new HSTexture(f.getAbsolutePath()));
         		hold.name = f.getName().split("\\.")[0];
-        		holdListPane.addHoldToHoldList(hold, holdListPane.holdList.getSelectedIndex());
+        		holdListPane.addHoldToHoldList(hold);
         		if(lastHold != null) {
         			lastHold.nextHold = hold;
         			lastHold.nextHoldId = hold.id;
@@ -1839,7 +1842,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         		hold.textures.add(new HSTexture(f.getAbsolutePath()));
         		hold.name = f.getName().split("\\.")[0];
         		int a = hold.nextHoldId;
-        		holdListPane.addHoldToHoldList(hold, holdListPane.holdList.getSelectedIndex());
+        		holdListPane.addHoldToHoldList(hold);
         		if(lastHold != null) {
         			lastHold.nextHold = hold;
         			lastHold.nextHoldId = hold.id;
@@ -1989,15 +1992,15 @@ public class HoldListWindow extends JFrame implements ActionListener {
 		public boolean dispatchKeyEvent(KeyEvent e) {
 			if(e.getID() == KeyEvent.KEY_PRESSED) {
 				if ((e.getKeyCode() == KeyEvent.VK_X) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
-					if(holdListPane.holdList.isFocusOwner())
+					if(holdListPane.tree.isFocusOwner())
 						cut();	
 		        }
 				else if ((e.getKeyCode() == KeyEvent.VK_C) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
-					if(holdListPane.holdList.isFocusOwner())
+					if(holdListPane.tree.isFocusOwner())
 						copy();
 		        }
 				else if ((e.getKeyCode() == KeyEvent.VK_V) && ((e.getModifiers() & KeyEvent.CTRL_MASK) != 0)) {
-					if(holdListPane.holdList.isFocusOwner())
+					if(holdListPane.tree.isFocusOwner())
 						paste();
 		        }
 				else {
