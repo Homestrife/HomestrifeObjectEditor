@@ -1857,7 +1857,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         		hold.textures.add(new HSTexture(f.getAbsolutePath()));
         		hold.name = f.getName().split("\\.")[0];
         		int a = hold.nextHoldId;
-        		holdListPane.addHoldToHoldList(hold, holdListPane.holdList.getSelectedIndex());
+        		holdListPane.addHoldToHoldList(hold);
         		if(lastHold != null) {
         			lastHold.nextHold = hold;
         			lastHold.nextHoldId = hold.id;
