@@ -274,7 +274,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
     
     public void applyHoldChanges(HSObjectHold hold, int index)
     {
-        holdListPane.applyHoldChanges(hold, index);
+        //holdListPane.applyHoldChanges(hold, index);
     }
     
     public void newObject()

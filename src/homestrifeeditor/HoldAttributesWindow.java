@@ -29,6 +29,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.tree.TreePath;
 
 /**
  * The attributes of the currently selected hold
@@ -99,10 +100,13 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
     
     private JButton applyButton;
     
-    public HoldAttributesWindow(HoldListPane theParent, HSObjectHold theHold)
+    TreePath holdPath;
+    
+    public HoldAttributesWindow(HoldListPane theParent, HSObjectHold theHold, TreePath path)
     {
         parent = theParent;
         hold = theHold;
+        holdPath = path;
         
         setTitle("Hold Attributes - " + hold.name);
         setSize(windowWidth, windowHeightGeneral);
@@ -603,6 +607,11 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         
         setTitle("Hold Attributes - " + hold.name);
         applyButton.setEnabled(false);
+        
+        //Remove it then re-add it to make sure it's in the right place
+        parent.removeHoldFromHoldList(holdPath);
+        parent.addHoldToTree(hold);
+        //parent.tree.makeVisible(holdPath);
     }
     
     private void closeWindow()

@@ -103,8 +103,8 @@ public class HoldListPane extends JPanel implements ActionListener, TreeSelectio
         holdListToolBar.setFloatable(false);
         holdListToolBar.add(addHoldButton);
         holdListToolBar.add(removeHoldsButton);
-        holdListToolBar.add(moveHoldUpButton);
-        holdListToolBar.add(moveHoldDownButton);
+        //holdListToolBar.add(moveHoldUpButton);
+        //holdListToolBar.add(moveHoldDownButton);
         holdListToolBar.add(editHoldButton);
         holdListToolBar.add(massShiftHoldButton);
         setToolBarEnabled(false);
@@ -237,8 +237,33 @@ public class HoldListPane extends JPanel implements ActionListener, TreeSelectio
 	        	Object obj = model.getChild(root, i);
 	        	Object userObject = ((DefaultMutableTreeNode)obj).getUserObject();
 	        	if(userObject instanceof String && ((String)userObject).compareTo(numberRemoved) == 0) {
-	        		model.insertNodeInto(node, (DefaultMutableTreeNode)model.getChild(root, i), ((DefaultMutableTreeNode)model.getChild(root, i)).getChildCount());
-	        		found = true;
+	        		//Position it correctly in numerical order
+	        		DefaultMutableTreeNode child = (DefaultMutableTreeNode)model.getChild(root, i);
+	        		for(int j=1; j < child.getChildCount(); j++) {
+	        			DefaultMutableTreeNode child2 = (DefaultMutableTreeNode) child.getChildAt(j);
+	        			if(!(child2.getUserObject() instanceof HSObjectHold)) {
+	        				break;
+	        			}
+	        			
+	        			HSObjectHold checkAgainst = (HSObjectHold) child2.getUserObject();
+	        			String[] split2 = checkAgainst.name.split("_");
+	        			String checkNum = split2[split2.length - 1];
+	        			if(Integer.parseInt(split[split.length-1]) < Integer.parseInt(checkNum)) {
+	        				//Insert before
+	    	        		model.insertNodeInto(node, child, j-1);
+	    	        		
+	    	        		found = true;
+	    	        		
+	        				break;
+	        			}
+	        			else {
+	        				continue;
+	        			}
+	        		}
+	        		if(!found) {
+    	        		model.insertNodeInto(node, child, child.getChildCount());
+    	        		found = true;
+	        		}
 	        	}
 	        }
 	        if(!found) {
@@ -289,20 +314,20 @@ public class HoldListPane extends JPanel implements ActionListener, TreeSelectio
         addHoldsToHoldList(currentlyLoadedObject.holds);
     }
     
-    public void applyHoldChanges(HSObjectHold hold, int index)
+    public void applyHoldChanges(HSObjectHold hold, TreePath path)
     {
     	//TODO: Set hold at index
     }
     
-    public void createHoldAttributesWindow(HSObjectHold hold)
+    public void createHoldAttributesWindow(HSObjectHold hold, TreePath path)
     {
-        HoldAttributesWindow window = new HoldAttributesWindow(this, hold);
+        HoldAttributesWindow window = new HoldAttributesWindow(this, hold, path);
         window.setVisible(true);
     }
     
     public void editHoldButtonPressed()
     {
-        createHoldAttributesWindow(getCurrentlySelectedHold());
+        createHoldAttributesWindow(getCurrentlySelectedHold(), tree.getSelectionPath());
     }
     public void massShiftButtonPressed()
     {
@@ -373,7 +398,7 @@ public class HoldListPane extends JPanel implements ActionListener, TreeSelectio
 	
 	            tree.makeVisible(path);
 	            
-	            createHoldAttributesWindow(hold);
+	            editHoldButtonPressed();
 	            break;
         }
     }
