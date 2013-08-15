@@ -179,6 +179,12 @@ public class HoldListPane extends JPanel implements ActionListener, TreeSelectio
     	//root.remove(row);
     	System.out.println(path);
     	((DefaultTreeModel)tree.getModel()).removeNodeFromParent(((DefaultMutableTreeNode)path.getPathComponent(path.getPathCount() - 1)));
+    	
+    	//If there are no more children delete the node
+    	if(((DefaultTreeModel)tree.getModel()).getChildCount(((DefaultMutableTreeNode)path.getPathComponent(path.getPathCount() - 2))) == 0)
+    		((DefaultTreeModel)tree.getModel()).removeNodeFromParent(((DefaultMutableTreeNode)path.getPathComponent(path.getPathCount() - 2)));
+    	//Geez that's a mouthful
+    	
         reload();
         tree.makeVisible(path);
     	return hold;
