@@ -4,6 +4,8 @@
  */
 package homestrifeeditor;
 
+import homestrifeeditor.windows.HoldListWindow;
+
 import javax.swing.SwingUtilities;
 
 /**
