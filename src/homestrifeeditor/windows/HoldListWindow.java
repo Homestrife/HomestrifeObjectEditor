@@ -278,7 +278,9 @@ public class HoldListWindow extends JFrame implements ActionListener {
     
     private void createWindowContents()
     {
-        this.setContentPane(new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, createHoldListPane(), createHoldDataPane()));
+    	JSplitPane sp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, createHoldListPane(), createHoldDataPane());
+    	sp.setResizeWeight(.34);
+        this.setContentPane(sp);
     }
     
     public void setCurrentlyLoadedObject(HSObject newObject)
