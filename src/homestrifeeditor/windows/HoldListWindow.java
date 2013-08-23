@@ -4,6 +4,7 @@
  */
 package homestrifeeditor.windows;
 
+import homestrifeeditor.objects.holds.properties.HSBox;
 import homestrifeeditor.TGAReader;
 import homestrifeeditor.objects.FighterObject;
 import homestrifeeditor.objects.HSObject;
@@ -16,7 +17,6 @@ import homestrifeeditor.objects.holds.TerrainObjectHold;
 import homestrifeeditor.objects.holds.properties.Blockability;
 import homestrifeeditor.objects.holds.properties.Cancel;
 import homestrifeeditor.objects.holds.properties.HSAudio;
-import homestrifeeditor.objects.holds.properties.HSBox;
 import homestrifeeditor.objects.holds.properties.HSPalette;
 import homestrifeeditor.objects.holds.properties.HSTexture;
 import homestrifeeditor.objects.holds.properties.SpawnObject;

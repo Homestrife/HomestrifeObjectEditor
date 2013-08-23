@@ -4,9 +4,9 @@
  */
 package homestrifeeditor.windows.panes;
 
+import homestrifeeditor.objects.holds.properties.HSBox;
 import homestrifeeditor.objects.holds.HSObjectHold;
 import homestrifeeditor.objects.holds.TerrainObjectHold;
-import homestrifeeditor.objects.holds.properties.HSBox;
 import homestrifeeditor.objects.holds.properties.HSBoxLabel;
 import homestrifeeditor.objects.holds.properties.HSTexture;
 import homestrifeeditor.objects.holds.properties.HSTextureLabel;
@@ -24,7 +24,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 
-import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -268,7 +267,6 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
                 textureHitboxPane.addHurtBox(box, false);
             }
         }
-        
         setAllEnabled(true);
         updateLockButton();
     }

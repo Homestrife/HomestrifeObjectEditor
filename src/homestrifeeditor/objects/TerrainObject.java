@@ -4,9 +4,9 @@
  */
 package homestrifeeditor.objects;
 
+import homestrifeeditor.objects.holds.properties.HSBox;
 import homestrifeeditor.objects.holds.TerrainEventHolds;
 import homestrifeeditor.objects.holds.properties.HSAudio;
-import homestrifeeditor.objects.holds.properties.HSBox;
 
 import java.util.ArrayList;
 

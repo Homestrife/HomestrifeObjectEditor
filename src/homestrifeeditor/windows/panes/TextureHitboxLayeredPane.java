@@ -4,10 +4,10 @@
  */
 package homestrifeeditor.windows.panes;
 
+import homestrifeeditor.objects.holds.properties.HSBox;
 import homestrifeeditor.objects.FighterObject;
 import homestrifeeditor.objects.TerrainObject;
 import homestrifeeditor.objects.holds.TerrainObjectHold;
-import homestrifeeditor.objects.holds.properties.HSBox;
 import homestrifeeditor.objects.holds.properties.HSBoxLabel;
 import homestrifeeditor.objects.holds.properties.HSTexture;
 import homestrifeeditor.objects.holds.properties.HSTextureLabel;

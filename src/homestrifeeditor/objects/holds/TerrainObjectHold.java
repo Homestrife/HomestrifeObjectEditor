@@ -4,9 +4,9 @@
  */
 package homestrifeeditor.objects.holds;
 
+import homestrifeeditor.objects.holds.properties.HSBox;
 import homestrifeeditor.objects.holds.properties.Blockability;
 import homestrifeeditor.objects.holds.properties.HSAudio;
-import homestrifeeditor.objects.holds.properties.HSBox;
 import homestrifeeditor.objects.holds.properties.HSVect2D;
 
 import java.util.ArrayList;

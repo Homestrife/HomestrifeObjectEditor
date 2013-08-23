@@ -4,6 +4,7 @@
  */
 package homestrifeeditor.objects.holds.properties;
 
+import homestrifeeditor.objects.holds.properties.HSBox;
 import homestrifeeditor.windows.HitboxAttributesWindow;
 import homestrifeeditor.windows.panes.TextureHitboxLayeredPane;
 

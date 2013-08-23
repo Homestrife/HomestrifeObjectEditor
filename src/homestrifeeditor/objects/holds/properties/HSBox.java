@@ -4,6 +4,8 @@
  */
 package homestrifeeditor.objects.holds.properties;
 
+import homestrifeeditor.objects.holds.properties.HSVect2D;
+
 /**
  *
  * @author Darlos9D

@@ -4,8 +4,8 @@
  */
 package homestrifeeditor.objects;
 
-import homestrifeeditor.objects.holds.FighterEventHolds;
 import homestrifeeditor.objects.holds.properties.HSBox;
+import homestrifeeditor.objects.holds.FighterEventHolds;
 
 import java.util.ArrayList;
 
