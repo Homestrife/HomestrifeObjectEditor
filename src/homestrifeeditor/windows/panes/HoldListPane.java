@@ -9,6 +9,8 @@ import homestrifeeditor.objects.holds.FighterHold;
 import homestrifeeditor.objects.holds.HSObjectHold;
 import homestrifeeditor.objects.holds.PhysicsObjectHold;
 import homestrifeeditor.objects.holds.TerrainObjectHold;
+import homestrifeeditor.objects.holds.properties.HSBox;
+import homestrifeeditor.objects.holds.properties.HSTexture;
 import homestrifeeditor.windows.HoldAttributesWindow;
 import homestrifeeditor.windows.HoldListWindow;
 import homestrifeeditor.windows.MassShiftWindow;
@@ -336,6 +338,41 @@ public class HoldListPane extends JPanel implements ActionListener, TreeSelectio
         MassShiftWindow window = new MassShiftWindow(this);
         window.setVisible(true);
     }
+
+	public void massShift(int shiftX, int shiftY) {
+		TreePath[] paths = tree.getSelectionPaths();
+		for(TreePath path : paths) {
+	    	HSObjectHold hold = null;
+	    	try {
+	    		hold = (HSObjectHold)((DefaultMutableTreeNode)path.getPathComponent(path.getPathCount() - 1)).getUserObject();
+	            for(HSTexture tex : hold.textures)
+	            {
+	                tex.offset.x += shiftX;
+	                tex.offset.y += shiftY;
+	            }
+	            
+	            if(hold.IsTerrainObjectHold())
+	            {
+	                for(HSBox box : ((TerrainObjectHold)hold).attackBoxes)
+	                {
+	                    box.offset.x += shiftX;
+	                    box.offset.y += shiftY;
+	                }
+	                
+	                for(HSBox box : ((TerrainObjectHold)hold).hurtBoxes)
+	                {
+	                    box.offset.x += shiftX;
+	                    box.offset.y += shiftY;
+	                }
+	            }
+
+	            parent.textureHitboxPane.loadHoldData((HSObjectHold)((DefaultMutableTreeNode)tree.getSelectionPath().getPathComponent(path.getPathCount() - 1)).getUserObject());
+	    	} catch(Exception exc) {
+	    		//What is selected isn't a HSObjectHold...ignore
+	    		continue;
+	    	}
+		}
+	}
     
     public void reload() {
     	((DefaultTreeModel)tree.getModel()).reload();

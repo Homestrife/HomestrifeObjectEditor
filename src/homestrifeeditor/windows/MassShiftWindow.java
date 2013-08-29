@@ -105,7 +105,7 @@ public class MassShiftWindow extends JFrame implements ActionListener, ChangeLis
         int xDiff = (int)offsetXSpinner.getValue() - prevOffsetX;
         int yDiff = (int)offsetYSpinner.getValue() - prevOffsetY;
         
-        //parent.massShift(xDiff, yDiff);
+        parent.massShift(xDiff, yDiff);
         
         prevOffsetX += xDiff;
         prevOffsetY += yDiff;
