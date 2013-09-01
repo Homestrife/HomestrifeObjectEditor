@@ -81,6 +81,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
     public HSObject currentlyLoadedObject;
     
     public String workingDirectory;
+    public String exeDirectory;
     
     private JMenu palettesMenu;
     
@@ -93,7 +94,15 @@ public class HoldListWindow extends JFrame implements ActionListener {
         
         workingDirectory = "";
         
-        fileChooser = new JFileChooser("..");
+        loadSettings();
+        
+        addWindowListener(new WindowAdapter() {
+        	@Override
+        	public void windowClosing(WindowEvent e) {
+        		saveSettings();
+        		super.windowClosing(e);
+        	}
+		});
         
         setTitle(BaseWindowTitle + "No Object Loaded");
         setSize(windowWidth, windowHeight);
@@ -108,7 +117,77 @@ public class HoldListWindow extends JFrame implements ActionListener {
         manager.addKeyEventDispatcher(new KeyDispatcher());
     }
     
-    private void createMenuBar()
+    private void loadSettings() {
+    	File file = new File("settings.xml");
+        
+        fileChooser = new JFileChooser("..");
+        exeDirectory = "";
+        
+		try {
+	        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+	        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+	        Document doc = dBuilder.parse(file);
+	        doc.getDocumentElement().normalize();
+	        
+	        Node root = doc.getDocumentElement();
+	        if(root.getNodeName().compareTo("Settings") != 0)
+	        {
+	            return;
+	        }
+	        NamedNodeMap attr = root.getAttributes();
+            if(attr.getNamedItem("chooserDir") != null) fileChooser = new JFileChooser(attr.getNamedItem("chooserDir").getNodeValue());
+            if(attr.getNamedItem("exeDir") != null) exeDirectory = attr.getNamedItem("exeDir").getNodeValue();
+		} 
+        catch(ParserConfigurationException e)
+        {
+        	JOptionPane.showMessageDialog(this, e.getMessage() + " | Using default settings", "Parser Configuration Exception", JOptionPane.ERROR_MESSAGE);  
+        }
+        catch(SAXException e)
+        {
+        	JOptionPane.showMessageDialog(this, e.getMessage() + " | Using default settings", "SAX Exception", JOptionPane.ERROR_MESSAGE);              
+        }
+        catch(IOException e)
+        {
+        	JOptionPane.showMessageDialog(this, e.getMessage() + " | Using default settings", "IO Exception", JOptionPane.ERROR_MESSAGE);              
+        }
+	}
+    
+    private void saveSettings() {
+        try
+        {
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.newDocument();
+            
+            Element root = doc.createElement("Settings");
+            root.setAttribute("chooserDir", fileChooser.getCurrentDirectory().getAbsolutePath());
+            root.setAttribute("exeDir", exeDirectory);
+            
+            doc.appendChild(root);
+            
+            //finally, save the file
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource source = new DOMSource(doc);
+            StreamResult result = new StreamResult(new File("settings.xml"));
+            transformer.transform(source, result);
+        }
+        catch(ParserConfigurationException e)
+        {
+        	JOptionPane.showMessageDialog(this, e.getMessage(), "Parser Configuration Exception", JOptionPane.ERROR_MESSAGE);  
+            
+        }
+        catch(TransformerConfigurationException e)
+        {
+        	JOptionPane.showMessageDialog(this, e.getMessage(), "Transformer Configuration Exception", JOptionPane.ERROR_MESSAGE);
+        }
+        catch(TransformerException e)
+        {
+        	JOptionPane.showMessageDialog(this, e.getMessage(), "Transformer Exception", JOptionPane.ERROR_MESSAGE);   
+        }
+    }
+
+	private void createMenuBar()
     {
         JMenuBar menuBar;
         JMenu file;
