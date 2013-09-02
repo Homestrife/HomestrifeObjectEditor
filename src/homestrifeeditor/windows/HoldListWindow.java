@@ -116,76 +116,6 @@ public class HoldListWindow extends JFrame implements ActionListener {
         KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
         manager.addKeyEventDispatcher(new KeyDispatcher());
     }
-    
-    private void loadSettings() {
-    	File file = new File("settings.xml");
-        
-        fileChooser = new JFileChooser("..");
-        exeDirectory = "";
-        
-		try {
-	        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-	        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-	        Document doc = dBuilder.parse(file);
-	        doc.getDocumentElement().normalize();
-	        
-	        Node root = doc.getDocumentElement();
-	        if(root.getNodeName().compareTo("Settings") != 0)
-	        {
-	            return;
-	        }
-	        NamedNodeMap attr = root.getAttributes();
-            if(attr.getNamedItem("chooserDir") != null) fileChooser = new JFileChooser(attr.getNamedItem("chooserDir").getNodeValue());
-            if(attr.getNamedItem("exeDir") != null) exeDirectory = attr.getNamedItem("exeDir").getNodeValue();
-		} 
-        catch(ParserConfigurationException e)
-        {
-        	JOptionPane.showMessageDialog(this, e.getMessage() + " | Using default settings", "Parser Configuration Exception", JOptionPane.ERROR_MESSAGE);  
-        }
-        catch(SAXException e)
-        {
-        	JOptionPane.showMessageDialog(this, e.getMessage() + " | Using default settings", "SAX Exception", JOptionPane.ERROR_MESSAGE);              
-        }
-        catch(IOException e)
-        {
-        	JOptionPane.showMessageDialog(this, e.getMessage() + " | Using default settings", "IO Exception", JOptionPane.ERROR_MESSAGE);              
-        }
-	}
-    
-    private void saveSettings() {
-        try
-        {
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.newDocument();
-            
-            Element root = doc.createElement("Settings");
-            root.setAttribute("chooserDir", fileChooser.getCurrentDirectory().getAbsolutePath());
-            root.setAttribute("exeDir", exeDirectory);
-            
-            doc.appendChild(root);
-            
-            //finally, save the file
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            DOMSource source = new DOMSource(doc);
-            StreamResult result = new StreamResult(new File("settings.xml"));
-            transformer.transform(source, result);
-        }
-        catch(ParserConfigurationException e)
-        {
-        	JOptionPane.showMessageDialog(this, e.getMessage(), "Parser Configuration Exception", JOptionPane.ERROR_MESSAGE);  
-            
-        }
-        catch(TransformerConfigurationException e)
-        {
-        	JOptionPane.showMessageDialog(this, e.getMessage(), "Transformer Configuration Exception", JOptionPane.ERROR_MESSAGE);
-        }
-        catch(TransformerException e)
-        {
-        	JOptionPane.showMessageDialog(this, e.getMessage(), "Transformer Exception", JOptionPane.ERROR_MESSAGE);   
-        }
-    }
 
 	private void createMenuBar()
     {
@@ -201,6 +131,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         JMenuItem save;
         JMenuItem saveAs;
         JMenuItem importAnimation;
+        JMenuItem setExeLocation;
         JMenu edit;
         JMenuItem undo;
         JMenuItem redo;
@@ -258,6 +189,10 @@ public class HoldListWindow extends JFrame implements ActionListener {
         importAnimation.setActionCommand("importAnimation");
         importAnimation.addActionListener(this);
         //
+        setExeLocation = new JMenuItem("Set Game Location");
+        setExeLocation.setActionCommand("exeLocation");
+        setExeLocation.addActionListener(this);
+        //
         newObject.add(newGraphic);
         newObject.add(newTerrain);
         newObject.add(newPhysicsObject);
@@ -269,6 +204,8 @@ public class HoldListWindow extends JFrame implements ActionListener {
         file.add(saveAs);
         file.add(new JSeparator());
         file.add(importAnimation);
+        file.add(new JSeparator());
+        file.add(setExeLocation);
         menuBar.add(file);
         
         edit = new JMenu("Edit");
@@ -360,6 +297,100 @@ public class HoldListWindow extends JFrame implements ActionListener {
     	JSplitPane sp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, createHoldListPane(), createHoldDataPane());
     	sp.setResizeWeight(.34);
         this.setContentPane(sp);
+    }
+    
+    private void loadSettings() {
+    	File file = new File("settings.xml");
+        
+        fileChooser = new JFileChooser(".");
+        exeDirectory = "";
+        
+		try {
+	        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+	        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+	        Document doc = dBuilder.parse(file);
+	        doc.getDocumentElement().normalize();
+	        
+	        Node root = doc.getDocumentElement();
+	        if(root.getNodeName().compareTo("Settings") != 0)
+	        {
+	            return;
+	        }
+	        NamedNodeMap attr = root.getAttributes();
+            if(attr.getNamedItem("chooserDir") != null) fileChooser = new JFileChooser(attr.getNamedItem("chooserDir").getNodeValue());
+            if(attr.getNamedItem("exeDir") != null) exeDirectory = attr.getNamedItem("exeDir").getNodeValue();
+		} 
+        catch(ParserConfigurationException e)
+        {
+        	JOptionPane.showMessageDialog(this, e.getMessage() + " | Using default settings", "Parser Configuration Exception", JOptionPane.ERROR_MESSAGE);  
+        }
+        catch(SAXException e)
+        {
+        	JOptionPane.showMessageDialog(this, e.getMessage() + " | Using default settings", "SAX Exception", JOptionPane.ERROR_MESSAGE);              
+        }
+        catch(IOException e)
+        {
+        	JOptionPane.showMessageDialog(this, e.getMessage() + " | Using default settings", "IO Exception", JOptionPane.ERROR_MESSAGE);              
+        }
+		
+		if(exeDirectory.isEmpty()) {
+        	if(JOptionPane.showConfirmDialog(this, "Set game .exe directory now?", ".exe Directory Not Set", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+        		setExeLocation();
+        	}
+        	else {
+        		
+        	}
+		}
+	}
+    
+    private void saveSettings() {
+        try
+        {
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.newDocument();
+            
+            Element root = doc.createElement("Settings");
+            root.setAttribute("chooserDir", fileChooser.getCurrentDirectory().getAbsolutePath());
+            root.setAttribute("exeDir", exeDirectory);
+            
+            doc.appendChild(root);
+            
+            //finally, save the file
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource source = new DOMSource(doc);
+            StreamResult result = new StreamResult(new File("settings.xml"));
+            transformer.transform(source, result);
+        }
+        catch(ParserConfigurationException e)
+        {
+        	JOptionPane.showMessageDialog(this, e.getMessage(), "Parser Configuration Exception", JOptionPane.ERROR_MESSAGE);  
+            
+        }
+        catch(TransformerConfigurationException e)
+        {
+        	JOptionPane.showMessageDialog(this, e.getMessage(), "Transformer Configuration Exception", JOptionPane.ERROR_MESSAGE);
+        }
+        catch(TransformerException e)
+        {
+        	JOptionPane.showMessageDialog(this, e.getMessage(), "Transformer Exception", JOptionPane.ERROR_MESSAGE);   
+        }
+        catch(Exception e)
+        {
+        	
+        }
+    }
+    
+    private void setExeLocation() {
+    	fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+    	int returnVal = fileChooser.showDialog(this, "Choose .exe Location");
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            exeDirectory = fileChooser.getSelectedFile().getAbsolutePath();
+            System.out.println(exeDirectory);
+        } else {
+            return;
+        }
     }
     
     public void setCurrentlyLoadedObject(HSObject newObject)
@@ -2074,6 +2105,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
             case "save": save(); break;
             case "saveAs": saveAs(); break;
             case "importAnimation": importAnimation(); break;
+            case "exeLocation": setExeLocation(); break;
             case "undo": undo(); break;
             case "redo": redo(); break;
             case "cut": cut(); break;
