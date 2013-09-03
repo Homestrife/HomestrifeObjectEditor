@@ -791,18 +791,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
     
     private String createAbsolutePath(String relPath)
     {
-    	relPath = relPath.replace('\\', File.separatorChar);
-    	relPath = relPath.replace('/', File.separatorChar);
-    	if(!workingDirectory.endsWith(File.separator)) workingDirectory += File.separator;
-    	File a = new File(workingDirectory);
-	    File b = new File(a, relPath);
-	    String absolute = "";
-		try {
-			absolute = b.getCanonicalPath();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
-	    return absolute;
+    	return createAbsolutePathFrom(relPath, workingDirectory);
     }
     
     private String createAbsolutePathFrom(String relPath, String fromPath)
@@ -821,6 +810,55 @@ public class HoldListWindow extends JFrame implements ActionListener {
 	    return absolute;
     }
     
+    private String createRelativePath(String absPath)
+    {
+    	return createPathRelativeTo(absPath, workingDirectory);
+    }
+
+    
+    private String createPathRelativeTo(String absPath, String relativeTo)
+    {
+    	String[] relativeToPieces = relativeTo.split(File.separator.compareTo("\\") == 0 ? "\\\\" : "/");
+        String[] absPathPieces = absPath.split(File.separator.compareTo("\\") == 0 ? "\\\\" : "/");
+        
+        //first, make sure they share the same drive
+        if(!relativeToPieces[0].equals(absPathPieces[0]))
+        {
+            return "";
+        }
+        
+        //compare each until either one ends or a point of divergeance is found
+        int end = relativeToPieces.length > absPathPieces.length ? absPathPieces.length : relativeToPieces.length;
+        int divergeancePoint = end;
+        for(int i = 0; i < end; i++)
+        {
+            if(!relativeToPieces[i].equals(absPathPieces[i]))
+            {
+                divergeancePoint = i;
+                break;
+            }
+        }
+        
+        //add double periods to signify parent directories
+        String relativePath = "";
+        for(int i = 0; i < end - divergeancePoint; i++)
+        {
+            relativePath += ".." + File.separator;
+        }
+        
+        //add the absolute path starting with the divergeance point
+        for(int i = divergeancePoint; i < absPathPieces.length; i++)
+        {
+            if(i > divergeancePoint)
+            {
+                relativePath += File.separator;
+            }
+            relativePath += absPathPieces[i];
+        }
+        
+        return relativePath;
+    }
+    
     private void open()
     {
         int returnVal = fileChooser.showOpenDialog(this);
@@ -831,6 +869,8 @@ public class HoldListWindow extends JFrame implements ActionListener {
         } else {
             return;
         }
+        
+        //TODO: account for loading files with the old format
         
         try
         {
@@ -1434,96 +1474,11 @@ public class HoldListWindow extends JFrame implements ActionListener {
         }
     }
     
-    private String createRelativePath(String absPath)
-    {
-    	String[] workingDirectoryPieces = workingDirectory.split(File.separator.compareTo("\\") == 0 ? "\\\\" : "/");
-        String[] absPathPieces = absPath.split(File.separator.compareTo("\\") == 0 ? "\\\\" : "/");
-        
-        //first, make sure they share the same drive
-        if(!workingDirectoryPieces[0].equals(absPathPieces[0]))
-        {
-            return "";
-        }
-        
-        //compare each until either one ends or a point of divergeance is found
-        int end = workingDirectoryPieces.length > absPathPieces.length ? absPathPieces.length : workingDirectoryPieces.length;
-        int divergeancePoint = end;
-        for(int i = 0; i < end; i++)
-        {
-            if(!workingDirectoryPieces[i].equals(absPathPieces[i]))
-            {
-                divergeancePoint = i;
-                break;
-            }
-        }
-        
-        //add double periods to signify parent directories
-        String relativePath = "";
-        for(int i = 0; i < end - divergeancePoint; i++)
-        {
-            relativePath += ".." + File.separator;
-        }
-        
-        //add the absolute path starting with the divergeance point
-        for(int i = divergeancePoint; i < absPathPieces.length; i++)
-        {
-            if(i > divergeancePoint)
-            {
-                relativePath += File.separator;
-            }
-            relativePath += absPathPieces[i];
-        }
-        
-        return relativePath;
-    }
-
-    
-    private String createPathRelativeTo(String absPath, String relativeTo)
-    {
-    	String[] relativeToPieces = relativeTo.split(File.separator.compareTo("\\") == 0 ? "\\\\" : "/");
-        String[] absPathPieces = absPath.split(File.separator.compareTo("\\") == 0 ? "\\\\" : "/");
-        
-        //first, make sure they share the same drive
-        if(!relativeToPieces[0].equals(absPathPieces[0]))
-        {
-            return "";
-        }
-        
-        //compare each until either one ends or a point of divergeance is found
-        int end = relativeToPieces.length > absPathPieces.length ? absPathPieces.length : relativeToPieces.length;
-        int divergeancePoint = end;
-        for(int i = 0; i < end; i++)
-        {
-            if(!relativeToPieces[i].equals(absPathPieces[i]))
-            {
-                divergeancePoint = i;
-                break;
-            }
-        }
-        
-        //add double periods to signify parent directories
-        String relativePath = "";
-        for(int i = 0; i < end - divergeancePoint; i++)
-        {
-            relativePath += ".." + File.separator;
-        }
-        
-        //add the absolute path starting with the divergeance point
-        for(int i = divergeancePoint; i < absPathPieces.length; i++)
-        {
-            if(i > divergeancePoint)
-            {
-                relativePath += File.separator;
-            }
-            relativePath += absPathPieces[i];
-        }
-        
-        return relativePath;
-    }
-    
     private void createDefinitionFile()
     {
         if(currentlyLoadedObject == null) { return; }
+        
+        //TODO: cry and complain if the path we're trying to save is outside of the game .exe location
         
         try
         {
