@@ -68,6 +68,11 @@ import org.xml.sax.SAXException;
  */
 public class HoldListWindow extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1L;
+
+    
+    //0 - ended 9/1/13
+    //1 - all paths now relative to game .exe - current
+	public static final int XML_FORMAT_VERSION = 1;
 	
 	public static String BaseWindowTitle = "Homestrife Editor - ";
     public static int windowWidth = 1000;
@@ -870,8 +875,6 @@ public class HoldListWindow extends JFrame implements ActionListener {
             return;
         }
         
-        //TODO: account for loading files with the old format
-        
         try
         {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -879,10 +882,16 @@ public class HoldListWindow extends JFrame implements ActionListener {
             Document doc = dBuilder.parse(file);
             doc.getDocumentElement().normalize();
             
+            int version = 0;
+            
             if(doc.getDocumentElement().getNodeName().compareTo("HSObjects") != 0)
             {
                 return;
             }
+            
+            if(!doc.getDocumentElement().getAttribute("version").isEmpty()) version = Integer.parseInt(doc.getDocumentElement().getAttribute("version"));
+            
+            System.out.println("Loading object with xml format version: " + version);
             
             Node object = doc.getDocumentElement().getFirstChild();
             
@@ -911,6 +920,13 @@ public class HoldListWindow extends JFrame implements ActionListener {
             
             //get the base path
             workingDirectory = file.getParent();
+            
+            String relativeDir = exeDirectory;
+            
+            if(version == 0) {
+            	//If this is loading with version 0, we use the working directory to load
+            	relativeDir = workingDirectory;
+            }
             
             //get the definition sections
             NodeList defSecs = object.getChildNodes();
@@ -1004,7 +1020,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                         NamedNodeMap textureAttributes = textureList.item(j).getAttributes();
                         
                         String filePath = "";
-                        if(textureAttributes.getNamedItem("textureFilePath") != null) filePath = createAbsolutePathFrom(textureAttributes.getNamedItem("textureFilePath").getNodeValue(), exeDirectory);
+                        if(textureAttributes.getNamedItem("textureFilePath") != null) filePath = createAbsolutePathFrom(textureAttributes.getNamedItem("textureFilePath").getNodeValue(), relativeDir);
                         filePath = filePath.replace('/', File.separatorChar);
                         filePath = filePath.replace('\\', File.separatorChar);
                         HSTexture tex = new HSTexture(filePath);
@@ -1026,7 +1042,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                         NamedNodeMap audioAttributes = audioListList.item(j).getAttributes();
                         
                         String filePath = "";
-                        if(audioAttributes.getNamedItem("audioFilePath") != null) filePath = createAbsolutePathFrom(audioAttributes.getNamedItem("audioFilePath").getNodeValue(), exeDirectory);
+                        if(audioAttributes.getNamedItem("audioFilePath") != null) filePath = createAbsolutePathFrom(audioAttributes.getNamedItem("audioFilePath").getNodeValue(), relativeDir);
                         filePath = filePath.replace('/', File.separatorChar);
                         filePath = filePath.replace('\\', File.separatorChar);
                         HSAudio aud = new HSAudio(filePath);
@@ -1049,7 +1065,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                         NamedNodeMap spawnObjectAttributes = spawnObjectsList.item(j).getAttributes();
                         
                         String filePath = "";
-                        if(spawnObjectAttributes.getNamedItem("definitionFilePath") != null) filePath = createAbsolutePathFrom(spawnObjectAttributes.getNamedItem("definitionFilePath").getNodeValue(), exeDirectory);
+                        if(spawnObjectAttributes.getNamedItem("definitionFilePath") != null) filePath = createAbsolutePathFrom(spawnObjectAttributes.getNamedItem("definitionFilePath").getNodeValue(), relativeDir);
                         filePath = filePath.replace('/', File.separatorChar);
                         filePath = filePath.replace('\\', File.separatorChar);
                         SpawnObject sob = new SpawnObject(filePath);
@@ -1135,7 +1151,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                             NamedNodeMap hitAudioAttributes = hitAudioListList.item(j).getAttributes();
 
                             String filePath = "";
-                            if(hitAudioAttributes.getNamedItem("hitAudioFilePath") != null) filePath = createAbsolutePathFrom(hitAudioAttributes.getNamedItem("hitAudioFilePath").getNodeValue(), exeDirectory);
+                            if(hitAudioAttributes.getNamedItem("hitAudioFilePath") != null) filePath = createAbsolutePathFrom(hitAudioAttributes.getNamedItem("hitAudioFilePath").getNodeValue(), relativeDir);
                             filePath = filePath.replace('/', File.separatorChar);
                             filePath = filePath.replace('\\', File.separatorChar);
                             HSAudio aud = new HSAudio(filePath);
@@ -1158,7 +1174,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                             NamedNodeMap blockedAudioAttributes = blockedAudioListList.item(j).getAttributes();
 
                             String filePath = "";
-                            if(blockedAudioAttributes.getNamedItem("blockedAudioFilePath") != null) filePath = createAbsolutePathFrom(blockedAudioAttributes.getNamedItem("blockedAudioFilePath").getNodeValue(), exeDirectory);
+                            if(blockedAudioAttributes.getNamedItem("blockedAudioFilePath") != null) filePath = createAbsolutePathFrom(blockedAudioAttributes.getNamedItem("blockedAudioFilePath").getNodeValue(), relativeDir);
                             filePath = filePath.replace('/', File.separatorChar);
                             filePath = filePath.replace('\\', File.separatorChar);
                             HSAudio aud = new HSAudio(filePath);
@@ -1214,7 +1230,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
             		break;
             	}
             	HSPalette pal = new HSPalette();
-            	pal.path = createAbsolutePathFrom(objectAttributes.getNamedItem("palette" + i + "FilePath").getNodeValue(), exeDirectory);
+            	pal.path = createAbsolutePathFrom(objectAttributes.getNamedItem("palette" + i + "FilePath").getNodeValue(), relativeDir);
             	pal.path = pal.path.replace('/', File.separatorChar);
             	pal.path = pal.path.replace('\\', File.separatorChar);
                 pal.name = "Palette " + i;
@@ -1229,7 +1245,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
 	                Node palette = palettesList.item(i);
 	                
 	                HSPalette pal = new HSPalette();
-	            	pal.path = createAbsolutePathFrom(palette.getAttributes().getNamedItem("path").getNodeValue(), exeDirectory);
+	            	pal.path = createAbsolutePathFrom(palette.getAttributes().getNamedItem("path").getNodeValue(), relativeDir);
 	            	pal.path = pal.path.replace('/', File.separatorChar);
 	            	pal.path = pal.path.replace('\\', File.separatorChar);
 	                pal.name = palette.getAttributes().getNamedItem("name").getNodeValue();
@@ -1487,6 +1503,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
             Document doc = dBuilder.newDocument();
             
             Element root = doc.createElement("HSObjects");
+            root.setAttribute("version", "" + XML_FORMAT_VERSION);
             
             //set the proper object type
             Element object;
