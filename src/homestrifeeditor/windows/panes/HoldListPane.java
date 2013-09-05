@@ -132,18 +132,11 @@ public class HoldListPane extends JPanel implements ActionListener, TreeSelectio
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(hold);
         
         try {
-	        String[] split = hold.name.split("_");
-	        String numberRemoved = "";
-	        for(int i=0; i < split.length - 1; i++) {
-	        	if(i != 0) numberRemoved += "_";
-	        	numberRemoved += split[i];
-	        }
-	        
 	        boolean found = false;
 	        for(int i=0; i < root.getChildCount(); i++) {
 	        	Object obj = model.getChild(root, i);
 	        	Object userObject = ((DefaultMutableTreeNode)obj).getUserObject();
-	        	if(userObject instanceof String && ((String)userObject).compareTo(numberRemoved) == 0) {
+	        	if(userObject instanceof String && ((String)userObject).compareTo(hold.getNameOnly()) == 0) {
 	        		//Position it correctly in numerical order
 	        		DefaultMutableTreeNode child = (DefaultMutableTreeNode)model.getChild(root, i);
 	        		for(int j=1; j < child.getChildCount(); j++) {
@@ -153,9 +146,7 @@ public class HoldListPane extends JPanel implements ActionListener, TreeSelectio
 	        			}
 	        			
 	        			HSObjectHold checkAgainst = (HSObjectHold) child2.getUserObject();
-	        			String[] split2 = checkAgainst.name.split("_");
-	        			String checkNum = split2[split2.length - 1];
-	        			if(Integer.parseInt(split[split.length-1]) < Integer.parseInt(checkNum)) {
+	        			if(hold.getNumFromName() < checkAgainst.getNumFromName()) {
 	        				//Insert before
 	    	        		model.insertNodeInto(node, child, j-1);
 	    	        		
@@ -174,7 +165,7 @@ public class HoldListPane extends JPanel implements ActionListener, TreeSelectio
 	        	}
 	        }
 	        if(!found) {
-	        	DefaultMutableTreeNode ndmtn = new DefaultMutableTreeNode(numberRemoved.length() > 0 ? numberRemoved : hold.name);
+	        	DefaultMutableTreeNode ndmtn = new DefaultMutableTreeNode(hold.getNameOnly().length() > 0 ? hold.getNameOnly() : hold.name);
 	        	ndmtn.add(node);
 	        	root.add(ndmtn);
 	        }

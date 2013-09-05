@@ -56,6 +56,21 @@ public class HSObjectHold {
         return false;
     }
     
+    public String getNameOnly() {
+    	String numberRemoved = new String(name);
+    	
+    	numberRemoved = numberRemoved.substring(0, numberRemoved.length() - 4);
+    	if(numberRemoved.endsWith("_")) numberRemoved = numberRemoved.substring(0, numberRemoved.length() - 1);
+        
+    	return numberRemoved;
+    }
+    
+    public int getNumFromName() {
+    	int num = -1;
+		num = Integer.parseInt(name.substring(name.length() - 4));
+		return num;
+    }
+    
     public String toString() {
     	//String[] split = name.split("_");
     	//return split[split.length - 1];
