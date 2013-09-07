@@ -379,6 +379,9 @@ public class HoldListPane extends JPanel implements ActionListener, TreeSelectio
             case "editHold": editHoldButtonPressed(); break;
             case "massShift": massShiftButtonPressed(); break;
         }
+        
+        if(parent.currentlyLoadedObject != null)
+        	parent.setTitle(HoldListWindow.BaseWindowTitle + parent.currentlyLoadedObject.name + "*");
     }
     
     @Override

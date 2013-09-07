@@ -356,8 +356,8 @@ public class HoldListWindow extends JFrame implements ActionListener {
         }
         catch(IOException e)
         {
-        	JOptionPane.showMessageDialog(this, e.getMessage() + " | Using default settings", "IO Exception", JOptionPane.ERROR_MESSAGE); 
-        	return;
+        	//JOptionPane.showMessageDialog(this, e.getMessage() + " | Using default settings", "IO Exception", JOptionPane.ERROR_MESSAGE); 
+        	//return;
         }
     	System.out.println("Finished Loading Settings\n");
 		
@@ -1955,6 +1955,8 @@ public class HoldListWindow extends JFrame implements ActionListener {
         
         File wd = new File(workingDirectory);
         if(!wd.exists()) { return; }
+        
+        setTitle(BaseWindowTitle + currentlyLoadedObject.name);
         
         createDefinitionFile();
     }

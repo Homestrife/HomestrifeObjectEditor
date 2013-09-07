@@ -512,6 +512,9 @@ public class TextureHitboxLayeredPane extends JLayeredPane implements MouseListe
         {
             unselectAll();
         }
+        
+        if(parent.parent.currentlyLoadedObject != null)
+        	parent.parent.setTitle(HoldListWindow.BaseWindowTitle + parent.parent.currentlyLoadedObject.name + "*");
     }
     
     @Override
