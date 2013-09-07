@@ -68,6 +68,11 @@ import org.xml.sax.SAXException;
  */
 public class HoldListWindow extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1L;
+
+    
+    //0 - ended 9/1/13
+    //1 - all paths now relative to game .exe - current
+	public static final int XML_FORMAT_VERSION = 1;
 	
 	public static String BaseWindowTitle = "Homestrife Editor - ";
     public static int windowWidth = 1000;
@@ -81,6 +86,8 @@ public class HoldListWindow extends JFrame implements ActionListener {
     public HSObject currentlyLoadedObject;
     
     public String workingDirectory;
+    public String exeDirectory;
+    public String fileChooserDirectory;
     
     private JMenu palettesMenu;
     
@@ -93,7 +100,15 @@ public class HoldListWindow extends JFrame implements ActionListener {
         
         workingDirectory = "";
         
-        fileChooser = new JFileChooser("..");
+        loadSettings();
+        
+        addWindowListener(new WindowAdapter() {
+        	@Override
+        	public void windowClosing(WindowEvent e) {
+        		saveSettings();
+        		super.windowClosing(e);
+        	}
+		});
         
         setTitle(BaseWindowTitle + "No Object Loaded");
         setSize(windowWidth, windowHeight);
@@ -107,8 +122,8 @@ public class HoldListWindow extends JFrame implements ActionListener {
         KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
         manager.addKeyEventDispatcher(new KeyDispatcher());
     }
-    
-    private void createMenuBar()
+
+	private void createMenuBar()
     {
         JMenuBar menuBar;
         JMenu file;
@@ -122,6 +137,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         JMenuItem save;
         JMenuItem saveAs;
         JMenuItem importAnimation;
+        JMenuItem setExeLocation;
         JMenu edit;
         JMenuItem undo;
         JMenuItem redo;
@@ -179,6 +195,10 @@ public class HoldListWindow extends JFrame implements ActionListener {
         importAnimation.setActionCommand("importAnimation");
         importAnimation.addActionListener(this);
         //
+        setExeLocation = new JMenuItem("Set Game Location");
+        setExeLocation.setActionCommand("exeLocation");
+        setExeLocation.addActionListener(this);
+        //
         newObject.add(newGraphic);
         newObject.add(newTerrain);
         newObject.add(newPhysicsObject);
@@ -190,6 +210,8 @@ public class HoldListWindow extends JFrame implements ActionListener {
         file.add(saveAs);
         file.add(new JSeparator());
         file.add(importAnimation);
+        file.add(new JSeparator());
+        file.add(setExeLocation);
         menuBar.add(file);
         
         edit = new JMenu("Edit");
@@ -281,6 +303,137 @@ public class HoldListWindow extends JFrame implements ActionListener {
     	JSplitPane sp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, createHoldListPane(), createHoldDataPane());
     	sp.setResizeWeight(.34);
         this.setContentPane(sp);
+    }
+    
+    private void loadSettings() {
+    	File file = new File("settings.xml");
+        
+        fileChooser = new JFileChooser(".");
+        exeDirectory = "";
+        fileChooserDirectory = ".";
+        
+    	System.out.println("Loading Settings...");
+        
+		try {
+	        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+	        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+	        Document doc = dBuilder.parse(file);
+	        doc.getDocumentElement().normalize();
+	        
+	        Node root = doc.getDocumentElement();
+	        if(root.getNodeName().compareTo("Settings") != 0)
+	        {
+	        	JOptionPane.showMessageDialog(this, "Settings file has invalid root", "Error loading settings", JOptionPane.ERROR_MESSAGE); 
+	        	return; 
+	        }
+	        
+	        NodeList nodes = root.getChildNodes();
+	        for(int i=0; i < nodes.getLength(); i++) {
+	        	Node node = nodes.item(i);
+	        	System.out.println(node.getNodeName() + ": " + node.getTextContent());
+	        	switch(node.getNodeName()) {
+	        	case "FileChooserDir":
+	        		if(node.getTextContent() != null)
+	        			fileChooserDirectory = node.getTextContent();
+	        		fileChooser = new JFileChooser(fileChooserDirectory);
+	        		break;
+	        	case "ExeDir":
+	        		if(node.getTextContent() != null)
+	        			exeDirectory = node.getTextContent();
+	        		break;
+	        	}
+	        }
+		} 
+        catch(ParserConfigurationException e)
+        {
+        	JOptionPane.showMessageDialog(this, e.getMessage() + " | Using default settings", "Parser Configuration Exception", JOptionPane.ERROR_MESSAGE); 
+        	return; 
+        }
+        catch(SAXException e)
+        {
+        	JOptionPane.showMessageDialog(this, e.getMessage() + " | Using default settings", "SAX Exception", JOptionPane.ERROR_MESSAGE);  
+        	return;            
+        }
+        catch(IOException e)
+        {
+        	JOptionPane.showMessageDialog(this, e.getMessage() + " | Using default settings", "IO Exception", JOptionPane.ERROR_MESSAGE); 
+        	return;
+        }
+    	System.out.println("Finished Loading Settings\n");
+		
+		if(exeDirectory.isEmpty()) {
+        	if(JOptionPane.showConfirmDialog(this, "Set game .exe directory now?", ".exe Directory Not Set", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+        		setExeLocation();
+        	}
+        	else {
+        		
+        	}
+		}
+	}
+    
+    private void saveSettings() {
+    	
+    	System.out.println("\nSaving Settings...");
+        try
+        {
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.newDocument();
+            
+            Element root = doc.createElement("Settings");
+            
+            Element chooserDir = doc.createElement("FileChooserDir");
+            chooserDir.setTextContent(fileChooser.getCurrentDirectory().getPath());
+        	System.out.println("FileChooserDir: " + fileChooser.getCurrentDirectory().getPath());
+            
+            Element exeDir = doc.createElement("ExeDir");
+            exeDir.setTextContent(exeDirectory);
+        	System.out.println("ExeDir: " + exeDirectory);
+            
+            root.appendChild(chooserDir);
+            root.appendChild(exeDir);
+            doc.appendChild(root);
+            
+            //finally, save the file
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            Transformer transformer = transformerFactory.newTransformer();
+            DOMSource source = new DOMSource(doc);
+            StreamResult result = new StreamResult(new File("settings.xml"));
+            transformer.transform(source, result);
+        }
+        catch(ParserConfigurationException e)
+        {
+        	JOptionPane.showMessageDialog(this, e.getMessage(), "Parser Configuration Exception", JOptionPane.ERROR_MESSAGE);  
+            
+        }
+        catch(TransformerConfigurationException e)
+        {
+        	JOptionPane.showMessageDialog(this, e.getMessage(), "Transformer Configuration Exception", JOptionPane.ERROR_MESSAGE);
+        }
+        catch(TransformerException e)
+        {
+        	JOptionPane.showMessageDialog(this, e.getMessage(), "Transformer Exception", JOptionPane.ERROR_MESSAGE);   
+        }
+        catch(Exception e)
+        {
+        	
+        }
+    }
+    
+    private void setExeLocation() {
+    	
+    	File lastFile = fileChooser.getCurrentDirectory();
+    	
+    	fileChooser = new JFileChooser(exeDirectory);
+    	fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+    	int returnVal = fileChooser.showDialog(this, "Choose .exe Location");
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            exeDirectory = fileChooser.getSelectedFile().getAbsolutePath();
+            System.out.println(exeDirectory);
+        } else {
+            
+        }
+        fileChooser = new JFileChooser(lastFile);
     }
     
     public void setCurrentlyLoadedObject(HSObject newObject)
@@ -643,10 +796,15 @@ public class HoldListWindow extends JFrame implements ActionListener {
     
     private String createAbsolutePath(String relPath)
     {
+    	return createAbsolutePathFrom(relPath, workingDirectory);
+    }
+    
+    private String createAbsolutePathFrom(String relPath, String fromPath)
+    {
     	relPath = relPath.replace('\\', File.separatorChar);
     	relPath = relPath.replace('/', File.separatorChar);
-    	if(!workingDirectory.endsWith(File.separator)) workingDirectory += File.separator;
-    	File a = new File(workingDirectory);
+    	if(!fromPath.endsWith(File.separator)) fromPath += File.separator;
+    	File a = new File(fromPath);
 	    File b = new File(a, relPath);
 	    String absolute = "";
 		try {
@@ -655,40 +813,55 @@ public class HoldListWindow extends JFrame implements ActionListener {
 			e.printStackTrace();
 		} 
 	    return absolute;
-    	/*
-        //break the working directory and relative path down into pieces
-        String[] workingDirectoryPieces = workingDirectory.split("\\\\");
-        String[] relPathPieces = relPath.split("\\\\");
+    }
+    
+    private String createRelativePath(String absPath)
+    {
+    	return createPathRelativeTo(absPath, workingDirectory);
+    }
+
+    
+    private String createPathRelativeTo(String absPath, String relativeTo)
+    {
+    	String[] relativeToPieces = relativeTo.split(File.separator.compareTo("\\") == 0 ? "\\\\" : "/");
+        String[] absPathPieces = absPath.split(File.separator.compareTo("\\") == 0 ? "\\\\" : "/");
         
-        //count the double periods
-        int doublePeriods = 0;
-        for(int i = 0; i < relPathPieces.length; i++)
+        //first, make sure they share the same drive
+        if(!relativeToPieces[0].equals(absPathPieces[0]))
         {
-            if(relPathPieces[i].equals(".."))
+            return "";
+        }
+        
+        //compare each until either one ends or a point of divergeance is found
+        int end = relativeToPieces.length > absPathPieces.length ? absPathPieces.length : relativeToPieces.length;
+        int divergeancePoint = end;
+        for(int i = 0; i < end; i++)
+        {
+            if(!relativeToPieces[i].equals(absPathPieces[i]))
             {
-                doublePeriods++;
-            }
-            else
-            {
+                divergeancePoint = i;
                 break;
             }
         }
         
-        //copy the working directory up until the double periods
-        String absolutePath = workingDirectoryPieces[0];
-        for(int i = 1; i < workingDirectoryPieces.length - doublePeriods; i++)
+        //add double periods to signify parent directories
+        String relativePath = "";
+        for(int i = 0; i < end - divergeancePoint; i++)
         {
-            absolutePath += "\\" + workingDirectoryPieces[i];
+            relativePath += ".." + File.separator;
         }
         
-        //copy the relative path past the doublePeriods
-        for(int i = doublePeriods; i < relPathPieces.length; i++)
+        //add the absolute path starting with the divergeance point
+        for(int i = divergeancePoint; i < absPathPieces.length; i++)
         {
-            absolutePath += "\\" + relPathPieces[i];
+            if(i > divergeancePoint)
+            {
+                relativePath += File.separator;
+            }
+            relativePath += absPathPieces[i];
         }
         
-        return absolutePath;
-        */
+        return relativePath;
     }
     
     private void open()
@@ -709,10 +882,16 @@ public class HoldListWindow extends JFrame implements ActionListener {
             Document doc = dBuilder.parse(file);
             doc.getDocumentElement().normalize();
             
+            int version = 0;
+            
             if(doc.getDocumentElement().getNodeName().compareTo("HSObjects") != 0)
             {
                 return;
             }
+            
+            if(!doc.getDocumentElement().getAttribute("version").isEmpty()) version = Integer.parseInt(doc.getDocumentElement().getAttribute("version"));
+            
+            System.out.println("Loading object with xml format version: " + version);
             
             Node object = doc.getDocumentElement().getFirstChild();
             
@@ -741,6 +920,13 @@ public class HoldListWindow extends JFrame implements ActionListener {
             
             //get the base path
             workingDirectory = file.getParent();
+            
+            String relativeDir = exeDirectory;
+            
+            if(version == 0) {
+            	//If this is loading with version 0, we use the working directory to load
+            	relativeDir = workingDirectory;
+            }
             
             //get the definition sections
             NodeList defSecs = object.getChildNodes();
@@ -834,7 +1020,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                         NamedNodeMap textureAttributes = textureList.item(j).getAttributes();
                         
                         String filePath = "";
-                        if(textureAttributes.getNamedItem("textureFilePath") != null) filePath = createAbsolutePath(textureAttributes.getNamedItem("textureFilePath").getNodeValue());
+                        if(textureAttributes.getNamedItem("textureFilePath") != null) filePath = createAbsolutePathFrom(textureAttributes.getNamedItem("textureFilePath").getNodeValue(), relativeDir);
                         filePath = filePath.replace('/', File.separatorChar);
                         filePath = filePath.replace('\\', File.separatorChar);
                         HSTexture tex = new HSTexture(filePath);
@@ -856,7 +1042,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                         NamedNodeMap audioAttributes = audioListList.item(j).getAttributes();
                         
                         String filePath = "";
-                        if(audioAttributes.getNamedItem("audioFilePath") != null) filePath = createAbsolutePath(audioAttributes.getNamedItem("audioFilePath").getNodeValue());
+                        if(audioAttributes.getNamedItem("audioFilePath") != null) filePath = createAbsolutePathFrom(audioAttributes.getNamedItem("audioFilePath").getNodeValue(), relativeDir);
                         filePath = filePath.replace('/', File.separatorChar);
                         filePath = filePath.replace('\\', File.separatorChar);
                         HSAudio aud = new HSAudio(filePath);
@@ -879,7 +1065,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                         NamedNodeMap spawnObjectAttributes = spawnObjectsList.item(j).getAttributes();
                         
                         String filePath = "";
-                        if(spawnObjectAttributes.getNamedItem("definitionFilePath") != null) filePath = createAbsolutePath(spawnObjectAttributes.getNamedItem("definitionFilePath").getNodeValue());
+                        if(spawnObjectAttributes.getNamedItem("definitionFilePath") != null) filePath = createAbsolutePathFrom(spawnObjectAttributes.getNamedItem("definitionFilePath").getNodeValue(), relativeDir);
                         filePath = filePath.replace('/', File.separatorChar);
                         filePath = filePath.replace('\\', File.separatorChar);
                         SpawnObject sob = new SpawnObject(filePath);
@@ -965,7 +1151,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                             NamedNodeMap hitAudioAttributes = hitAudioListList.item(j).getAttributes();
 
                             String filePath = "";
-                            if(hitAudioAttributes.getNamedItem("hitAudioFilePath") != null) filePath = createAbsolutePath(hitAudioAttributes.getNamedItem("hitAudioFilePath").getNodeValue());
+                            if(hitAudioAttributes.getNamedItem("hitAudioFilePath") != null) filePath = createAbsolutePathFrom(hitAudioAttributes.getNamedItem("hitAudioFilePath").getNodeValue(), relativeDir);
                             filePath = filePath.replace('/', File.separatorChar);
                             filePath = filePath.replace('\\', File.separatorChar);
                             HSAudio aud = new HSAudio(filePath);
@@ -988,7 +1174,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                             NamedNodeMap blockedAudioAttributes = blockedAudioListList.item(j).getAttributes();
 
                             String filePath = "";
-                            if(blockedAudioAttributes.getNamedItem("blockedAudioFilePath") != null) filePath = createAbsolutePath(blockedAudioAttributes.getNamedItem("blockedAudioFilePath").getNodeValue());
+                            if(blockedAudioAttributes.getNamedItem("blockedAudioFilePath") != null) filePath = createAbsolutePathFrom(blockedAudioAttributes.getNamedItem("blockedAudioFilePath").getNodeValue(), relativeDir);
                             filePath = filePath.replace('/', File.separatorChar);
                             filePath = filePath.replace('\\', File.separatorChar);
                             HSAudio aud = new HSAudio(filePath);
@@ -1044,7 +1230,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
             		break;
             	}
             	HSPalette pal = new HSPalette();
-            	pal.path = createAbsolutePath(objectAttributes.getNamedItem("palette" + i + "FilePath").getNodeValue());
+            	pal.path = createAbsolutePathFrom(objectAttributes.getNamedItem("palette" + i + "FilePath").getNodeValue(), relativeDir);
             	pal.path = pal.path.replace('/', File.separatorChar);
             	pal.path = pal.path.replace('\\', File.separatorChar);
                 pal.name = "Palette " + i;
@@ -1059,7 +1245,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
 	                Node palette = palettesList.item(i);
 	                
 	                HSPalette pal = new HSPalette();
-	            	pal.path = createAbsolutePath(palette.getAttributes().getNamedItem("path").getNodeValue());
+	            	pal.path = createAbsolutePathFrom(palette.getAttributes().getNamedItem("path").getNodeValue(), relativeDir);
 	            	pal.path = pal.path.replace('/', File.separatorChar);
 	            	pal.path = pal.path.replace('\\', File.separatorChar);
 	                pal.name = palette.getAttributes().getNamedItem("name").getNodeValue();
@@ -1304,52 +1490,11 @@ public class HoldListWindow extends JFrame implements ActionListener {
         }
     }
     
-    private String createRelativePath(String absPath)
-    {
-    	String[] workingDirectoryPieces = workingDirectory.split(File.separator.compareTo("\\") == 0 ? "\\\\" : "/");
-        String[] absPathPieces = absPath.split(File.separator.compareTo("\\") == 0 ? "\\\\" : "/");
-        
-        //first, make sure they share the same drive
-        if(!workingDirectoryPieces[0].equals(absPathPieces[0]))
-        {
-            return "";
-        }
-        
-        //compare each until either one ends or a point of divergeance is found
-        int end = workingDirectoryPieces.length > absPathPieces.length ? absPathPieces.length : workingDirectoryPieces.length;
-        int divergeancePoint = end;
-        for(int i = 0; i < end; i++)
-        {
-            if(!workingDirectoryPieces[i].equals(absPathPieces[i]))
-            {
-                divergeancePoint = i;
-                break;
-            }
-        }
-        
-        //add double periods to signify parent directories
-        String relativePath = "";
-        for(int i = 0; i < end - divergeancePoint; i++)
-        {
-            relativePath += ".." + File.separator;
-        }
-        
-        //add the absolute path starting with the divergeance point
-        for(int i = divergeancePoint; i < absPathPieces.length; i++)
-        {
-            if(i > divergeancePoint)
-            {
-                relativePath += File.separator;
-            }
-            relativePath += absPathPieces[i];
-        }
-        
-        return relativePath;
-    }
-    
     private void createDefinitionFile()
     {
         if(currentlyLoadedObject == null) { return; }
+        
+        //TODO: cry and complain if the path we're trying to save is outside of the game .exe location
         
         try
         {
@@ -1358,6 +1503,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
             Document doc = dBuilder.newDocument();
             
             Element root = doc.createElement("HSObjects");
+            root.setAttribute("version", "" + XML_FORMAT_VERSION);
             
             //set the proper object type
             Element object;
@@ -1393,7 +1539,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
             	Element singlePalElement = doc.createElement("Palette");
                 
             	singlePalElement.setAttribute("name", p.name);
-            	singlePalElement.setAttribute("path", createRelativePath(p.path));
+            	singlePalElement.setAttribute("path", createPathRelativeTo(p.path, exeDirectory));
             	
                 palElement.appendChild(singlePalElement);
             }
@@ -1431,7 +1577,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                     {
                         Element hitAudio = doc.createElement("OnHitAudio");
                         hitAudio.setAttribute("delay", "" + a.delay);
-                        hitAudio.setAttribute("hitAudioFilePath", createRelativePath(a.filePath));
+                        hitAudio.setAttribute("hitAudioFilePath", createPathRelativeTo(a.filePath, exeDirectory));
                         hitAudio.setAttribute("exclusive", "" + a.exclusive);
                         hitAudio.setAttribute("percentage", "" + a.percentage);
                         hitAudio.setAttribute("usePercentage", "" + a.usePercentage);
@@ -1642,7 +1788,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                         {
                             Element hitAudio = doc.createElement("HitAudio");
                             hitAudio.setAttribute("delay", "" + a.delay);
-                            hitAudio.setAttribute("hitAudioFilePath", createRelativePath(a.filePath));
+                            hitAudio.setAttribute("hitAudioFilePath", createPathRelativeTo(a.filePath, exeDirectory));
                             hitAudio.setAttribute("exclusive", "" + a.exclusive);
                             hitAudio.setAttribute("percentage", "" + a.percentage);
                             hitAudio.setAttribute("usePercentage", "" + a.usePercentage);
@@ -1659,7 +1805,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                         {
                             Element blockedAudio = doc.createElement("BlockedAudio");
                             blockedAudio.setAttribute("delay", "" + a.delay);
-                            blockedAudio.setAttribute("blockedAudioFilePath", createRelativePath(a.filePath));
+                            blockedAudio.setAttribute("blockedAudioFilePath", createPathRelativeTo(a.filePath, exeDirectory));
                             blockedAudio.setAttribute("exclusive", "" + a.exclusive);
                             blockedAudio.setAttribute("percentage", "" + a.percentage);
                             blockedAudio.setAttribute("usePercentage", "" + a.usePercentage);
@@ -1707,7 +1853,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                         texture.setAttribute("depth", "" + t.depth);
                         texture.setAttribute("offsetX", "" + t.offset.x);
                         texture.setAttribute("offsetY", "" + t.offset.y);
-                        texture.setAttribute("textureFilePath", createRelativePath(t.filePath));
+                        texture.setAttribute("textureFilePath", createPathRelativeTo(t.filePath, exeDirectory));
                         textures.appendChild(texture);
                     }
                     hold.appendChild(textures);
@@ -1721,7 +1867,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                     {
                         Element audio = doc.createElement("Audio");
                         audio.setAttribute("delay", "" + a.delay);
-                        audio.setAttribute("audioFilePath", createRelativePath(a.filePath));
+                        audio.setAttribute("audioFilePath", createPathRelativeTo(a.filePath, exeDirectory));
                         audio.setAttribute("exclusive", "" + a.exclusive);
                         audio.setAttribute("percentage", "" + a.percentage);
                         audio.setAttribute("usePercentage", "" + a.usePercentage);
@@ -1737,7 +1883,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                     for(SpawnObject s : h.spawnObjects)
                     {
                         Element spawnObject = doc.createElement("SpawnObject");
-                        spawnObject.setAttribute("definitionFilePath", createRelativePath(s.defFilePath));
+                        spawnObject.setAttribute("definitionFilePath", createPathRelativeTo(s.defFilePath, exeDirectory));
                         spawnObject.setAttribute("delay", "" + s.delay);
                         spawnObject.setAttribute("number", "" + s.number);
                         spawnObject.setAttribute("parentOffsetX", "" + s.parentOffset.x);
@@ -1995,6 +2141,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
             case "save": save(); break;
             case "saveAs": saveAs(); break;
             case "importAnimation": importAnimation(); break;
+            case "exeLocation": setExeLocation(); break;
             case "undo": undo(); break;
             case "redo": redo(); break;
             case "cut": cut(); break;
