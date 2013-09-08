@@ -169,11 +169,13 @@ public class TextureHitboxLayeredPane extends JLayeredPane implements MouseListe
             return;
         }
         
-        HSBoxLabel terrainBoxLabel = new HSBoxLabel(this, ((TerrainObject)parent.parent.currentlyLoadedObject).terrainBoxes.get(0));
-        terrainBoxLabel.setAsTerrainBox();
-        terrainBoxLabel.setVisible(showTerrainBox);
-        
-        add(terrainBoxLabel);
+        for(HSBox tBos : ((TerrainObject)parent.parent.currentlyLoadedObject).terrainBoxes) {
+	        HSBoxLabel terrainBoxLabel = new HSBoxLabel(this, tBos);
+	        terrainBoxLabel.setAsTerrainBox();
+	        terrainBoxLabel.setVisible(showTerrainBox);
+	        
+	        add(terrainBoxLabel);
+        }
         
         repaint();
     }
@@ -306,7 +308,24 @@ public class TextureHitboxLayeredPane extends JLayeredPane implements MouseListe
         addTexture(file.getPath());
     }
     
-    public void addAttackBox(HSBox box)
+    public void addTerrainBox(HSBox box) {
+		addTerrainBox(box, true);
+	}
+    
+    public void addTerrainBox(HSBox box, boolean addToHold) {
+        HSBoxLabel boxLabel = new HSBoxLabel(this, box);
+        boxLabel.setAsTerrainBox();
+        boxLabel.setVisible(showTerrainBox);
+        
+        add(boxLabel, new Integer(box.depth));
+        
+        if(addToHold) 
+            ((TerrainObject)parent.parent.currentlyLoadedObject).terrainBoxes.add(box);
+        
+        setSelected(boxLabel, false);
+	}
+
+	public void addAttackBox(HSBox box)
     {
         addAttackBox(box, true);
     }
@@ -325,7 +344,20 @@ public class TextureHitboxLayeredPane extends JLayeredPane implements MouseListe
         setSelected(boxLabel, false);
     }
     
-    public void addAttackBox()
+    public void addTerrainBox() {
+    	if(!parent.hold.IsTerrainObjectHold() || parent.hold.IsFighterHold() || parent.hold.IsPhysicsObjectHold()) return;
+        
+        HSBox newBox = new HSBox();
+        newBox.depth = highestLayer() + 1;
+        newBox.width = defaultHitBoxSize;
+        newBox.height = defaultHitBoxSize;
+        newBox.offset.x = 0;
+        newBox.offset.y = 0;
+        
+        addTerrainBox(newBox);
+    }
+
+	public void addAttackBox()
     {
         if(!parent.hold.IsTerrainObjectHold()) { return; }
         

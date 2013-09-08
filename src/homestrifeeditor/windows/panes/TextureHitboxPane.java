@@ -53,6 +53,7 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
     private JLabel terrainBoxLabel;
     private JComboBox<?> terrainBoxCombo;
     
+    private JButton addTerrainBoxButton;    
     private JButton addAttackBoxButton;
     private JButton addHurtBoxButton;
     public JButton removeButton;
@@ -106,6 +107,11 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
         addTextureButton.setToolTipText("Create New Texture");
         addTextureButton.addActionListener(this);
         
+        addTerrainBoxButton = new JButton("+Trn");
+        addTerrainBoxButton.setActionCommand("addTerrainBox");
+        addTerrainBoxButton.setToolTipText("Create New Terrain Box (Terrain Objects Only)");
+        addTerrainBoxButton.addActionListener(this);
+        
         addAttackBoxButton = new JButton("+Atk");
         addAttackBoxButton.setActionCommand("addAttackBox");
         addAttackBoxButton.setToolTipText("Create New Attack Hitbox");
@@ -154,6 +160,7 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
         textureHitboxToolBar = new JToolBar();
         textureHitboxToolBar.setFloatable(false);
         textureHitboxToolBar.add(addTextureButton);
+        textureHitboxToolBar.add(addTerrainBoxButton);
         textureHitboxToolBar.add(addAttackBoxButton);
         textureHitboxToolBar.add(addHurtBoxButton);
         textureHitboxToolBar.add(removeButton);
@@ -214,6 +221,10 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
                 {
                     c.setEnabled(false);
                 }
+            }
+            if(parent.currentlyLoadedObject != null && (!parent.currentlyLoadedObject.IsTerrainObject() || parent.currentlyLoadedObject.IsFighter() || parent.currentlyLoadedObject.IsPhysicsObject())) {
+            	if(c == addTerrainBoxButton)
+            		c.setEnabled(false);
             }
         }
         textureHitboxToolBar.setEnabled(enable);
@@ -456,7 +467,8 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
     {
         switch(e.getActionCommand())
         {
-            case "addTexture": textureHitboxPane.addTexture(); break;
+	        case "addTexture": textureHitboxPane.addTexture(); break;
+	        case "addTerrainBox": textureHitboxPane.addTerrainBox(); break;
             case "addAttackBox": textureHitboxPane.addAttackBox(); break;
             case "addHurtBox": textureHitboxPane.addHurtBox(); break;
             case "remove": textureHitboxPane.removeSelectedItems(); break;
