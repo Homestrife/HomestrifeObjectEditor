@@ -3,6 +3,6 @@ HomestrifeObjectEditor
 
 Object editor for Homestrife
 
-Most recent compiled version (2013-09-04): https://dl.dropboxusercontent.com/u/47252499/Homestrife/2013-09-07-1230.jar
+Most recent compiled version (2013-09-08): https://dl.dropboxusercontent.com/u/47252499/Homestrife/2013-09-08-1305.jar
 
-Includes commit 2181b362f9fa8e186725c0e68791998aa6cd7e71
+Includes commit 6825158285b644d8c083781766ba3801e70ba3b3
