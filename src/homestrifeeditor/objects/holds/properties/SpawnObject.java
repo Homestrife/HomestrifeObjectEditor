@@ -17,6 +17,7 @@ public class SpawnObject {
     public int delay; //frames to wait before actually spawning the object
     public boolean collideParent; //whether or not it should collide with its parent
     public int number; //how many to spawn
+    public boolean useParentPalette;
     
     public SpawnObject (String theFilePath)
     {
@@ -31,5 +32,6 @@ public class SpawnObject {
         delay = 0;
         collideParent = false;
         number = 1;
+        useParentPalette = false;
     }
 }

@@ -1077,6 +1077,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                         if(spawnObjectAttributes.getNamedItem("velocityY") != null) sob.vel.y = Float.parseFloat(spawnObjectAttributes.getNamedItem("velocityY").getNodeValue());
                         if(spawnObjectAttributes.getNamedItem("followParent") != null) sob.followParent = Boolean.parseBoolean(spawnObjectAttributes.getNamedItem("followParent").getNodeValue());
                         if(spawnObjectAttributes.getNamedItem("collideParent") != null) sob.collideParent = Boolean.parseBoolean(spawnObjectAttributes.getNamedItem("collideParent").getNodeValue());
+                        if(spawnObjectAttributes.getNamedItem("useParentPalette") != null) sob.useParentPalette = Boolean.parseBoolean(spawnObjectAttributes.getNamedItem("useParentPalette").getNodeValue());
                         
                         loadHold.spawnObjects.add(sob);
                     }
@@ -1898,6 +1899,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                         spawnObject.setAttribute("velocityY", "" + s.vel.y);
                         spawnObject.setAttribute("followParent", "" + s.followParent);
                         spawnObject.setAttribute("collideParent", "" + s.collideParent);
+                        spawnObject.setAttribute("useParentPalette", "" + s.useParentPalette);
                         spawnObjects.appendChild(spawnObject);
                     }
                     hold.appendChild(spawnObjects);

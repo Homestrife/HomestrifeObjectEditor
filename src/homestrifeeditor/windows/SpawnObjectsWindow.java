@@ -66,12 +66,13 @@ public class SpawnObjectsWindow extends JFrame implements ActionListener, ListSe
     private JButton changeObjectButton;    	private static String changeObjectTooltip = "<html>Load a sound from the hard drive.</html>";
     private JSpinner delaySpinner;       	private static String delayTooltip = "<html>Which frame of this hold the sound triggers on.</html>";
     private JSpinner numberSpinner;       	private static String numberTooltip = "<html>How many of the object should be spawned.</html>";
-    private JCheckBox followParentCheck;        private static String followParentTooltip = "<html>Whether or not this object should follow the parent's motion.</html>";
-    private JCheckBox collideParentCheck;        private static String collideParentTooltip = "<html>Whether or not this object should collide with its parent.</html>";
+    private JCheckBox followParentCheck;    private static String followParentTooltip = "<html>Whether or not this object should follow the parent's motion.</html>";
+    private JCheckBox collideParentCheck;   private static String collideParentTooltip = "<html>Whether or not this object should collide with its parent.</html>";
     private JSpinner offsetXSpinner;       	private static String offsetXTooltip = "<html>Horizontal spawn location in relation to the parent.</html>";
     private JSpinner offsetYSpinner;       	private static String offsetYTooltip = "<html>Vertical spawn location in relation to the parent.</html>";
     private JSpinner velXSpinner;       	private static String velXTooltip = "<html>Initial horizontal velocity.</html>";
     private JSpinner velYSpinner;       	private static String velYTooltip = "<html>Initial vertical velocity.</html>";
+    private JCheckBox useParentPaletteCheck;private static String useParentPaletteTooltip = "<html>Change your colors along with your parent's palette</html>";
     
     public SpawnObjectsWindow(JFrame theParent, Object theObject)
     {
@@ -193,6 +194,12 @@ public class SpawnObjectsWindow extends JFrame implements ActionListener, ListSe
         collideParentCheck.setEnabled(false);
         collideParentCheck.setActionCommand("changeCollideParent");
         collideParentCheck.addActionListener(this);
+
+        useParentPaletteCheck = new JCheckBox("Use Parent Palette");
+        useParentPaletteCheck.setToolTipText(useParentPaletteTooltip);
+        useParentPaletteCheck.setEnabled(false);
+        useParentPaletteCheck.setActionCommand("useParentPalette");
+        useParentPaletteCheck.addActionListener(this);
         
         /*
         JPanel soundDataPane = new JPanel(new GridLayout(2, gridColumns, gridHorizontalGap, gridVerticalGap));
@@ -311,6 +318,13 @@ public class SpawnObjectsWindow extends JFrame implements ActionListener, ListSe
         gbc.fill = GridBagConstraints.HORIZONTAL;
         spawnDataPane.add(collideParentCheck, gbc);
         
+        gbc.gridx = 1;
+        gbc.gridy = 9;
+        gbc.gridwidth = 1;
+        gbc.ipady = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        spawnDataPane.add(useParentPaletteCheck, gbc);
+        
         JSplitPane sPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, spawnListPane, spawnDataPane);
         sPane.setDividerLocation(100);
         this.setContentPane(sPane);
@@ -401,6 +415,7 @@ public class SpawnObjectsWindow extends JFrame implements ActionListener, ListSe
         velYSpinner.setEnabled(false);
         followParentCheck.setEnabled(false);
         collideParentCheck.setEnabled(false);
+        useParentPaletteCheck.setEnabled(false);
         
         loading = false;
     }
@@ -430,6 +445,8 @@ public class SpawnObjectsWindow extends JFrame implements ActionListener, ListSe
         followParentCheck.setEnabled(true);
         collideParentCheck.setSelected(spawnObject.collideParent);
         collideParentCheck.setEnabled(true);
+        useParentPaletteCheck.setSelected(spawnObject.useParentPalette);
+        useParentPaletteCheck.setEnabled(true);
         
         loading = false;
     }
@@ -476,6 +493,7 @@ public class SpawnObjectsWindow extends JFrame implements ActionListener, ListSe
             spawnObject.vel.y = ((SpinnerNumberModel)velYSpinner.getModel()).getNumber().floatValue();
             spawnObject.followParent = followParentCheck.isSelected();
             spawnObject.collideParent = collideParentCheck.isSelected();
+            spawnObject.useParentPalette = useParentPaletteCheck.isSelected();
         }
     }
     
@@ -489,6 +507,7 @@ public class SpawnObjectsWindow extends JFrame implements ActionListener, ListSe
             case "changeObject": changeObject(); break;
             case "followParentChanged": valueChanged(); break;
             case "collideParentChanged": valueChanged(); break;
+            case "useParentPalette": valueChanged(); break;
         }
     }
     
