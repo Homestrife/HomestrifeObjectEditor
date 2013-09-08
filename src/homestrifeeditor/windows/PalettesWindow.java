@@ -16,6 +16,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,9 +31,11 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.JToolBar;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
@@ -65,6 +69,7 @@ public class PalettesWindow extends JFrame implements KeyListener, ActionListene
     private JLabel paletteFile;
     private JButton changePaletteButton;    	private static String changePaletteTooltip = "<html>Load a palette from the hard drive.</html>";
     private JTextField paletteNameTextBox;    	private static String paletteNameTooltip = "<html>The name of the palette</html>";
+    private JSpinner idSpinner;
     
     
     public PalettesWindow(JFrame theParent, Object obj)
@@ -78,6 +83,12 @@ public class PalettesWindow extends JFrame implements KeyListener, ActionListene
         setLocationRelativeTo(null);
         
         createWindowContents();
+        
+        addWindowListener(new WindowAdapter() {
+        	public void windowClosing(WindowEvent e) {
+                ((HoldListWindow) parent).updatePalettesMenu(true);   
+        	}
+		});
     }
     
     private void createWindowContents()
@@ -130,6 +141,11 @@ public class PalettesWindow extends JFrame implements KeyListener, ActionListene
         JLabel nameLabel = new JLabel("Name");
         nameLabel.setToolTipText(paletteNameTooltip);
         
+        JLabel idLabel = new JLabel("ID");
+        idSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
+        idSpinner.addChangeListener(this);
+        idSpinner.setEnabled(false);
+        
         JPanel paletteDataPane = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         
@@ -165,6 +181,20 @@ public class PalettesWindow extends JFrame implements KeyListener, ActionListene
         gbc.fill = GridBagConstraints.HORIZONTAL;
         paletteDataPane.add(paletteNameTextBox, gbc);
         
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 1;
+        gbc.ipady = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        paletteDataPane.add(idLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        gbc.gridwidth = 1;
+        gbc.ipady = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        paletteDataPane.add(idSpinner, gbc);
+        
         JSplitPane sPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, paletteListPane, paletteDataPane);
         sPane.setDividerLocation(100);
         this.setContentPane(sPane);
@@ -188,7 +218,7 @@ public class PalettesWindow extends JFrame implements KeyListener, ActionListene
         int index = paletteList.getSelectedIndex();
         paletteList.clearSelection();
         
-        HSPalette newPalette = new HSPalette("New Palette", file.getPath());
+        HSPalette newPalette = new HSPalette("New Palette", file.getPath(), paletteList.getSelectedIndex());
         
         ((HSObject)object).palettes.add(newPalette);
         
@@ -202,12 +232,14 @@ public class PalettesWindow extends JFrame implements KeyListener, ActionListene
             paletteListModel.addElement(newPalette);
             paletteList.setSelectedIndex(paletteListModel.getSize() - 1);
         }
+        ((HoldListWindow) parent).updatePalettesMenu();   
     }
     
     public HSPalette removePaletteFromPaletteList(int index)
     {
     	HSPalette pal = (HSPalette)paletteListModel.remove(index);
     	((HSObject)object).palettes.remove(pal);
+        ((HoldListWindow) parent).updatePalettesMenu();   
         
         return pal;
     }
@@ -221,6 +253,7 @@ public class PalettesWindow extends JFrame implements KeyListener, ActionListene
         {
             removedPalettes.add(0, removePaletteFromPaletteList(indices[i]));
         }
+        ((HoldListWindow) parent).updatePalettesMenu();   
         
         return removedPalettes;
     }
@@ -260,10 +293,14 @@ public class PalettesWindow extends JFrame implements KeyListener, ActionListene
 
         paletteFile.setText(file.getName());
         paletteFile.setToolTipText(file.getPath());
-        changePaletteButton.setEnabled(true);
-        paletteNameTextBox.setText(pal.name);
         
+        changePaletteButton.setEnabled(true);
+        
+        paletteNameTextBox.setText(pal.name);
         paletteNameTextBox.setEnabled(true);
+        
+        idSpinner.setValue(pal.id);
+        idSpinner.setEnabled(true);
         
         loading = false;
     }
@@ -305,6 +342,14 @@ public class PalettesWindow extends JFrame implements KeyListener, ActionListene
         paletteList.repaint();
         ((HoldListWindow) parent).updatePalettesMenu();        
 	}    
+
+	private void updateId() {
+		((HSPalette)paletteListModel.get(paletteList.getSelectedIndex())).id = (int) idSpinner.getValue();
+		
+        paletteList.repaint();
+        ((HoldListWindow) parent).updatePalettesMenu(); 
+	}
+
     
     
     @Override
@@ -365,9 +410,8 @@ public class PalettesWindow extends JFrame implements KeyListener, ActionListene
     @Override
     public void stateChanged(ChangeEvent e)
     {
-    	
+    	updateId();
     }
-
 	@Override
 	public void keyTyped(KeyEvent e) {
 		changeName();
@@ -380,6 +424,6 @@ public class PalettesWindow extends JFrame implements KeyListener, ActionListene
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		
+		changeName();		
 	}
 }

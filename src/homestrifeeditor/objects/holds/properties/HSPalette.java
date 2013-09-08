@@ -11,19 +11,22 @@ package homestrifeeditor.objects.holds.properties;
 public class HSPalette {
     public String name;
     public String path;
+    public int id;
     
     public HSPalette()
     {
         name = "";
         path = "";
+        id = 0;
     }
     
-    public HSPalette(String n, String p) {
+    public HSPalette(String n, String p, int i) {
     	name = n;
     	path = p;
+    	id = i;
     }
     
     public String toString() {
-    	return name;
+    	return id + ": " + name;
     }
 }

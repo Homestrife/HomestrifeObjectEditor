@@ -1234,6 +1234,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
             	pal.path = pal.path.replace('/', File.separatorChar);
             	pal.path = pal.path.replace('\\', File.separatorChar);
                 pal.name = "Palette " + i;
+                pal.id = i;
             	loadObject.palettes.add(pal);
             }
             
@@ -1248,7 +1249,11 @@ public class HoldListWindow extends JFrame implements ActionListener {
 	            	pal.path = createAbsolutePathFrom(palette.getAttributes().getNamedItem("path").getNodeValue(), relativeDir);
 	            	pal.path = pal.path.replace('/', File.separatorChar);
 	            	pal.path = pal.path.replace('\\', File.separatorChar);
-	                pal.name = palette.getAttributes().getNamedItem("name").getNodeValue();
+	                if(palette.getAttributes().getNamedItem("name") != null) pal.name = palette.getAttributes().getNamedItem("name").getNodeValue();
+	                else pal.name = "";
+	                if(palette.getAttributes().getNamedItem("id") != null) pal.id = Integer.parseInt(palette.getAttributes().getNamedItem("id").getNodeValue());
+	                else pal.id = i;
+	                
 	            	loadObject.palettes.add(pal);
 	            }
             }
@@ -1474,7 +1479,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
             setCurrentlyLoadedObject(loadObject);
             newObject();
             
-            updatePalettesMenu();
+            updatePalettesMenu(true);
         }
         catch(ParserConfigurationException e)
         {
@@ -1540,6 +1545,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                 
             	singlePalElement.setAttribute("name", p.name);
             	singlePalElement.setAttribute("path", createPathRelativeTo(p.path, exeDirectory));
+            	singlePalElement.setAttribute("id", "" + p.id);
             	
                 palElement.appendChild(singlePalElement);
             }
@@ -2099,26 +2105,37 @@ public class HoldListWindow extends JFrame implements ActionListener {
     }
     int curPal;
     public void updatePalettesMenu() {
+    	updatePalettesMenu(false);
+    }
+    public void updatePalettesMenu(boolean warn) {
     	palettesMenu.removeAll();
 		JMenuItem menuItem;
     	if(currentlyLoadedObject == null || currentlyLoadedObject.palettes.size() == 0) {
     		palettesMenu.add(new JMenuItem("NONE"));
     	}
     	else {
-	    	curPal = 0;
-	    	for(HSPalette hsp : currentlyLoadedObject.palettes) {
-	    		//Set each palette menu item to load the correct palette when clicked
-	    		menuItem = new JMenuItem(new AbstractAction(hsp.name) {
-					private static final long serialVersionUID = 1L;
-					int palNum = curPal;
-					@Override
-					public void actionPerformed(ActionEvent arg0) {
-				        currentlyLoadedObject.curPalette = palNum;
-				        textureHitboxPane.reloadTextures();	
-					}
-				});
-	    		palettesMenu.add(menuItem);
-	    		curPal++;
+	    	for(curPal=0; curPal < currentlyLoadedObject.palettes.size(); curPal++) {
+	    		boolean alreadyUsedId = false;
+		    	for(HSPalette hsp : currentlyLoadedObject.palettes) {
+		    		if(hsp.id != curPal) continue;
+		    		if(alreadyUsedId) {
+		    			if(warn)
+		    				JOptionPane.showMessageDialog(this, "Duplicate palette IDs detected on: " + hsp.name, "Palette Loading", JOptionPane.ERROR_MESSAGE);  
+		    			continue;
+		    		}
+		    		alreadyUsedId = true;
+		    		//Set each palette menu item to load the correct palette when clicked
+		    		menuItem = new JMenuItem(new AbstractAction(hsp.name) {
+						private static final long serialVersionUID = 1L;
+						int palNum = curPal;
+						@Override
+						public void actionPerformed(ActionEvent arg0) {
+					        currentlyLoadedObject.curPalette = palNum;
+					        textureHitboxPane.reloadTextures();	
+						}
+					});
+			    	palettesMenu.add(menuItem);
+		    	}
 	    	}
     	}
     	palettesMenu.add(new JSeparator());

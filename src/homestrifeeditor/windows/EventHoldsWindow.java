@@ -28,7 +28,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
@@ -37,7 +36,9 @@ import javax.swing.border.TitledBorder;
  * @author Darlos9D
  */
 public class EventHoldsWindow extends JFrame implements ActionListener, ItemListener {
-    private static int windowWidth = 920;
+	private static final long serialVersionUID = 1L;
+	
+	private static int windowWidth = 920;
     private static int windowHeightGeneral = 160;
     private static int windowHeightTerrain = 210;
     private static int windowHeightPhysics = 210;
