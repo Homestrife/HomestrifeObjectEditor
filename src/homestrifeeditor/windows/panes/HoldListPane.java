@@ -38,8 +38,6 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 /**
- * TODO: New button inserts on selected hold (and properly named/numbered/linked(?))
- * TODO: Dragging holds (multiple?)
  * @author Darlos9D
  */
 public class HoldListPane extends JPanel implements ActionListener, TreeSelectionListener, MouseListener {
@@ -126,8 +124,8 @@ public class HoldListPane extends JPanel implements ActionListener, TreeSelectio
         }
     }
     
-    public void addHoldToTree(HSObjectHold hold) {
-    	if(hold == null) { return; }
+    public TreeNode[] addHoldToTree(HSObjectHold hold) {
+    	if(hold == null) { return null; }
         DefaultTreeModel model = ((DefaultTreeModel)tree.getModel());
         
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(hold);
@@ -149,7 +147,7 @@ public class HoldListPane extends JPanel implements ActionListener, TreeSelectio
 	        			HSObjectHold checkAgainst = (HSObjectHold) child2.getUserObject();
 	        			if(hold.getNumFromName() < checkAgainst.getNumFromName()) {
 	        				//Insert before
-	    	        		model.insertNodeInto(node, child, j-1);
+	    	        		model.insertNodeInto(node, child, j);
 	    	        		
 	    	        		found = true;
 	    	        		
@@ -175,6 +173,7 @@ public class HoldListPane extends JPanel implements ActionListener, TreeSelectio
         	root.add(node);
         }
         reload();
+        return node.getPath();
     }
     
     public void addHoldToHoldList(HSObjectHold hold, int index)
@@ -223,24 +222,22 @@ public class HoldListPane extends JPanel implements ActionListener, TreeSelectio
     	//TreePath path = tree.getPathForRow(row);
     	HSObjectHold hold = null;
     	try {
-    		hold = (HSObjectHold)((DefaultMutableTreeNode)path.getPathComponent(path.getPathCount() - 1)).getUserObject();
+    		hold = (HSObjectHold)((DefaultMutableTreeNode)path.getLastPathComponent()).getUserObject();
     	} catch(Exception exc) {
     		//What is selected isn't a HSObjectHold...ignore
+    		return null;
     	}
     	//root.remove(row);
     	System.out.println(path);
-
-    	System.out.println((DefaultMutableTreeNode)path.getPathComponent(path.getPathCount() - 1));
     	
-	    ((DefaultTreeModel)tree.getModel()).removeNodeFromParent(((DefaultMutableTreeNode)path.getPathComponent(path.getPathCount() - 1)));
+	    ((DefaultTreeModel)tree.getModel()).removeNodeFromParent(((DefaultMutableTreeNode)path.getLastPathComponent()));
 	    	
     	//If there are no more children delete the node
     	if(((DefaultTreeModel)tree.getModel()).getChildCount(((DefaultMutableTreeNode)path.getPathComponent(path.getPathCount() - 2))) == 0)
     		((DefaultTreeModel)tree.getModel()).removeNodeFromParent(((DefaultMutableTreeNode)path.getPathComponent(path.getPathCount() - 2)));
     	//Geez that's a mouthful
-	
+
         reload();
-        tree.makeVisible(path);
     	return hold;
     }
     

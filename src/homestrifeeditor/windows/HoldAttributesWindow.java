@@ -108,7 +108,7 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
     
     private JButton applyButton;
     
-    TreePath holdPath;
+    public TreePath holdPath;
     
     public HoldAttributesWindow(HoldListPane theParent, HSObjectHold theHold, TreePath path)
     {
@@ -618,8 +618,9 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         
         //Remove it then re-add it to make sure it's in the right place
         parent.removeHoldFromHoldList(holdPath);
-        parent.addHoldToTree(hold);
-        //parent.tree.makeVisible(holdPath);
+        holdPath = new TreePath(parent.addHoldToTree(hold));
+        parent.tree.makeVisible(holdPath);
+        parent.tree.setSelectionPath(holdPath);
     }
     
     private void closeWindow()
