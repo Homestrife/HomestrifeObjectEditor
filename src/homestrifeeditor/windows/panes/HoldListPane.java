@@ -33,6 +33,7 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -228,13 +229,16 @@ public class HoldListPane extends JPanel implements ActionListener, TreeSelectio
     	}
     	//root.remove(row);
     	System.out.println(path);
-    	((DefaultTreeModel)tree.getModel()).removeNodeFromParent(((DefaultMutableTreeNode)path.getPathComponent(path.getPathCount() - 1)));
+
+    	System.out.println((DefaultMutableTreeNode)path.getPathComponent(path.getPathCount() - 1));
     	
+	    ((DefaultTreeModel)tree.getModel()).removeNodeFromParent(((DefaultMutableTreeNode)path.getPathComponent(path.getPathCount() - 1)));
+	    	
     	//If there are no more children delete the node
     	if(((DefaultTreeModel)tree.getModel()).getChildCount(((DefaultMutableTreeNode)path.getPathComponent(path.getPathCount() - 2))) == 0)
     		((DefaultTreeModel)tree.getModel()).removeNodeFromParent(((DefaultMutableTreeNode)path.getPathComponent(path.getPathCount() - 2)));
     	//Geez that's a mouthful
-    	
+	
         reload();
         tree.makeVisible(path);
     	return hold;

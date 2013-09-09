@@ -1996,6 +1996,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         	FighterHold lastHold = null;
         	for(File f : files) {
         		FighterHold hold = new FighterHold();
+        		hold.id = currentlyLoadedObject.getHighestHoldId() + 1;
         		hold.textures.add(new HSTexture(f.getAbsolutePath()));
         		hold.name = f.getName().split("\\.")[0];
         		holdListPane.addHoldToHoldList(hold);
@@ -2003,6 +2004,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         			lastHold.nextHold = hold;
         			lastHold.nextHoldId = hold.id;
         		}
+        		currentlyLoadedObject.holds.add(hold);
         		lastHold = hold;
         	}
         }
@@ -2010,6 +2012,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         	PhysicsObjectHold lastHold = null;
         	for(File f : files) {
         		PhysicsObjectHold hold = new FighterHold();
+        		hold.id = currentlyLoadedObject.getHighestHoldId() + 1;
         		hold.textures.add(new HSTexture(f.getAbsolutePath()));
         		hold.name = f.getName().split("\\.")[0];
         		holdListPane.addHoldToHoldList(hold);
@@ -2017,6 +2020,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         			lastHold.nextHold = hold;
         			lastHold.nextHoldId = hold.id;
         		}
+        		currentlyLoadedObject.holds.add(hold);
         		lastHold = hold;
         	}        	
         }
@@ -2024,14 +2028,15 @@ public class HoldListWindow extends JFrame implements ActionListener {
         	TerrainObjectHold lastHold = null;
         	for(File f : files) {
         		TerrainObjectHold hold = new FighterHold();
+        		hold.id = currentlyLoadedObject.getHighestHoldId() + 1;
         		hold.textures.add(new HSTexture(f.getAbsolutePath()));
         		hold.name = f.getName().split("\\.")[0];
-        		int a = hold.nextHoldId;
         		holdListPane.addHoldToHoldList(hold);
         		if(lastHold != null) {
         			lastHold.nextHold = hold;
         			lastHold.nextHoldId = hold.id;
         		}
+        		currentlyLoadedObject.holds.add(hold);
         		lastHold = hold;
         	}        	
         }
@@ -2039,14 +2044,15 @@ public class HoldListWindow extends JFrame implements ActionListener {
         	HSObjectHold lastHold = null;
         	for(File f : files) {
         		HSObjectHold hold = new FighterHold();
+        		hold.id = currentlyLoadedObject.getHighestHoldId() + 1;
         		hold.textures.add(new HSTexture(f.getAbsolutePath()));
         		hold.name = f.getName().split("\\.")[0];
-        		int a = hold.nextHoldId;
         		holdListPane.addHoldToHoldList(hold);
         		if(lastHold != null) {
         			lastHold.nextHold = hold;
         			lastHold.nextHoldId = hold.id;
         		}
+        		currentlyLoadedObject.holds.add(hold);
         		lastHold = hold;
         	}        	
         	

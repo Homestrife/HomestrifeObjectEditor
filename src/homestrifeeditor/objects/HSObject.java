@@ -53,4 +53,12 @@ public class HSObject {
     {
         return false;
     }
+    
+    public int getHighestHoldId() {
+    	int highest = -1;
+    	for(HSObjectHold hold : holds) {
+    		if(hold.id > highest) highest = hold.id;
+    	}
+    	return highest;
+    }
 }
