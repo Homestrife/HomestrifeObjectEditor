@@ -6,6 +6,7 @@ package homestrifeeditor.windows;
 
 import homestrifeeditor.objects.holds.FighterHold;
 import homestrifeeditor.objects.holds.HSObjectHold;
+import homestrifeeditor.objects.holds.PhysicsObjectHold;
 import homestrifeeditor.objects.holds.TerrainObjectHold;
 import homestrifeeditor.objects.holds.properties.Blockability;
 import homestrifeeditor.objects.holds.properties.Cancel;
@@ -49,7 +50,8 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
 	private static int windowWidth = 800;
     private static int windowHeightGeneral = 650;
     private static int windowHeightTerrain = 465;
-    private static int windowHeightFighter = 865;
+    private static int windowHeightPhysics = 665;
+    private static int windowHeightFighter = 900;
     private static int windowBorderBuffer = 10;
     
     private static int gridWidth = 650;
@@ -86,6 +88,9 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
     private JCheckBox reverseBlockCheck;    private static String reverseBlockTooltip = "<html>If checked, another fighter must face the direction opposite<br>of what they would normally need to in order to block this object's attack boxes.</html>";
     private JButton hitSoundsButton;        private static String hitSoundsTooltip = "<html>Add/Edit sounds that occur upon an attack box collision</html>";
     private JButton blockedSoundsButton;        private static String blockedSoundsTooltip = "<html>Add/Edit sounds that occur upon an attack being blocked</html>";
+
+    private JCheckBox changePhysicsCheck;   private static String changePhysicsTooltip = "<html>If this is unchecked, this hold will not modify the object's physics attributes</html>";
+    private JCheckBox ignoreGravityCheck;   //private static String ignoreGravityTooltip = "<html>If this is unchecked, this hold will not modify the object's physics attributes</html>";
     
     private JCheckBox changeCancelsCheck;   private static String changeCancelsTooltip = "<html>If this is unchecked, this hold will inhereit the cancels<br>of any hold that has this hold as its next hold.</html>";
     private JComboBox<Cancel> dashCancelCombo; private static String cancelTooltip = "<html>Any Time: This action can be cancelled into at any time.<br>After Hit or Block: This action can be cancelled into after striking a hurt box.<br>After Hit: This action can ben cancelled into after striking a hurt box without being blocked.<br>After Block: This action can be cancelled into after striking a hurt box and beinb blocked.<br>Never: This action can never be cancelled into.</html>";
@@ -104,6 +109,7 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
     private JComboBox<Cancel> heavyQCFCancelCombo;
     
     private JPanel terrainInterface;
+    private JPanel physicsInterface;
     private JPanel fighterInterface;
     
     private JButton applyButton;
@@ -344,6 +350,35 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             holdAttributesPane.add(terrainInterface);
         }
         
+        if(hold.IsPhysicsObjectHold()) {
+            setSize(windowWidth, windowHeightPhysics);
+            PhysicsObjectHold pHold = (PhysicsObjectHold)hold;
+
+            changePhysicsCheck = new JCheckBox("Change Physics Attributes This Hold", pHold.changePhysics);
+            changePhysicsCheck.setToolTipText(changePhysicsTooltip);
+            changePhysicsCheck.setActionCommand("changePhysicsChanged");
+            changePhysicsCheck.addActionListener(this);
+            
+            JPanel changePhysicsInterface = new JPanel(new GridLayout(1, gridColumns, gridHorizontalGap, gridVerticalGap));
+            changePhysicsInterface.setSize(gridWidth, gridRowHeight);
+            changePhysicsInterface.add(changePhysicsCheck);
+            
+            holdAttributesPane.add(changePhysicsInterface);
+            
+            ignoreGravityCheck = new JCheckBox("Ignore Gravity", pHold.ignoreGravity);
+            //ignoreGravityCheck.setToolTipText(ignoreGravityTooltip);
+            ignoreGravityCheck.setActionCommand("ignoreGravityChanged");
+            ignoreGravityCheck.addActionListener(this); 
+            
+            physicsInterface = new JPanel(new GridLayout(1, gridColumns, gridHorizontalGap, gridVerticalGap));
+            physicsInterface.setSize(gridWidth, gridRowHeight * 7);
+            physicsInterface.setBorder(new TitledBorder("Physics Attributes"));
+            physicsInterface.add(ignoreGravityCheck);
+            setPhysicsInterfaceEnabled();
+
+            holdAttributesPane.add(physicsInterface);
+        }
+        
         if(hold.IsFighterHold())
         {
             setSize(windowWidth, windowHeightFighter);
@@ -546,6 +581,22 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         }
     }
     
+    private void setPhysicsInterfaceEnabled()
+    {
+        if(hold.IsPhysicsObjectHold())
+        {
+            PhysicsObjectHold toHold = (PhysicsObjectHold)hold;
+            
+            physicsInterface.setEnabled(changePhysicsCheck.isSelected());
+            
+            Component[] components = physicsInterface.getComponents();
+            for(int i = 0; i < components.length; i++)
+            {
+                components[i].setEnabled(changePhysicsCheck.isSelected());
+            }
+        }
+    }
+    
     private void setFighterInterfaceEnabled()
     {
         if(hold.IsFighterHold())
@@ -590,6 +641,11 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             ((TerrainObjectHold)hold).blockability = (Blockability)blockabilityCombo.getSelectedItem();
             ((TerrainObjectHold)hold).horizontalDirectionBasedBlock = directionBlockCheck.isSelected();
             ((TerrainObjectHold)hold).reversedHorizontalBlock = reverseBlockCheck.isSelected();
+        }
+        
+        if(hold.IsPhysicsObjectHold()) {
+        	((PhysicsObjectHold)hold).changePhysics = changePhysicsCheck.isSelected();
+        	((PhysicsObjectHold)hold).ignoreGravity = ignoreGravityCheck.isSelected();
         }
         
         if(hold.IsFighterHold())
@@ -667,6 +723,11 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         fieldChanged();
     }
     
+    private void changePhysicsChanged() {
+		setPhysicsInterfaceEnabled();
+		fieldChanged();
+	}
+    
     private void changeCancelsChanged()
     {
         setFighterInterfaceEnabled();
@@ -697,13 +758,14 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             case "applyButton": applyButtonPressed(); break;
             case "fieldChanged": fieldChanged(); break;
             case "changeAttackBoxAttributesChanged": changeAttackBoxAttributesChanged(); break;
+            case "changePhysicsChanged": changePhysicsChanged();
             case "changeCancelsChanged": changeCancelsChanged(); break;
             case "hitSoundsButton": hitSoundsButtonPressed(); break;
             case "blockedSoundsButton": blockedSoundsButtonPressed(); break;
         }
     }
-    
-    @Override
+
+	@Override
     public void stateChanged(ChangeEvent e)
     {
         fieldChanged();

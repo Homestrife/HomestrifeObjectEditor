@@ -9,9 +9,14 @@ package homestrifeeditor.objects.holds;
  * @author Darlos9D
  */
 public class PhysicsObjectHold extends TerrainObjectHold {
+	public boolean changePhysics;
+	public boolean ignoreGravity;
+	
     public PhysicsObjectHold()
     {
         super();
+        changePhysics = false;
+        ignoreGravity = false;
     }
     
     @Override

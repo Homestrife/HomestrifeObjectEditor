@@ -1193,6 +1193,8 @@ public class HoldListWindow extends JFrame implements ActionListener {
                 if(loadHold.IsPhysicsObjectHold())
                 {
                     PhysicsObjectHold poHold = (PhysicsObjectHold)loadHold;
+                    if(holdAttributes.getNamedItem("changePhysics") != null) poHold.changePhysics = Boolean.parseBoolean(holdAttributes.getNamedItem("changePhysics").getNodeValue());
+                    if(holdAttributes.getNamedItem("ignoreGravity") != null) poHold.ignoreGravity = Boolean.parseBoolean(holdAttributes.getNamedItem("ignoreGravity").getNodeValue());
                 }
                 
                 if(loadHold.IsFighterHold())
@@ -1834,6 +1836,9 @@ public class HoldListWindow extends JFrame implements ActionListener {
                 {
                     //get PhysicsObjectHold attributes
                     PhysicsObjectHold ph = (PhysicsObjectHold)h;
+                    
+                    hold.setAttribute("changePhysics", "" + ph.changePhysics);
+                    hold.setAttribute("ignoreGravity", "" + ph.ignoreGravity);
                 }
                 
                 if(h.IsFighterHold())
