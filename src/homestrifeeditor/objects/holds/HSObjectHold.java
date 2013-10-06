@@ -6,6 +6,7 @@ package homestrifeeditor.objects.holds;
 
 import homestrifeeditor.objects.holds.properties.HSAudio;
 import homestrifeeditor.objects.holds.properties.HSTexture;
+import homestrifeeditor.objects.holds.properties.HSVect2D;
 import homestrifeeditor.objects.holds.properties.SpawnObject;
 
 import java.util.ArrayList;
@@ -23,6 +24,9 @@ public class HSObjectHold {
     public int duration;
     public int id;
     public int nextHoldId;
+    public HSVect2D reposition;
+    public HSVect2D velocity;
+    public boolean overwriteVelocity;
     
     public HSObjectHold()
     {
@@ -34,6 +38,9 @@ public class HSObjectHold {
         duration = 4;
         id = 0;
         nextHoldId = 0;
+        reposition = new HSVect2D();
+        velocity = new HSVect2D();
+        overwriteVelocity = false;
     }
     
     public boolean IsHSObjectHold()

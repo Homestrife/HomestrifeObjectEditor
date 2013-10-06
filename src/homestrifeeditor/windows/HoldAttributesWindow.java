@@ -10,6 +10,7 @@ import homestrifeeditor.objects.holds.PhysicsObjectHold;
 import homestrifeeditor.objects.holds.TerrainObjectHold;
 import homestrifeeditor.objects.holds.properties.Blockability;
 import homestrifeeditor.objects.holds.properties.Cancel;
+import homestrifeeditor.objects.holds.properties.HSVect2D;
 import homestrifeeditor.windows.panes.HoldListPane;
 import homestrifeeditor.windows.renderers.HoldComboBoxRenderer;
 
@@ -48,8 +49,8 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
 	private static final long serialVersionUID = 1L;
 	
 	private static int windowWidth = 800;
-    private static int windowHeightGeneral = 650;
-    private static int windowHeightTerrain = 465;
+    private static int windowHeightGeneral = 250;
+    private static int windowHeightTerrain = 510;
     private static int windowHeightPhysics = 665;
     private static int windowHeightFighter = 900;
     private static int windowBorderBuffer = 10;
@@ -68,6 +69,12 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
     private JComboBox<?> nextHoldCombo;        private static String nextHoldTooltip = "<html>Which hold this object should switch to once this hold's duration expires.<br>If this is set to NONE, the engine will determine the next hold some other way.</html>";
     private JButton holdSoundsButton;       private static String holdSoundsTooltip = "<html>Add/Edit sounds that occur in this hold</html>";
     private JButton spawnObjectsButton;     private static String spawnObjectsTooltip = "<html>Add/Edit objects that are spawned in this hold</html>";
+    
+    private JSpinner repositionXSpinner; private static String repositionTooltip = "<html>I'm not sure what this means Darlos just told me to put it in, I assume it has something to do with repositioning??</html>";
+    private JSpinner repositionYSpinner;
+    private JSpinner velocityXSpinner; private static String velocityTooltip = "<html>Probably something pertaining to velocity? I dunno I didn't make the engine</html>";
+    private JSpinner velocityYSpinner;
+    private JCheckBox overwriteVelocityCheck; private static String overwriteVelocityTooltip = "<html>Whether or not you should overwrite the velocity (duh?)</html>";
     
     private JCheckBox changeAttackBoxAttributesCheck; private static String changeAttackBoxAttributesTooltip = "<html>If this is unchecked, this hold will inherit the attack<br/>attributes of any hold that has this hold as its<br/>next hold.</html>";
     
@@ -181,8 +188,42 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         spawnObjectsButton.setActionCommand("spawnObjectsButton");
         spawnObjectsButton.addActionListener(this);
         
-        JPanel graphicInterface = new JPanel(new GridLayout(3, gridColumns, gridHorizontalGap, gridVerticalGap));
-        graphicInterface.setSize(gridWidth, gridRowHeight * 3);
+        JLabel repositionLabel = new JLabel("Reposition X/Y");
+        repositionLabel.setToolTipText(repositionTooltip);
+        
+        repositionXSpinner = new JSpinner(new SpinnerNumberModel(0.0f, -99999.0, 99999.0, 1.0));
+        repositionXSpinner.setToolTipText(repositionTooltip);
+        repositionXSpinner.setValue(hold.reposition.x);
+        repositionXSpinner.addChangeListener(this);
+        
+        repositionYSpinner = new JSpinner(new SpinnerNumberModel(0.0, -99999.0, 99999.0, 1.0));
+        repositionYSpinner.setToolTipText(repositionTooltip);
+        repositionYSpinner.setValue(hold.reposition.y);
+        repositionYSpinner.addChangeListener(this);
+
+        
+        JLabel velocityLabel = new JLabel("Velocity X/Y");
+        velocityLabel.setToolTipText(velocityTooltip);
+        
+        overwriteVelocityCheck = new JCheckBox("Overwrite Velocity", hold.overwriteVelocity);
+        overwriteVelocityCheck.setToolTipText(overwriteVelocityTooltip);
+        overwriteVelocityCheck.setActionCommand("overwriteVelocityChanged");
+        overwriteVelocityCheck.addActionListener(this);
+        
+        velocityXSpinner = new JSpinner(new SpinnerNumberModel(0, -99999, 99999, 1));
+        velocityXSpinner.setToolTipText(velocityTooltip);
+        velocityXSpinner.setValue(hold.velocity.x);
+        velocityXSpinner.setEnabled(overwriteVelocityCheck.isSelected());
+        velocityXSpinner.addChangeListener(this);
+        
+        velocityYSpinner = new JSpinner(new SpinnerNumberModel(0, -99999, 99999, 1));
+        velocityYSpinner.setToolTipText(velocityTooltip);
+        velocityYSpinner.setValue(hold.velocity.y);
+        velocityYSpinner.setEnabled(overwriteVelocityCheck.isSelected());
+        velocityYSpinner.addChangeListener(this);
+        
+        JPanel graphicInterface = new JPanel(new GridLayout(5, gridColumns, gridHorizontalGap, gridVerticalGap));
+        graphicInterface.setSize(gridWidth, gridRowHeight * 6);
         graphicInterface.setBorder(new TitledBorder("General Attributes"));
         graphicInterface.add(nameLabel);
         graphicInterface.add(nameField);
@@ -196,6 +237,14 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         graphicInterface.add(spawnObjectsButton);
         graphicInterface.add(new JLabel(""));
         graphicInterface.add(new JLabel(""));
+        graphicInterface.add(repositionLabel);
+        graphicInterface.add(repositionXSpinner);
+        graphicInterface.add(repositionYSpinner);
+        graphicInterface.add(new JLabel(""));
+        graphicInterface.add(velocityLabel);
+        graphicInterface.add(velocityXSpinner);
+        graphicInterface.add(velocityYSpinner);
+        graphicInterface.add(overwriteVelocityCheck);
         
         JPanel holdAttributesPane = new JPanel();
         holdAttributesPane.setLayout(new BoxLayout(holdAttributesPane, BoxLayout.Y_AXIS));
@@ -617,6 +666,12 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
     {
         hold.name = nameField.getText();
         hold.duration = (int)durationSpinner.getValue();
+        hold.reposition.x = ((Number)repositionXSpinner.getValue()).floatValue();
+        hold.reposition.y = ((Number)repositionYSpinner.getValue()).floatValue();
+        hold.velocity.x = ((Number)velocityXSpinner.getValue()).floatValue();
+        hold.velocity.y = ((Number)velocityYSpinner.getValue()).floatValue();
+        hold.overwriteVelocity = overwriteVelocityCheck.isSelected();
+        
         if(nextHoldCombo.getSelectedIndex() == 0)
         {
             hold.nextHold = null;
@@ -745,6 +800,11 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         SoundsWindow window = new SoundsWindow(this, hold, "blocked");
         window.setVisible(true);
     }
+
+	private void overwriteVelocityChanged() {
+		velocityXSpinner.setEnabled(overwriteVelocityCheck.isSelected());
+		velocityYSpinner.setEnabled(overwriteVelocityCheck.isSelected());
+	}
     
     @Override
     public void actionPerformed(ActionEvent e)
@@ -757,6 +817,7 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             case "closeButton": closeButtonPressed(); break;
             case "applyButton": applyButtonPressed(); break;
             case "fieldChanged": fieldChanged(); break;
+            case "overwriteVelocityChanged": overwriteVelocityChanged(); break;
             case "changeAttackBoxAttributesChanged": changeAttackBoxAttributesChanged(); break;
             case "changePhysicsChanged": changePhysicsChanged();
             case "changeCancelsChanged": changeCancelsChanged(); break;

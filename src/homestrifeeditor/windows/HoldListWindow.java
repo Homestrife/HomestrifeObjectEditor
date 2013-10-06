@@ -1010,6 +1010,11 @@ public class HoldListWindow extends JFrame implements ActionListener {
                 if(holdAttributes.getNamedItem("id") != null) loadHold.id = Integer.parseInt(holdAttributes.getNamedItem("id").getNodeValue());
                 if(holdAttributes.getNamedItem("nextHoldId") != null) loadHold.nextHoldId = Integer.parseInt(holdAttributes.getNamedItem("nextHoldId").getNodeValue());
                 if(holdAttributes.getNamedItem("duration") != null) loadHold.duration = Integer.parseInt(holdAttributes.getNamedItem("duration").getNodeValue());
+                if(holdAttributes.getNamedItem("repositionX") != null) loadHold.reposition.x = Float.parseFloat(holdAttributes.getNamedItem("repositionX").getNodeValue());
+                if(holdAttributes.getNamedItem("repositionY") != null) loadHold.reposition.y = Float.parseFloat(holdAttributes.getNamedItem("repositionY").getNodeValue());
+                if(holdAttributes.getNamedItem("velocityX") != null) loadHold.velocity.x = Float.parseFloat(holdAttributes.getNamedItem("velocityX").getNodeValue());
+                if(holdAttributes.getNamedItem("velocityY") != null) loadHold.velocity.y = Float.parseFloat(holdAttributes.getNamedItem("velocityY").getNodeValue());
+                if(holdAttributes.getNamedItem("overwriteVelocity") != null) loadHold.overwriteVelocity = Boolean.parseBoolean(holdAttributes.getNamedItem("overwriteVelocity").getNodeValue());
                 
                 //get textures
                 if(textures != null)
@@ -1742,6 +1747,12 @@ public class HoldListWindow extends JFrame implements ActionListener {
                 hold.setAttribute("name", h.name);
                 hold.setAttribute("duration", "" + h.duration);
                 hold.setAttribute("id", "" + h.id);
+                hold.setAttribute("repositionX", "" + h.reposition.x);
+                hold.setAttribute("repositionY", "" + h.reposition.y);
+                hold.setAttribute("velocityX", "" + h.velocity.x);
+                hold.setAttribute("velocityY", "" + h.velocity.y);
+                hold.setAttribute("overwriteVelocity", "" + h.overwriteVelocity);
+                
                 if(h.nextHold != null) { hold.setAttribute("nextHoldId", "" + h.nextHold.id); }
                 
                 if(h.IsTerrainObjectHold())
