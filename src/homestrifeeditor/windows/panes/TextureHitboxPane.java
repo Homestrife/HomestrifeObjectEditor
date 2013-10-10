@@ -40,8 +40,8 @@ import javax.swing.ScrollPaneConstants;
 public class TextureHitboxPane extends JPanel implements ActionListener, ItemListener {
 	private static final long serialVersionUID = 1L;
 	
-	public static int textureHitboxPaneWidth = 1920 * 4;
-    public static int textureHitboxPaneHeight = 1080 * 4;
+	public static int textureHitboxPaneWidth = 1920 * 8;
+    public static int textureHitboxPaneHeight = 1080 * 8;
     
     public HoldListWindow parent;
     public HSObjectHold hold;
