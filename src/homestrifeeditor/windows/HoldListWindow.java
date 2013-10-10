@@ -73,7 +73,8 @@ public class HoldListWindow extends JFrame implements ActionListener {
     
     //0 - ended 9/1/13
     //1 - all paths now relative to game .exe - current
-	public static final int XML_FORMAT_VERSION = 1;
+	//2 - Terrain Boxes are now nested under a <TerrainBoxes> tag
+	public static final int XML_FORMAT_VERSION = 2;
 	
 	public static String BaseWindowTitle = "Homestrife Editor - ";
     public static int windowWidth = 1000;
@@ -932,6 +933,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
             //get the definition sections
             NodeList defSecs = object.getChildNodes();
             LinkedList<NamedNodeMap> terrainBoxAttributes = new LinkedList<NamedNodeMap>();
+            Node terrainBoxes = null;
             NamedNodeMap uprightTerrainBoxAttributes = null;
             NamedNodeMap crouchingTerrainBoxAttributes = null;
             NamedNodeMap proneTerrainBoxAttributes = null;
@@ -944,6 +946,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                 Node defSec = defSecs.item(i);
                 
                 if(defSec.getNodeName().compareTo("TerrainBox") == 0) terrainBoxAttributes.add(defSec.getAttributes());
+                if(defSec.getNodeName().compareTo("TerrainBoxes") == 0) terrainBoxes = defSec;
                 if(defSec.getNodeName().compareTo("UprightTerrainBox") == 0) uprightTerrainBoxAttributes = defSec.getAttributes();
                 if(defSec.getNodeName().compareTo("CrouchingTerrainBox") == 0) crouchingTerrainBoxAttributes = defSec.getAttributes();
                 if(defSec.getNodeName().compareTo("ProneTerrainBox") == 0) proneTerrainBoxAttributes = defSec.getAttributes();
@@ -1286,18 +1289,39 @@ public class HoldListWindow extends JFrame implements ActionListener {
                 if(objectAttributes.getNamedItem("takesTerrainDamage") != null) tObject.takesTerrainDamage = Boolean.parseBoolean(objectAttributes.getNamedItem("takesTerrainDamage").getNodeValue());
                 if(objectAttributes.getNamedItem("fragile") != null) tObject.fragile = Boolean.parseBoolean(objectAttributes.getNamedItem("fragile").getNodeValue());
                 
-                //get terrain box
-                for(NamedNodeMap attr : terrainBoxAttributes) {
-	                HSBox terrainBox = new HSBox();
-	                if(attr.getNamedItem("width") != null) terrainBox.width = Float.parseFloat(attr.getNamedItem("width").getNodeValue());
-	                if(attr.getNamedItem("height") != null) terrainBox.height = Float.parseFloat(attr.getNamedItem("height").getNodeValue());
-	                if(attr.getNamedItem("offsetX") != null) terrainBox.offset.x = Float.parseFloat(attr.getNamedItem("offsetX").getNodeValue());
-	                if(attr.getNamedItem("offsetY") != null) terrainBox.offset.y = Float.parseFloat(attr.getNamedItem("offsetY").getNodeValue());
-	                if(attr.getNamedItem("depth") != null) terrainBox.depth = Integer.parseInt(attr.getNamedItem("depth").getNodeValue());
-	                tObject.terrainBoxes.add(terrainBox);
-	                
-	                //Only allow terrain objects to have more than one
-	                if(loadObject.IsPhysicsObject() || loadObject.IsFighter()) break;
+                if(version < 2) {
+	                //get terrain box (legacy)
+	                for(NamedNodeMap attr : terrainBoxAttributes) {
+		                HSBox terrainBox = new HSBox();
+		                if(attr.getNamedItem("width") != null) terrainBox.width = Float.parseFloat(attr.getNamedItem("width").getNodeValue());
+		                if(attr.getNamedItem("height") != null) terrainBox.height = Float.parseFloat(attr.getNamedItem("height").getNodeValue());
+		                if(attr.getNamedItem("offsetX") != null) terrainBox.offset.x = Float.parseFloat(attr.getNamedItem("offsetX").getNodeValue());
+		                if(attr.getNamedItem("offsetY") != null) terrainBox.offset.y = Float.parseFloat(attr.getNamedItem("offsetY").getNodeValue());
+		                if(attr.getNamedItem("depth") != null) terrainBox.depth = Integer.parseInt(attr.getNamedItem("depth").getNodeValue());
+		                tObject.terrainBoxes.add(terrainBox);
+		                
+		                //Only allow terrain objects to have more than one
+		                if(loadObject.IsPhysicsObject() || loadObject.IsFighter()) break;
+	                }
+                }
+                else {
+                	//After change
+	                //get terrain boxes
+    	            NodeList terrainBoxNodeList = terrainBoxes.getChildNodes();
+    	            for(int i = 0; i < terrainBoxNodeList.getLength(); i++) {
+    	            	Node tBox = terrainBoxNodeList.item(i);
+    	            	NamedNodeMap attr = tBox.getAttributes();
+		                HSBox terrainBox = new HSBox();
+		                if(attr.getNamedItem("width") != null) terrainBox.width = Float.parseFloat(attr.getNamedItem("width").getNodeValue());
+		                if(attr.getNamedItem("height") != null) terrainBox.height = Float.parseFloat(attr.getNamedItem("height").getNodeValue());
+		                if(attr.getNamedItem("offsetX") != null) terrainBox.offset.x = Float.parseFloat(attr.getNamedItem("offsetX").getNodeValue());
+		                if(attr.getNamedItem("offsetY") != null) terrainBox.offset.y = Float.parseFloat(attr.getNamedItem("offsetY").getNodeValue());
+		                if(attr.getNamedItem("depth") != null) terrainBox.depth = Integer.parseInt(attr.getNamedItem("depth").getNodeValue());
+		                tObject.terrainBoxes.add(terrainBox);
+		                
+		                //Only allow terrain objects to have more than one
+		                if(loadObject.IsPhysicsObject() || loadObject.IsFighter()) break;
+	                }
                 }
                 
                 //get terrain object event holds
@@ -1580,6 +1604,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
                 object.setAttribute("fragile", "" + tObject.fragile);
                 object.setAttribute("canBeJumpedThrough", "" + tObject.canBeJumpedThrough);
                 
+                Element terrainBoxesElement = doc.createElement("TerrainBoxes");
                 //get TerrainObject terrain box
                 for(HSBox tBox : tObject.terrainBoxes) {
 	                Element terrainBox = doc.createElement("TerrainBox");
@@ -1588,8 +1613,9 @@ public class HoldListWindow extends JFrame implements ActionListener {
 	                terrainBox.setAttribute("width", "" + tBox.width);
 	                terrainBox.setAttribute("height", "" + tBox.height);
 	                terrainBox.setAttribute("depth", "" + tBox.depth);
-	                object.appendChild(terrainBox);
+	                terrainBoxesElement.appendChild(terrainBox);
                 }
+                object.appendChild(terrainBoxesElement);
                 
                 //on hit sounds
                 if(!tObject.onHitSounds.isEmpty())
