@@ -462,7 +462,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
     
     public void newObject()
     {
-        if(currentlyLoadedObject.IsTerrainObject())
+        if(currentlyLoadedObject.IsTerrainObject() && ((TerrainObject)currentlyLoadedObject).terrainBoxes.size() == 0)
         {
             HSBox terrainBox = new HSBox();
             terrainBox.width = newObjectTerrainBoxSize;
@@ -473,7 +473,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
             ((TerrainObject)currentlyLoadedObject).terrainBoxes.add(terrainBox);
         }
         
-        if(currentlyLoadedObject.IsFighter())
+        if(currentlyLoadedObject.IsFighter() && ((FighterObject)currentlyLoadedObject).uprightTerrainBoxes.size() == 0)
         {
             HSBox uprightBox = new HSBox();
             uprightBox.width = newObjectTerrainBoxSize;
@@ -482,7 +482,10 @@ public class HoldListWindow extends JFrame implements ActionListener {
             uprightBox.offset.y = -uprightBox.height;
             uprightBox.depth = 1;
             ((FighterObject)currentlyLoadedObject).uprightTerrainBoxes.add(uprightBox);
+        }
 
+        if(currentlyLoadedObject.IsFighter() && ((FighterObject)currentlyLoadedObject).crouchingTerrainBoxes.size() == 0)
+        {
             HSBox crouchingBox = new HSBox();
             crouchingBox.width = newObjectTerrainBoxSize;
             crouchingBox.height = newObjectTerrainBoxSize;
@@ -490,7 +493,10 @@ public class HoldListWindow extends JFrame implements ActionListener {
             crouchingBox.offset.y = -crouchingBox.height;
             crouchingBox.depth = 1;
             ((FighterObject)currentlyLoadedObject).crouchingTerrainBoxes.add(crouchingBox);
+        }
 
+        if(currentlyLoadedObject.IsFighter() && ((FighterObject)currentlyLoadedObject).proneTerrainBoxes.size() == 0)
+        {
             HSBox proneBox = new HSBox();
             proneBox.width = newObjectTerrainBoxSize * 2;
             proneBox.height = newObjectTerrainBoxSize;
@@ -498,7 +504,10 @@ public class HoldListWindow extends JFrame implements ActionListener {
             proneBox.offset.y = -proneBox.height;
             proneBox.depth = 1;
             ((FighterObject)currentlyLoadedObject).proneTerrainBoxes.add(proneBox);
+        }
 
+        if(currentlyLoadedObject.IsFighter() && ((FighterObject)currentlyLoadedObject).compactTerrainBoxes.size() == 0)
+        {
             HSBox compactBox = new HSBox();
             compactBox.width = newObjectTerrainBoxSize;
             compactBox.height = newObjectTerrainBoxSize;
@@ -2242,7 +2251,6 @@ public class HoldListWindow extends JFrame implements ActionListener {
         }
     }
     
-    //https://www.java.net//node/667186#comment-684625
     private static void removeWhitespaceNodes(Document doc) {
     	XPath xp = XPathFactory.newInstance().newXPath();
 	    NodeList nl;
