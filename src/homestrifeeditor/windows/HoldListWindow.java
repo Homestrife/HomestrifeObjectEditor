@@ -49,12 +49,18 @@ import javax.swing.tree.TreePath;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.soap.Text;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -883,11 +889,14 @@ public class HoldListWindow extends JFrame implements ActionListener {
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(file);
             doc.getDocumentElement().normalize();
+            //Clean it up
+            removeWhitespaceNodes(doc);
             
             int version = 0;
             
             if(doc.getDocumentElement().getNodeName().compareTo("HSObjects") != 0)
             {
+            	System.out.println(doc.getDocumentElement().getNodeName() + " - Not Recognized As Definition - " + file.getName());
                 return;
             }
             
@@ -898,7 +907,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
             Node object = doc.getDocumentElement().getFirstChild();
             
             HSObject loadObject;
-            
+
             if(object.getNodeName().compareTo("Fighter") == 0)
             {
                 loadObject = new FighterObject();
@@ -917,9 +926,10 @@ public class HoldListWindow extends JFrame implements ActionListener {
             }
             else
             {
+            	System.out.println(object.getNodeName() + " - Not Recognized As Object - " + file.getName());
                 return;
             }
-            
+
             //get the base path
             workingDirectory = file.getParent();
             
@@ -2230,6 +2240,24 @@ public class HoldListWindow extends JFrame implements ActionListener {
             case "eventHolds": createEventHoldsWindow(); break;
             case "palettes": createPalettesWindow(); break;
         }
+    }
+    
+    //https://www.java.net//node/667186#comment-684625
+    private static void removeWhitespaceNodes(Document doc) {
+    	XPath xp = XPathFactory.newInstance().newXPath();
+	    NodeList nl;
+		try {
+			nl = (NodeList) xp.evaluate("//text()[normalize-space(.)='']", doc, XPathConstants.NODESET);
+		} catch (XPathExpressionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return;
+		}
+	
+	    for (int i=0; i < nl.getLength(); ++i) {
+	        Node node = nl.item(i);
+	        node.getParentNode().removeChild(node);
+	    }
     }
 
 	private class KeyDispatcher implements KeyEventDispatcher {
