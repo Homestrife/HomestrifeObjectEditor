@@ -1227,7 +1227,10 @@ public class HoldListWindow extends JFrame implements ActionListener {
                 if(loadHold.IsFighterHold())
                 {
                     FighterHold fHold = (FighterHold)loadHold;
-                    
+
+                    if(holdAttributes.getNamedItem("changeFighterAttributes") != null) fHold.changeFighterAttributes = Boolean.parseBoolean(holdAttributes.getNamedItem("changeFighterAttributes").getNodeValue());
+                    if(holdAttributes.getNamedItem("disableAirControl") != null) fHold.disableAirControl = Boolean.parseBoolean(holdAttributes.getNamedItem("disableAirControl").getNodeValue());
+                    if(holdAttributes.getNamedItem("endAirDash") != null) fHold.endAirDash = Boolean.parseBoolean(holdAttributes.getNamedItem("endAirDash").getNodeValue());
                     if(holdAttributes.getNamedItem("changeCancels") != null) fHold.changeCancels = Boolean.parseBoolean(holdAttributes.getNamedItem("changeCancels").getNodeValue());
                     if(holdAttributes.getNamedItem("dashCancel") != null) fHold.cancels.dash = Cancel.valueOf(holdAttributes.getNamedItem("dashCancel").getNodeValue());
                     if(holdAttributes.getNamedItem("jumpCancel") != null) fHold.cancels.jump = Cancel.valueOf(holdAttributes.getNamedItem("jumpCancel").getNodeValue());
@@ -1293,7 +1296,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
             }
             
             //get hs object event holds
-            if(eventHoldsAttributes.getNamedItem("lifetimeDeath") != null)
+            if(eventHoldsAttributes != null && eventHoldsAttributes.getNamedItem("lifetimeDeath") != null)
                 loadObject.hsObjectEventHolds.lifetimeDeath = getHoldFromId(loadObject, Integer.parseInt(eventHoldsAttributes.getNamedItem("lifetimeDeath").getNodeValue()));
             
             if(loadObject.IsTerrainObject())
@@ -1901,6 +1904,10 @@ public class HoldListWindow extends JFrame implements ActionListener {
                 {
                     //get FighterHold attributes
                     FighterHold fh = (FighterHold)h;
+
+                    hold.setAttribute("changeFighterAttributes", "" + fh.changeFighterAttributes);
+                    hold.setAttribute("disableAirControl", "" + fh.disableAirControl);
+                    hold.setAttribute("endAirDash", "" + fh.endAirDash);
                     
                     hold.setAttribute("changeCancels", "" + fh.changeCancels);
                     hold.setAttribute("dashCancel", "" + fh.cancels.dash);
@@ -2251,6 +2258,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
         }
     }
     
+    //Found on Google
     private static void removeWhitespaceNodes(Document doc) {
     	XPath xp = XPathFactory.newInstance().newXPath();
 	    NodeList nl;

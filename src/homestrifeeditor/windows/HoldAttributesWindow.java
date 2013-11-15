@@ -98,6 +98,10 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
 
     private JCheckBox changePhysicsCheck;   private static String changePhysicsTooltip = "<html>If this is unchecked, this hold will not modify the object's physics attributes</html>";
     private JCheckBox ignoreGravityCheck;   //private static String ignoreGravityTooltip = "<html>If this is unchecked, this hold will not modify the object's physics attributes</html>";
+
+    private JCheckBox changeFighterAttributesCheck; private static String changeFighterAttributesTooltip = "<html>If this is checked, the fighter attributes will change on this hold</html>";
+    private JCheckBox disableAirControlCheck; private static String disableAirControlTooltip = "<html>If this is checked, this will disable the player's ability to affect horizontal motion while jumping, either until the end of the current animation or until the next time a hold that changes this attribute</html>";
+    private JCheckBox endAirDashCheck; private static String endAirDashTooltip = "<html>If this is checked, the air-dashing state will be terminated immediately upon reaching this hold</html>";
     
     private JCheckBox changeCancelsCheck;   private static String changeCancelsTooltip = "<html>If this is unchecked, this hold will inhereit the cancels<br>of any hold that has this hold as its next hold.</html>";
     private JComboBox<Cancel> dashCancelCombo; private static String cancelTooltip = "<html>Any Time: This action can be cancelled into at any time.<br>After Hit or Block: This action can be cancelled into after striking a hurt box.<br>After Hit: This action can ben cancelled into after striking a hurt box without being blocked.<br>After Block: This action can be cancelled into after striking a hurt box and beinb blocked.<br>Never: This action can never be cancelled into.</html>";
@@ -117,6 +121,7 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
     
     private JPanel terrainInterface;
     private JPanel physicsInterface;
+    private JPanel fighterAttributesInterface;
     private JPanel fighterInterface;
     
     private JButton applyButton;
@@ -434,6 +439,38 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             
             FighterHold fHold = (FighterHold)hold;
             
+            changeFighterAttributesCheck = new JCheckBox("Change fighter attributes this hold", fHold.changeFighterAttributes);
+            changeFighterAttributesCheck.setToolTipText(changeFighterAttributesTooltip);
+            changeFighterAttributesCheck.setActionCommand("changeFighterAttributesChanged");
+            changeFighterAttributesCheck.addActionListener(this);
+            
+            JPanel changeFighterAttributesInterface = new JPanel(new GridLayout(1, gridColumns, gridHorizontalGap, gridVerticalGap));
+            changeFighterAttributesInterface.setSize(gridWidth, gridRowHeight);
+            changeFighterAttributesInterface.add(changeFighterAttributesCheck);
+            
+            holdAttributesPane.add(changeFighterAttributesInterface);
+            
+            disableAirControlCheck = new JCheckBox("Disable Air Control", fHold.disableAirControl);
+            disableAirControlCheck.setToolTipText(disableAirControlTooltip);
+            disableAirControlCheck.setActionCommand("disableAirControlChanged");
+            disableAirControlCheck.addActionListener(this);
+            
+            endAirDashCheck = new JCheckBox("End Air Dash", fHold.endAirDash);
+            endAirDashCheck.setToolTipText(endAirDashTooltip);
+            endAirDashCheck.setActionCommand("endAirDashChanged");
+            endAirDashCheck.addActionListener(this);
+            
+            fighterAttributesInterface = new JPanel(new GridLayout(1, gridColumns, gridHorizontalGap, gridVerticalGap));
+            fighterAttributesInterface.setSize(gridWidth, gridRowHeight * 7);
+            fighterAttributesInterface.setBorder(new TitledBorder("Fighter Attributes"));
+            fighterAttributesInterface.add(disableAirControlCheck);
+            fighterAttributesInterface.add(endAirDashCheck);
+            setFighterAttributesInterfaceEnabled();
+
+            holdAttributesPane.add(fighterAttributesInterface);
+            
+            //
+            
             changeCancelsCheck = new JCheckBox("Change cancels this hold", fHold.changeCancels);
             changeCancelsCheck.setToolTipText(changeCancelsTooltip);
             changeCancelsCheck.setActionCommand("changeCancelsChanged");
@@ -646,10 +683,26 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         }
     }
     
-    private void setFighterInterfaceEnabled()
+    private void setFighterAttributesInterfaceEnabled()
     {
         if(hold.IsFighterHold())
         {
+            FighterHold fHold = (FighterHold)hold;
+            
+            fighterAttributesInterface.setEnabled(changeFighterAttributesCheck.isSelected());
+            
+            Component[] components = fighterAttributesInterface.getComponents();
+            for(int i = 0; i < components.length; i++)
+            {
+                components[i].setEnabled(changeFighterAttributesCheck.isSelected());
+            }
+        }
+    }
+    
+    private void setFighterInterfaceEnabled()
+    {
+        if(hold.IsFighterHold())
+        { 
             FighterHold fHold = (FighterHold)hold;
             
             fighterInterface.setEnabled(changeCancelsCheck.isSelected());
@@ -705,6 +758,9 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         
         if(hold.IsFighterHold())
         {
+            ((FighterHold)hold).changeFighterAttributes = changeFighterAttributesCheck.isSelected();
+            ((FighterHold)hold).disableAirControl = disableAirControlCheck.isSelected();
+            ((FighterHold)hold).endAirDash = endAirDashCheck.isSelected();
             ((FighterHold)hold).changeCancels = changeCancelsCheck.isSelected();
             ((FighterHold)hold).cancels.dash = (Cancel)dashCancelCombo.getSelectedItem();
             ((FighterHold)hold).cancels.jump = (Cancel)jumpCancelCombo.getSelectedItem();
@@ -788,6 +844,11 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         setFighterInterfaceEnabled();
         fieldChanged();
     }
+
+	private void changeFighterAttributesChanged() {
+		setFighterAttributesInterfaceEnabled();
+		fieldChanged();
+	}
     
     private void hitSoundsButtonPressed()
     {
@@ -821,6 +882,7 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             case "changeAttackBoxAttributesChanged": changeAttackBoxAttributesChanged(); break;
             case "changePhysicsChanged": changePhysicsChanged();
             case "changeCancelsChanged": changeCancelsChanged(); break;
+            case "changeFighterAttributesChanged": changeFighterAttributesChanged(); break;
             case "hitSoundsButton": hitSoundsButtonPressed(); break;
             case "blockedSoundsButton": blockedSoundsButtonPressed(); break;
         }

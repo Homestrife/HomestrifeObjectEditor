@@ -13,12 +13,17 @@ import homestrifeeditor.objects.holds.properties.Cancels;
 public class FighterHold extends PhysicsObjectHold {
     public Cancels cancels;
     public boolean changeCancels;
+
+    public boolean changeFighterAttributes;
+    public boolean disableAirControl;
+    public boolean endAirDash;
     
     public FighterHold()
     {
         super();
         
         cancels = new Cancels();
+        endAirDash = false;
     }
     
     @Override
