@@ -2274,7 +2274,6 @@ public class HoldListWindow extends JFrame implements ActionListener {
 		try {
 			nl = (NodeList) xp.evaluate("//text()[normalize-space(.)='']", doc, XPathConstants.NODESET);
 		} catch (XPathExpressionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return;
 		}
