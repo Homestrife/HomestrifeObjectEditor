@@ -396,7 +396,6 @@ public class HoldListPane extends JPanel implements ActionListener, TreeSelectio
         }
         else
         {
-            System.out.println("Loading hold");
             parent.textureHitboxPane.loadHoldData((HSObjectHold)node.getUserObject());
         }
     }
