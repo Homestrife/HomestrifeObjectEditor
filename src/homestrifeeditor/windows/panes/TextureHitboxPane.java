@@ -245,10 +245,10 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
         
         float horMin = textureHitboxScrollPane.getHorizontalScrollBar().getMinimum();
         float horMax = textureHitboxScrollPane.getHorizontalScrollBar().getMaximum();
-        float horMid = (horMax - horMin) / (float)2.5;
+        float horMid = (horMax - horMin) / 2f - textureHitboxScrollPane.getWidth() / 2;
         float verMin = textureHitboxScrollPane.getVerticalScrollBar().getMinimum();
         float verMax = textureHitboxScrollPane.getVerticalScrollBar().getMaximum();
-        float verMid = (verMax - verMin) / (float)2.5;
+        float verMid = (verMax - verMin) / 2f - textureHitboxScrollPane.getHeight();
         textureHitboxScrollPane.getHorizontalScrollBar().setValue((int)horMid);
         textureHitboxScrollPane.getVerticalScrollBar().setValue((int)verMid);
     }
