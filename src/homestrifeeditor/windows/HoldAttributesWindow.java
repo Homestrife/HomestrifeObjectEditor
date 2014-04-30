@@ -10,7 +10,6 @@ import homestrifeeditor.objects.holds.PhysicsObjectHold;
 import homestrifeeditor.objects.holds.TerrainObjectHold;
 import homestrifeeditor.objects.holds.properties.Blockability;
 import homestrifeeditor.objects.holds.properties.Cancel;
-import homestrifeeditor.objects.holds.properties.HSVect2D;
 import homestrifeeditor.windows.panes.HoldListPane;
 import homestrifeeditor.windows.renderers.HoldComboBoxRenderer;
 
@@ -352,9 +351,9 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             tripsCheck.addActionListener(this);
             
             JLabel resetHitsLabel = new JLabel("Reset Hits");
-            resetHitsLabel.setToolTipText(tripsTooltip);
+            resetHitsLabel.setToolTipText(resetHitsTooltip);
             resetHitsCheck = new JCheckBox("", toHold.resetHits);
-            resetHitsCheck.setToolTipText(tripsTooltip);
+            resetHitsCheck.setToolTipText(resetHitsTooltip);
             resetHitsCheck.setActionCommand("fieldChanged");
             resetHitsCheck.addActionListener(this);
         
