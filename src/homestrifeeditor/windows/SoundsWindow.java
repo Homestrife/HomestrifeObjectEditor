@@ -266,11 +266,11 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
     
     private void addSoundToSoundList()
     {
-        int returnVal = HoldListWindow.fileChooser.showOpenDialog(this);
+        int returnVal = EditorWindow.fileChooser.showOpenDialog(this);
         File file;
         
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            file = HoldListWindow.fileChooser.getSelectedFile();
+            file = EditorWindow.fileChooser.getSelectedFile();
         } else {
             return;
         }
@@ -406,11 +406,11 @@ public class SoundsWindow extends JFrame implements ActionListener, ListSelectio
     
     private void changeSound()
     {
-        int returnVal = HoldListWindow.fileChooser.showOpenDialog(this);
+        int returnVal = EditorWindow.fileChooser.showOpenDialog(this);
         File file;
         
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            file = HoldListWindow.fileChooser.getSelectedFile();
+            file = EditorWindow.fileChooser.getSelectedFile();
         } else {
             return;
         }

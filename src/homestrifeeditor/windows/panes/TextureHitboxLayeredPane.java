@@ -11,7 +11,7 @@ import homestrifeeditor.objects.holds.TerrainObjectHold;
 import homestrifeeditor.objects.holds.properties.HSBoxLabel;
 import homestrifeeditor.objects.holds.properties.HSTexture;
 import homestrifeeditor.objects.holds.properties.HSTextureLabel;
-import homestrifeeditor.windows.HoldListWindow;
+import homestrifeeditor.windows.EditorWindow;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -296,11 +296,11 @@ public class TextureHitboxLayeredPane extends JLayeredPane implements MouseListe
     
     public void addTexture()
     {
-        int returnVal = HoldListWindow.fileChooser.showOpenDialog(null);
+        int returnVal = EditorWindow.fileChooser.showOpenDialog(null);
         File file;
         
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            file = HoldListWindow.fileChooser.getSelectedFile();
+            file = EditorWindow.fileChooser.getSelectedFile();
         } else {
             return;
         }
@@ -546,7 +546,7 @@ public class TextureHitboxLayeredPane extends JLayeredPane implements MouseListe
         }
         
         if(parent.parent.currentlyLoadedObject != null)
-        	parent.parent.setTitle(HoldListWindow.BaseWindowTitle + parent.parent.currentlyLoadedObject.name + "*");
+        	parent.parent.setTitle(EditorWindow.BaseWindowTitle + parent.parent.currentlyLoadedObject.name + "*");
     }
     
     @Override

@@ -51,7 +51,7 @@ public class EventHoldsWindow extends JFrame implements ActionListener, ItemList
     private static int gridHorizontalGap = 10;
     private static int gridVerticalGap = 5;
     
-    private HoldListWindow parent;
+    private EditorWindow parent;
     private HSObject hsObject;
     
     private JComboBox lifetimeDeath;
@@ -164,7 +164,7 @@ public class EventHoldsWindow extends JFrame implements ActionListener, ItemList
     
     private JButton applyButton;
     
-    public EventHoldsWindow(HoldListWindow theParent, HSObject theHSObject)
+    public EventHoldsWindow(EditorWindow theParent, HSObject theHSObject)
     {
         parent = theParent;
         hsObject = theHSObject;

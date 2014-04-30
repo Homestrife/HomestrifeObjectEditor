@@ -11,7 +11,7 @@ import homestrifeeditor.objects.holds.properties.HSBoxLabel;
 import homestrifeeditor.objects.holds.properties.HSTexture;
 import homestrifeeditor.objects.holds.properties.HSTextureLabel;
 import homestrifeeditor.objects.holds.properties.HSVect2D;
-import homestrifeeditor.windows.HoldListWindow;
+import homestrifeeditor.windows.EditorWindow;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -43,7 +43,7 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
 	public static int textureHitboxPaneWidth = 1920 * 8;
     public static int textureHitboxPaneHeight = 1080 * 8;
     
-    public HoldListWindow parent;
+    public EditorWindow parent;
     public HSObjectHold hold;
     
     public TextureHitboxLayeredPane textureHitboxPane;
@@ -67,7 +67,7 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
     //Currently cut/copied object
     public ArrayList<JLabel> clipboard;
     
-    public TextureHitboxPane(HoldListWindow theParent)
+    public TextureHitboxPane(EditorWindow theParent)
     {
         parent = theParent;
         hold = null;

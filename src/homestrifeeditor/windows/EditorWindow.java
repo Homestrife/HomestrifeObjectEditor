@@ -72,7 +72,7 @@ import org.xml.sax.SAXException;
  * but also displays the textures, hitboxes, and attributes of the currently selected hold.
  * @author Darlos9D
  */
-public class HoldListWindow extends JFrame implements ActionListener {
+public class EditorWindow extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1L;
 
     
@@ -101,7 +101,7 @@ public class HoldListWindow extends JFrame implements ActionListener {
     //File chooser is declared at the class level so that it remembers last folder location..
     public static JFileChooser fileChooser;
     
-    public HoldListWindow()
+    public EditorWindow()
     {
         currentlyLoadedObject = null;
         

@@ -12,7 +12,7 @@ import homestrifeeditor.objects.holds.TerrainObjectHold;
 import homestrifeeditor.objects.holds.properties.HSBox;
 import homestrifeeditor.objects.holds.properties.HSTexture;
 import homestrifeeditor.windows.HoldAttributesWindow;
-import homestrifeeditor.windows.HoldListWindow;
+import homestrifeeditor.windows.EditorWindow;
 import homestrifeeditor.windows.MassShiftWindow;
 
 import java.awt.BorderLayout;
@@ -43,14 +43,14 @@ import javax.swing.tree.TreeSelectionModel;
 public class HoldListPane extends JPanel implements ActionListener, TreeSelectionListener, MouseListener {
 	private static final long serialVersionUID = 1L;
 
-	public HoldListWindow parent;
+	public EditorWindow parent;
     
     public JTree tree;
     public DefaultMutableTreeNode root;
     
     private JToolBar holdListToolBar;
     
-    public HoldListPane(HoldListWindow theParent)
+    public HoldListPane(EditorWindow theParent)
     {
         parent = theParent;
         createPaneContents();
@@ -382,7 +382,7 @@ public class HoldListPane extends JPanel implements ActionListener, TreeSelectio
         }
         
         if(parent.currentlyLoadedObject != null)
-        	parent.setTitle(HoldListWindow.BaseWindowTitle + parent.currentlyLoadedObject.name + "*");
+        	parent.setTitle(EditorWindow.BaseWindowTitle + parent.currentlyLoadedObject.name + "*");
     }
     
     @Override

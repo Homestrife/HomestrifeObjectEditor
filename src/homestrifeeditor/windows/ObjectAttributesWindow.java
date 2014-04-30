@@ -51,7 +51,7 @@ public class ObjectAttributesWindow extends JFrame implements ActionListener, Ch
     private static int gridHorizontalGap = 10;
     private static int gridVerticalGap = 5;
     
-    private HoldListWindow parent;
+    private EditorWindow parent;
     private HSObject hsObject;
     
     private JTextField nameField;                       private static String nameTooltip = "<html>The name of the object.</html>";
@@ -81,7 +81,7 @@ public class ObjectAttributesWindow extends JFrame implements ActionListener, Ch
     
     private JButton applyButton;
     
-    public ObjectAttributesWindow(HoldListWindow theParent, HSObject theHSObject)
+    public ObjectAttributesWindow(EditorWindow theParent, HSObject theHSObject)
     {
         parent = theParent;
         hsObject = theHSObject;

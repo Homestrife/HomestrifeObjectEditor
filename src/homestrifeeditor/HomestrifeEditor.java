@@ -4,7 +4,7 @@
  */
 package homestrifeeditor;
 
-import homestrifeeditor.windows.HoldListWindow;
+import homestrifeeditor.windows.EditorWindow;
 
 import javax.swing.SwingUtilities;
 
@@ -21,7 +21,7 @@ public class HomestrifeEditor
     {
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                HoldListWindow holdListWindow = new HoldListWindow();
+                EditorWindow holdListWindow = new EditorWindow();
                 holdListWindow.setVisible(true);
             }
         });

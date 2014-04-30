@@ -86,7 +86,7 @@ public class PalettesWindow extends JFrame implements KeyListener, ActionListene
         
         addWindowListener(new WindowAdapter() {
         	public void windowClosing(WindowEvent e) {
-                ((HoldListWindow) parent).updatePalettesMenu(true);   
+                ((EditorWindow) parent).updatePalettesMenu(true);   
         	}
 		});
     }
@@ -206,11 +206,11 @@ public class PalettesWindow extends JFrame implements KeyListener, ActionListene
     
     private void addPaletteToPaletteList()
     {
-        int returnVal = HoldListWindow.fileChooser.showOpenDialog(this);
+        int returnVal = EditorWindow.fileChooser.showOpenDialog(this);
         File file;
         
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            file = HoldListWindow.fileChooser.getSelectedFile();
+            file = EditorWindow.fileChooser.getSelectedFile();
         } else {
             return;
         }
@@ -232,14 +232,14 @@ public class PalettesWindow extends JFrame implements KeyListener, ActionListene
             paletteListModel.addElement(newPalette);
             paletteList.setSelectedIndex(paletteListModel.getSize() - 1);
         }
-        ((HoldListWindow) parent).updatePalettesMenu();   
+        ((EditorWindow) parent).updatePalettesMenu();   
     }
     
     public HSPalette removePaletteFromPaletteList(int index)
     {
     	HSPalette pal = (HSPalette)paletteListModel.remove(index);
     	((HSObject)object).palettes.remove(pal);
-        ((HoldListWindow) parent).updatePalettesMenu();   
+        ((EditorWindow) parent).updatePalettesMenu();   
         
         return pal;
     }
@@ -253,7 +253,7 @@ public class PalettesWindow extends JFrame implements KeyListener, ActionListene
         {
             removedPalettes.add(0, removePaletteFromPaletteList(indices[i]));
         }
-        ((HoldListWindow) parent).updatePalettesMenu();   
+        ((EditorWindow) parent).updatePalettesMenu();   
         
         return removedPalettes;
     }
@@ -307,11 +307,11 @@ public class PalettesWindow extends JFrame implements KeyListener, ActionListene
     
     private void changePalette()
     {
-        int returnVal = HoldListWindow.fileChooser.showOpenDialog(this);
+        int returnVal = EditorWindow.fileChooser.showOpenDialog(this);
         File file;
         
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            file = HoldListWindow.fileChooser.getSelectedFile();
+            file = EditorWindow.fileChooser.getSelectedFile();
         } else {
             return;
         }
@@ -327,7 +327,7 @@ public class PalettesWindow extends JFrame implements KeyListener, ActionListene
         }
         
         paletteList.repaint();
-        ((HoldListWindow) parent).updatePalettesMenu();    
+        ((EditorWindow) parent).updatePalettesMenu();    
     }
     
     private void changeName() {
@@ -340,14 +340,14 @@ public class PalettesWindow extends JFrame implements KeyListener, ActionListene
         }
         
         paletteList.repaint();
-        ((HoldListWindow) parent).updatePalettesMenu();        
+        ((EditorWindow) parent).updatePalettesMenu();        
 	}    
 
 	private void updateId() {
 		((HSPalette)paletteListModel.get(paletteList.getSelectedIndex())).id = (int) idSpinner.getValue();
 		
         paletteList.repaint();
-        ((HoldListWindow) parent).updatePalettesMenu(); 
+        ((EditorWindow) parent).updatePalettesMenu(); 
 	}
 
     
