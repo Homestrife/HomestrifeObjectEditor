@@ -81,6 +81,17 @@ public class HSObjectHold {
     public String toString() {
     	//String[] split = name.split("_");
     	//return split[split.length - 1];
-    	return name;
+    	String suffix = "";
+    	if(audioList.size() > 0 || spawnObjects.size() > 0) {
+    		suffix = " (";
+    		if(spawnObjects.size() > 0) {
+    			suffix += "S";
+    		}
+    		if(audioList.size() > 0) {
+    			suffix += spawnObjects.size() > 0 ? "|A" : "A";
+    		}
+    		suffix += ")";
+    	}
+    	return name + suffix;
     }
 }

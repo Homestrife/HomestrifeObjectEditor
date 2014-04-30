@@ -60,7 +60,7 @@ public class HoldListPane extends JPanel implements ActionListener, TreeSelectio
     {
         JLabel holdListLabel = new JLabel("Hold List");
         
-        root = new DefaultMutableTreeNode("Holds");
+        root = new DefaultMutableTreeNode("Holds (S - Spawn Object | A - Audio)");
         tree = new JTree(root);
         tree.setName("holdTree");
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
