@@ -153,6 +153,7 @@ public class ObjectAttributesWindow extends JFrame implements ActionListener, Ch
             JLabel fragileLabel = new JLabel("Fragile");
             fragileCheck = new JCheckBox("", tObject.fragile);
             fragileCheck.setActionCommand("fieldChanged");
+            fragileCheck.setToolTipText(fragileTooltip);
             fragileCheck.addActionListener(this);
             
             JButton getHitSounds = new JButton("Sounds on Hit...");

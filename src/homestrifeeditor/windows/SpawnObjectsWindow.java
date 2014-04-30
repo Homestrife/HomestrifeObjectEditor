@@ -5,7 +5,7 @@
 package homestrifeeditor.windows;
 
 import homestrifeeditor.objects.holds.HSObjectHold;
-import homestrifeeditor.objects.holds.properties.SpawnObject;
+import homestrifeeditor.objects.holds.properties.HSSpawnObject;
 import homestrifeeditor.windows.renderers.SpawnListCellRenderer;
 
 import java.awt.BorderLayout;
@@ -53,12 +53,12 @@ public class SpawnObjectsWindow extends JFrame implements ActionListener, ListSe
     private static int gridHorizontalGap = 10;
     private static int gridVerticalGap = 5;
     */
-    private JFrame parent;
+    private HoldAttributesWindow parent;
     private Object object;
     private boolean loading;
     
-    public DefaultListModel<SpawnObject> spawnListModel;
-    public JList<SpawnObject> spawnList;
+    public DefaultListModel<HSSpawnObject> spawnListModel;
+    public JList<HSSpawnObject> spawnList;
     
     private JToolBar spawnListToolBar;
     
@@ -74,7 +74,7 @@ public class SpawnObjectsWindow extends JFrame implements ActionListener, ListSe
     private JSpinner velYSpinner;       	private static String velYTooltip = "<html>Initial vertical velocity.</html>";
     private JCheckBox useParentPaletteCheck;private static String useParentPaletteTooltip = "<html>Change your colors along with your parent's palette</html>";
     
-    public SpawnObjectsWindow(JFrame theParent, Object theObject)
+    public SpawnObjectsWindow(HoldAttributesWindow theParent, Object theObject)
     {
         parent = theParent;
         object = theObject;
@@ -91,14 +91,14 @@ public class SpawnObjectsWindow extends JFrame implements ActionListener, ListSe
     private void createWindowContents()
     {
         JLabel spawnListLabel = new JLabel("Object List");
-        spawnListModel = new DefaultListModel<SpawnObject>();
-        spawnList = new JList<SpawnObject>(spawnListModel);
+        spawnListModel = new DefaultListModel<HSSpawnObject>();
+        spawnList = new JList<HSSpawnObject>(spawnListModel);
         spawnList.setName("spawnList");
         spawnList.setCellRenderer(new SpawnListCellRenderer());
         spawnList.addListSelectionListener(this);
         spawnList.addMouseListener(this);
         
-        for (SpawnObject a : ((HSObjectHold)object).spawnObjects)
+        for (HSSpawnObject a : ((HSObjectHold)object).spawnObjects)
         {
             spawnListModel.addElement(a);
         }
@@ -344,7 +344,7 @@ public class SpawnObjectsWindow extends JFrame implements ActionListener, ListSe
         int index = spawnList.getSelectedIndex();
         spawnList.clearSelection();
         
-        SpawnObject newObject = new SpawnObject(file.getPath());
+        HSSpawnObject newObject = new HSSpawnObject(file.getPath());
         
         ((HSObjectHold)object).spawnObjects.add(newObject);
         
@@ -360,16 +360,16 @@ public class SpawnObjectsWindow extends JFrame implements ActionListener, ListSe
         }
     }
     
-    public SpawnObject removeObjectFromSpawnList(int index)
+    public HSSpawnObject removeObjectFromSpawnList(int index)
     {
-        SpawnObject spawnObject = (SpawnObject)spawnListModel.remove(index);
+        HSSpawnObject spawnObject = (HSSpawnObject)spawnListModel.remove(index);
         ((HSObjectHold)object).spawnObjects.remove(spawnObject);
         return spawnObject;
     }
     
-    public ArrayList<SpawnObject> removeObjectsFromSpawnList(int[] indices)
+    public ArrayList<HSSpawnObject> removeObjectsFromSpawnList(int[] indices)
     {
-        ArrayList<SpawnObject> removedObjects = new ArrayList<>();
+        ArrayList<HSSpawnObject> removedObjects = new ArrayList<>();
         
         Arrays.sort(indices, 0, indices.length - 1);
         for(int i = indices.length - 1; i >= 0; i--)
@@ -380,7 +380,7 @@ public class SpawnObjectsWindow extends JFrame implements ActionListener, ListSe
         return removedObjects;
     }
     
-    public ArrayList<SpawnObject> removeSelectedObjectsFromSpawnList()
+    public ArrayList<HSSpawnObject> removeSelectedObjectsFromSpawnList()
     {
         int n = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete the selected object(s)?", "Delete Object(s)", JOptionPane.YES_NO_OPTION);
         
@@ -420,7 +420,7 @@ public class SpawnObjectsWindow extends JFrame implements ActionListener, ListSe
         loading = false;
     }
     
-    private void loadObjectData(SpawnObject spawnObject)
+    private void loadObjectData(HSSpawnObject spawnObject)
     {
         loading = true;
         
@@ -463,7 +463,7 @@ public class SpawnObjectsWindow extends JFrame implements ActionListener, ListSe
         }
         
         int index = spawnList.getSelectedIndex();
-        SpawnObject spawnObject = (SpawnObject)spawnListModel.get(index);
+        HSSpawnObject spawnObject = (HSSpawnObject)spawnListModel.get(index);
         
         if(spawnObject != null)
         {
@@ -481,7 +481,7 @@ public class SpawnObjectsWindow extends JFrame implements ActionListener, ListSe
         
         int index = spawnList.getSelectedIndex();
         if(index == -1) { return; }
-        SpawnObject spawnObject = (SpawnObject)spawnListModel.get(index);
+        HSSpawnObject spawnObject = (HSSpawnObject)spawnListModel.get(index);
         
         if(spawnObject != null)
         {
@@ -519,7 +519,7 @@ public class SpawnObjectsWindow extends JFrame implements ActionListener, ListSe
             unloadObjectData();
             if (spawnList.getSelectedIndex() >= 0)
             {
-                loadObjectData((SpawnObject)spawnList.getSelectedValue());
+                loadObjectData((HSSpawnObject)spawnList.getSelectedValue());
             }
         }
     }
@@ -561,5 +561,6 @@ public class SpawnObjectsWindow extends JFrame implements ActionListener, ListSe
         {
             valueChanged();
         }
+        parent.fieldChanged();
     }
 }

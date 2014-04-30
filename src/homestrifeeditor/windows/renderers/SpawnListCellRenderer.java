@@ -4,7 +4,7 @@
  */
 package homestrifeeditor.windows.renderers;
 
-import homestrifeeditor.objects.holds.properties.SpawnObject;
+import homestrifeeditor.objects.holds.properties.HSSpawnObject;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -29,7 +29,7 @@ public class SpawnListCellRenderer extends JLabel implements ListCellRenderer<Ob
         boolean isSelected,      // is the cell selected
         boolean cellHasFocus)    // does the cell have focus
     {
-        File file = new File(((SpawnObject)value).defFilePath);
+        File file = new File(((HSSpawnObject)value).defFilePath);
         
         String s = file.getName();
         setText(s);

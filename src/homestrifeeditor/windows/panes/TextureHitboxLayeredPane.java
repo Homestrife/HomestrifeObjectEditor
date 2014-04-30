@@ -9,6 +9,8 @@ import homestrifeeditor.objects.FighterObject;
 import homestrifeeditor.objects.TerrainObject;
 import homestrifeeditor.objects.holds.TerrainObjectHold;
 import homestrifeeditor.objects.holds.properties.HSBoxLabel;
+import homestrifeeditor.objects.holds.properties.HSSpawnObject;
+import homestrifeeditor.objects.holds.properties.HSSpawnObjectLabel;
 import homestrifeeditor.objects.holds.properties.HSTexture;
 import homestrifeeditor.objects.holds.properties.HSTextureLabel;
 import homestrifeeditor.windows.EditorWindow;
@@ -402,6 +404,11 @@ public class TextureHitboxLayeredPane extends JLayeredPane implements MouseListe
         newBox.offset.y = 0;
         
         addHurtBox(newBox);
+    }
+    
+    public void addSpawnObject(HSSpawnObject spawn) {
+    	HSSpawnObjectLabel spawnLabel = new HSSpawnObjectLabel(this, spawn);
+    	add(spawnLabel);
     }
     
     public void removeSelectedItems()

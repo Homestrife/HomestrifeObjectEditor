@@ -19,7 +19,7 @@ import homestrifeeditor.objects.holds.properties.Cancel;
 import homestrifeeditor.objects.holds.properties.HSAudio;
 import homestrifeeditor.objects.holds.properties.HSPalette;
 import homestrifeeditor.objects.holds.properties.HSTexture;
-import homestrifeeditor.objects.holds.properties.SpawnObject;
+import homestrifeeditor.objects.holds.properties.HSSpawnObject;
 import homestrifeeditor.windows.panes.HoldListPane;
 import homestrifeeditor.windows.panes.TextureHitboxPane;
 
@@ -1095,7 +1095,7 @@ public class EditorWindow extends JFrame implements ActionListener {
                         if(spawnObjectAttributes.getNamedItem("definitionFilePath") != null) filePath = createAbsolutePathFrom(spawnObjectAttributes.getNamedItem("definitionFilePath").getNodeValue(), relativeDir);
                         filePath = filePath.replace('/', File.separatorChar);
                         filePath = filePath.replace('\\', File.separatorChar);
-                        SpawnObject sob = new SpawnObject(filePath);
+                        HSSpawnObject sob = new HSSpawnObject(filePath);
                         if(spawnObjectAttributes.getNamedItem("delay") != null) sob.delay = Integer.parseInt(spawnObjectAttributes.getNamedItem("delay").getNodeValue());
                         if(spawnObjectAttributes.getNamedItem("number") != null) sob.number = Integer.parseInt(spawnObjectAttributes.getNamedItem("number").getNodeValue());
                         if(spawnObjectAttributes.getNamedItem("parentOffsetX") != null) sob.parentOffset.x = Float.parseFloat(spawnObjectAttributes.getNamedItem("parentOffsetX").getNodeValue());
@@ -1962,7 +1962,7 @@ public class EditorWindow extends JFrame implements ActionListener {
                 if(!h.spawnObjects.isEmpty())
                 {
                     Element spawnObjects = doc.createElement("SpawnObjects");
-                    for(SpawnObject s : h.spawnObjects)
+                    for(HSSpawnObject s : h.spawnObjects)
                     {
                         Element spawnObject = doc.createElement("SpawnObject");
                         spawnObject.setAttribute("definitionFilePath", createPathRelativeTo(s.defFilePath, exeDirectory));

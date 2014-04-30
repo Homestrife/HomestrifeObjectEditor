@@ -9,7 +9,7 @@ package homestrifeeditor.objects.holds.properties;
  *
  * @author Darlos9D
  */
-public class SpawnObject {
+public class HSSpawnObject {
     public boolean followParent; //whether or not it should follow the parent's movements
     public HSVect2D parentOffset; //initial location in reference to the parent
     public HSVect2D vel; //initial velocity of the object
@@ -19,7 +19,7 @@ public class SpawnObject {
     public int number; //how many to spawn
     public boolean useParentPalette;
     
-    public SpawnObject (String theFilePath)
+    public HSSpawnObject (String theFilePath)
     {
         followParent = false;
         parentOffset = new HSVect2D();
@@ -33,5 +33,10 @@ public class SpawnObject {
         collideParent = false;
         number = 1;
         useParentPalette = false;
+    }
+    
+    public String toString() {
+    	String[] split = defFilePath.split("/");
+    	return split[split.length-1];
     }
 }

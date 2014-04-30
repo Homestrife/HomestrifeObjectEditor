@@ -8,6 +8,7 @@ import homestrifeeditor.objects.holds.properties.HSBox;
 import homestrifeeditor.objects.holds.HSObjectHold;
 import homestrifeeditor.objects.holds.TerrainObjectHold;
 import homestrifeeditor.objects.holds.properties.HSBoxLabel;
+import homestrifeeditor.objects.holds.properties.HSSpawnObject;
 import homestrifeeditor.objects.holds.properties.HSTexture;
 import homestrifeeditor.objects.holds.properties.HSTextureLabel;
 import homestrifeeditor.objects.holds.properties.HSVect2D;
@@ -277,6 +278,9 @@ public class TextureHitboxPane extends JPanel implements ActionListener, ItemLis
             {
                 textureHitboxPane.addHurtBox(box, false);
             }
+        }
+        for(HSSpawnObject spawn : hold.spawnObjects) {
+        	textureHitboxPane.addSpawnObject(spawn);
         }
         setAllEnabled(true);
         updateLockButton();
