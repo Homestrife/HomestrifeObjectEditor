@@ -101,6 +101,12 @@ public class EditorWindow extends JFrame implements ActionListener {
     //File chooser is declared at the class level so that it remembers last folder location..
     public static JFileChooser fileChooser;
     
+    private String changeLogText = "<html><h2>Noteworthy Changes:</h2>" +
+			"30 April, 2014:" +
+			"<ul><li>Added spawn object indicator in hold window/list</li>" +
+			"<li>Added change log! :D</li></ul>" +
+			"</html>";
+    
     public EditorWindow()
     {
         currentlyLoadedObject = null;
@@ -145,7 +151,7 @@ public class EditorWindow extends JFrame implements ActionListener {
         JMenuItem objectAttributesItem, eventHoldsItem;
         
         JMenu helpMenu;
-        JMenuItem helpContentItem, aboutItem;
+        JMenuItem helpContentItem, aboutItem, changeLogItem;
         
         menuBar = new JMenuBar();
         
@@ -285,9 +291,14 @@ public class EditorWindow extends JFrame implements ActionListener {
         aboutItem.setActionCommand("about");
         aboutItem.addActionListener(this);
         //
+        changeLogItem = new JMenuItem("Change Log");
+        changeLogItem.setActionCommand("changeLog");
+        changeLogItem.addActionListener(this);
+        //
         
         helpMenu.add(helpContentItem);
         helpMenu.add(aboutItem);
+        helpMenu.add(changeLogItem);
         menuBar.add(helpMenu);
         
         setJMenuBar(menuBar);
@@ -2165,6 +2176,10 @@ public class EditorWindow extends JFrame implements ActionListener {
     	JOptionPane.showMessageDialog(this, "This is the object editor created for the Homestrife Fighting Game!\nOriginally created by Darlos9D and maintained by WhiteVoidia.", "About", JOptionPane.INFORMATION_MESSAGE);
     }
     
+    private void changeLog() {
+    	JOptionPane.showMessageDialog(this, changeLogText,"Change Log", JOptionPane.INFORMATION_MESSAGE);
+	}
+    
     private void createObjectAttributesWindow()
     {
     	if(currentlyLoadedObject == null) {
@@ -2264,10 +2279,11 @@ public class EditorWindow extends JFrame implements ActionListener {
             case "palettes": createPalettesWindow(); break;
             case "helpContent": helpContent(); break;
             case "about": about();
+            case "changeLog": changeLog(); break;
         }
     }
-    
-    //Found on Google
+
+	//Found on Google
     private static void removeWhitespaceNodes(Document doc) {
     	XPath xp = XPathFactory.newInstance().newXPath();
 	    NodeList nl;
