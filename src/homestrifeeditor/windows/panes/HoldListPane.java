@@ -104,8 +104,6 @@ public class HoldListPane extends JPanel implements ActionListener, TreeSelectio
         holdListToolBar.setFloatable(false);
         holdListToolBar.add(addHoldButton);
         holdListToolBar.add(removeHoldsButton);
-        //holdListToolBar.add(moveHoldUpButton);
-        //holdListToolBar.add(moveHoldDownButton);
         holdListToolBar.add(editHoldButton);
         holdListToolBar.add(massShiftHoldButton);
         setToolBarEnabled(false);
@@ -219,7 +217,6 @@ public class HoldListPane extends JPanel implements ActionListener, TreeSelectio
     
     public HSObjectHold removeHoldFromHoldList(TreePath path)
     {    	
-    	//TreePath path = tree.getPathForRow(row);
     	HSObjectHold hold = null;
     	try {
     		hold = (HSObjectHold)((DefaultMutableTreeNode)path.getLastPathComponent()).getUserObject();
@@ -227,8 +224,6 @@ public class HoldListPane extends JPanel implements ActionListener, TreeSelectio
     		//What is selected isn't a HSObjectHold...ignore
     		return null;
     	}
-    	//root.remove(row);
-    	System.out.println(path);
     	
 	    ((DefaultTreeModel)tree.getModel()).removeNodeFromParent(((DefaultMutableTreeNode)path.getLastPathComponent()));
 	    	
