@@ -102,6 +102,8 @@ public class EditorWindow extends JFrame implements ActionListener {
     public static JFileChooser fileChooser;
     
     private String changeLogText = "<html><h2>Noteworthy Changes:</h2>" +
+			"7 May, 2014:" +
+			"<ul><li>Saves using only forward slashes</li></ul>" +
 			"30 April, 2014:" +
 			"<ul><li>Added spawn object indicator in hold window/list</li>" +
 			"<li>Added change log! :D</li></ul>" +
@@ -828,9 +830,8 @@ public class EditorWindow extends JFrame implements ActionListener {
     
     public String createAbsolutePathFrom(String relPath, String fromPath)
     {
-    	relPath = relPath.replace('\\', File.separatorChar);
-    	relPath = relPath.replace('/', File.separatorChar);
-    	if(!fromPath.endsWith(File.separator)) fromPath += File.separator;
+    	relPath = relPath.replace('\\', '/');
+    	if(!fromPath.endsWith("/")) fromPath += "/";
     	File a = new File(fromPath);
 	    File b = new File(a, relPath);
 	    String absolute = "";
@@ -839,7 +840,7 @@ public class EditorWindow extends JFrame implements ActionListener {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} 
-	    return absolute;
+	    return absolute.replace('\\', '/');
     }
     
     public String createRelativePath(String absPath)
@@ -850,8 +851,10 @@ public class EditorWindow extends JFrame implements ActionListener {
     
     public String createPathRelativeTo(String absPath, String relativeTo)
     {
-    	String[] relativeToPieces = relativeTo.split(File.separator.compareTo("\\") == 0 ? "\\\\" : "/");
-        String[] absPathPieces = absPath.split(File.separator.compareTo("\\") == 0 ? "\\\\" : "/");
+    	absPath = absPath.replace('\\', '/');
+    	relativeTo = relativeTo.replace('\\', '/');
+    	String[] relativeToPieces = relativeTo.split("/");
+        String[] absPathPieces = absPath.split("/");
         
         //first, make sure they share the same drive
         if(!relativeToPieces[0].equals(absPathPieces[0]))
@@ -875,7 +878,7 @@ public class EditorWindow extends JFrame implements ActionListener {
         String relativePath = "";
         for(int i = 0; i < end - divergeancePoint; i++)
         {
-            relativePath += ".." + File.separator;
+            relativePath += "../";
         }
         
         //add the absolute path starting with the divergeance point
@@ -883,12 +886,12 @@ public class EditorWindow extends JFrame implements ActionListener {
         {
             if(i > divergeancePoint)
             {
-                relativePath += File.separator;
+                relativePath += "/";
             }
             relativePath += absPathPieces[i];
         }
         
-        return relativePath;
+        return relativePath.replace('\\', '/');
     }
     
     private void open()
@@ -1059,8 +1062,7 @@ public class EditorWindow extends JFrame implements ActionListener {
                         
                         String filePath = "";
                         if(textureAttributes.getNamedItem("textureFilePath") != null) filePath = createAbsolutePathFrom(textureAttributes.getNamedItem("textureFilePath").getNodeValue(), relativeDir);
-                        filePath = filePath.replace('/', File.separatorChar);
-                        filePath = filePath.replace('\\', File.separatorChar);
+                        filePath = filePath.replace('\\', '/');
                         HSTexture tex = new HSTexture(filePath);
                         if(textureAttributes.getNamedItem("depth") != null) tex.depth = Integer.parseInt(textureAttributes.getNamedItem("depth").getNodeValue());
                         if(textureAttributes.getNamedItem("offsetX") != null) tex.offset.x = Float.parseFloat(textureAttributes.getNamedItem("offsetX").getNodeValue());
@@ -1081,8 +1083,7 @@ public class EditorWindow extends JFrame implements ActionListener {
                         
                         String filePath = "";
                         if(audioAttributes.getNamedItem("audioFilePath") != null) filePath = createAbsolutePathFrom(audioAttributes.getNamedItem("audioFilePath").getNodeValue(), relativeDir);
-                        filePath = filePath.replace('/', File.separatorChar);
-                        filePath = filePath.replace('\\', File.separatorChar);
+                        filePath = filePath.replace('\\', '/');
                         HSAudio aud = new HSAudio(filePath);
                         if(audioAttributes.getNamedItem("delay") != null) aud.delay = Integer.parseInt(audioAttributes.getNamedItem("delay").getNodeValue());
                         if(audioAttributes.getNamedItem("exclusive") != null) aud.exclusive = Boolean.parseBoolean(audioAttributes.getNamedItem("exclusive").getNodeValue());
@@ -1104,8 +1105,7 @@ public class EditorWindow extends JFrame implements ActionListener {
                         
                         String filePath = "";
                         if(spawnObjectAttributes.getNamedItem("definitionFilePath") != null) filePath = createAbsolutePathFrom(spawnObjectAttributes.getNamedItem("definitionFilePath").getNodeValue(), relativeDir);
-                        filePath = filePath.replace('/', File.separatorChar);
-                        filePath = filePath.replace('\\', File.separatorChar);
+                        filePath = filePath.replace('\\', '/');
                         HSSpawnObject sob = new HSSpawnObject(filePath);
                         if(spawnObjectAttributes.getNamedItem("delay") != null) sob.delay = Integer.parseInt(spawnObjectAttributes.getNamedItem("delay").getNodeValue());
                         if(spawnObjectAttributes.getNamedItem("number") != null) sob.number = Integer.parseInt(spawnObjectAttributes.getNamedItem("number").getNodeValue());
@@ -1191,8 +1191,7 @@ public class EditorWindow extends JFrame implements ActionListener {
 
                             String filePath = "";
                             if(hitAudioAttributes.getNamedItem("hitAudioFilePath") != null) filePath = createAbsolutePathFrom(hitAudioAttributes.getNamedItem("hitAudioFilePath").getNodeValue(), relativeDir);
-                            filePath = filePath.replace('/', File.separatorChar);
-                            filePath = filePath.replace('\\', File.separatorChar);
+                            filePath = filePath.replace('\\', '/');
                             HSAudio aud = new HSAudio(filePath);
                             if(hitAudioAttributes.getNamedItem("delay") != null) aud.delay = Integer.parseInt(hitAudioAttributes.getNamedItem("delay").getNodeValue());
                             if(hitAudioAttributes.getNamedItem("exclusive") != null) aud.exclusive = Boolean.parseBoolean(hitAudioAttributes.getNamedItem("exclusive").getNodeValue());
@@ -1214,8 +1213,7 @@ public class EditorWindow extends JFrame implements ActionListener {
 
                             String filePath = "";
                             if(blockedAudioAttributes.getNamedItem("blockedAudioFilePath") != null) filePath = createAbsolutePathFrom(blockedAudioAttributes.getNamedItem("blockedAudioFilePath").getNodeValue(), relativeDir);
-                            filePath = filePath.replace('/', File.separatorChar);
-                            filePath = filePath.replace('\\', File.separatorChar);
+                            filePath = filePath.replace('\\', '/');
                             HSAudio aud = new HSAudio(filePath);
                             if(blockedAudioAttributes.getNamedItem("delay") != null) aud.delay = Integer.parseInt(blockedAudioAttributes.getNamedItem("delay").getNodeValue());
                             if(blockedAudioAttributes.getNamedItem("exclusive") != null) aud.exclusive = Boolean.parseBoolean(blockedAudioAttributes.getNamedItem("exclusive").getNodeValue());
@@ -1275,8 +1273,7 @@ public class EditorWindow extends JFrame implements ActionListener {
             	}
             	HSPalette pal = new HSPalette();
             	pal.path = createAbsolutePathFrom(objectAttributes.getNamedItem("palette" + i + "FilePath").getNodeValue(), relativeDir);
-            	pal.path = pal.path.replace('/', File.separatorChar);
-            	pal.path = pal.path.replace('\\', File.separatorChar);
+            	pal.path = pal.path.replace('\\', '/');
                 pal.name = "Palette " + i;
                 pal.id = i;
             	loadObject.palettes.add(pal);
@@ -1291,8 +1288,7 @@ public class EditorWindow extends JFrame implements ActionListener {
 	                
 	                HSPalette pal = new HSPalette();
 	            	pal.path = createAbsolutePathFrom(palette.getAttributes().getNamedItem("path").getNodeValue(), relativeDir);
-	            	pal.path = pal.path.replace('/', File.separatorChar);
-	            	pal.path = pal.path.replace('\\', File.separatorChar);
+	            	pal.path = pal.path.replace('\\', '/');
 	                if(palette.getAttributes().getNamedItem("name") != null) pal.name = palette.getAttributes().getNamedItem("name").getNodeValue();
 	                else pal.name = "";
 	                if(palette.getAttributes().getNamedItem("id") != null) pal.id = Integer.parseInt(palette.getAttributes().getNamedItem("id").getNodeValue());
@@ -2001,7 +1997,7 @@ public class EditorWindow extends JFrame implements ActionListener {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource source = new DOMSource(doc);
-            StreamResult result = new StreamResult(new File(workingDirectory + File.separatorChar + currentlyLoadedObject.name + ".xml"));
+            StreamResult result = new StreamResult(new File(workingDirectory + "/" + currentlyLoadedObject.name + ".xml"));
             transformer.transform(source, result);
         }
         catch(ParserConfigurationException e)
