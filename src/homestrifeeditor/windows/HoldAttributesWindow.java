@@ -78,11 +78,9 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
     private JCheckBox changeAttackBoxAttributesCheck; private static String changeAttackBoxAttributesTooltip = "<html>If this is unchecked, this hold will inherit the attack<br/>attributes of any hold that has this hold as its<br/>next hold.</html>";
     
     private JSpinner damageSpinner;         private static String damageTooltip = "<html>How much damage is done to another object with hurt boxes,<br>should one of this objects attack boxes collide with one of them.</html>";
-    private JSpinner ownHitstopSpinner;     private static String ownHitstopTooltip = "<html>How many frames this object is frozen when it strikes<br>something else. This is usually the same amount as victim hitstop.</html>";
-    private JSpinner victimHitstopSpinner;  private static String victimHitstopTooltip = "<html>How many frames another object is frozen when struck<br>by this object. This is usually the same amount as own hitstop.</html>";
     private JSpinner hitstunSpinner;        private static String hitstunTooltip = "<html>How many frames another fighter is rendered out-of-control<br>when struck by one of this object's attack boxes.</html>";
     private JSpinner blockstunSpinner;      private static String blockstunTooltip = "<html>How many frames another fighter is rendered out-of-control<br>when struck by one of this object's attack boxes while blocking.</html>";
-    
+        
     private JSpinner forceXSpinner;         private static String forceXTooltip = "<html>When another physics object is struck by one of this object's<br>attack boxes, its X velocity is set to this value.</html>";
     private JSpinner forceYSpinner;         private static String forceYTooltip = "<html>When another physics object is struck by one of this object's<br>attack boxes, its Y velocity is set to this value.</html>";
     private JCheckBox tripsCheck;           private static String tripsTooltip = "<html>If checked, another fighter will fall prone if struck by one of<br>this object's attack boxes.</html>";
@@ -95,6 +93,12 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
     private JButton hitSoundsButton;        private static String hitSoundsTooltip = "<html>Add/Edit sounds that occur upon an attack box collision</html>";
     private JButton blockedSoundsButton;        private static String blockedSoundsTooltip = "<html>Add/Edit sounds that occur upon an attack being blocked</html>";
 
+    private JPanel hitstopInterface;
+    private JSpinner ownHitstopSpinner;     private static String ownHitstopTooltip = "<html>How many frames this object is frozen when it strikes<br>something else. This is usually the same amount as victim hitstop.</html>";
+    private JSpinner victimHitstopSpinner;  private static String victimHitstopTooltip = "<html>How many frames another object is frozen when struck<br>by this object. This is usually the same amount as own hitstop.</html>";
+    private JCheckBox ownHitstopOverride;	private static String ownHitstopOverrideTooltip = "<html>If checked, the own hitstop value overrides a universal hitstop value.</html>";
+    private JCheckBox victimHitstopOverride;private static String victimHitstopOverrideTooltip = "<html>If checked, the victim hitstop value overrides a universal hitstop value.</html>";
+   
     private JCheckBox changePhysicsCheck;   private static String changePhysicsTooltip = "<html>If this is unchecked, this hold will not modify the object's physics attributes</html>";
     private JCheckBox ignoreGravityCheck;   //private static String ignoreGravityTooltip = "<html>If this is unchecked, this hold will not modify the object's physics attributes</html>";
 
@@ -279,18 +283,17 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             blockabilityCombo.setSelectedItem(toHold.blockability);
             blockabilityCombo.setActionCommand("fieldChanged");
             blockabilityCombo.addItemListener(this);
-            JLabel directionBlockLabel = new JLabel("Direction Block");
-            directionBlockLabel.setToolTipText(directionBlockTooltip);
-            directionBlockCheck = new JCheckBox("", toHold.horizontalDirectionBasedBlock);
+
+            directionBlockCheck = new JCheckBox("Direction Block", toHold.horizontalDirectionBasedBlock);
             directionBlockCheck.setToolTipText(directionBlockTooltip);
             directionBlockCheck.setActionCommand("fieldChanged");
             directionBlockCheck.addActionListener(this);
-            JLabel reverseBlockLabel = new JLabel("Reverse Block");
-            reverseBlockLabel.setToolTipText(reverseBlockTooltip);
-            reverseBlockCheck = new JCheckBox("", toHold.reversedHorizontalBlock);
+
+            reverseBlockCheck = new JCheckBox("Reverse Block", toHold.reversedHorizontalBlock);
             reverseBlockCheck.setToolTipText(reverseBlockTooltip);
             reverseBlockCheck.setActionCommand("fieldChanged");
             reverseBlockCheck.addActionListener(this);
+            
             JLabel damageLabel = new JLabel("Damage");
             damageLabel.setToolTipText(damageTooltip);
             damageSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 99999, 1));
@@ -298,19 +301,25 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             damageSpinner.setValue(toHold.damage);
             damageSpinner.addChangeListener(this);
             
-            JLabel ownHitstopLabel = new JLabel("Own Hit Stop");
-            ownHitstopLabel.setToolTipText(ownHitstopTooltip);
             ownHitstopSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 99999, 1));
             ownHitstopSpinner.setToolTipText(ownHitstopTooltip);
             ownHitstopSpinner.setValue(toHold.ownHitstop);
             ownHitstopSpinner.addChangeListener(this);
             
-            JLabel victimHitstopLabel = new JLabel("Victim Hit Stop");
-            victimHitstopLabel.setToolTipText(victimHitstopTooltip);
+            ownHitstopOverride = new JCheckBox("Own Hit Stop", toHold.ownHitstopOverride);
+            ownHitstopOverride.setToolTipText(ownHitstopOverrideTooltip);
+            ownHitstopOverride.setActionCommand("ownHitstopOverrideChanged");
+            ownHitstopOverride.addActionListener(this);
+            
             victimHitstopSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 99999, 1));
             victimHitstopSpinner.setToolTipText(victimHitstopTooltip);
             victimHitstopSpinner.setValue(toHold.victimHitstop);
             victimHitstopSpinner.addChangeListener(this);
+            
+            victimHitstopOverride = new JCheckBox("Victim Hit Stop", toHold.victimHitstopOverride);
+            victimHitstopOverride.setToolTipText(victimHitstopOverrideTooltip);
+            victimHitstopOverride.setActionCommand("victimHitstopOverrideChanged");
+            victimHitstopOverride.addActionListener(this);
             
             JLabel hitstunLabel = new JLabel("Hit Stun");
             hitstunLabel.setToolTipText(hitstunTooltip);
@@ -343,16 +352,12 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             forceYSpinner.setValue(toHold.force.y);
             forceYSpinner.addChangeListener(this);
             
-            JLabel tripsLabel = new JLabel("Trips");
-            tripsLabel.setToolTipText(tripsTooltip);
-            tripsCheck = new JCheckBox("", toHold.trips);
+            tripsCheck = new JCheckBox("Trips", toHold.trips);
             tripsCheck.setToolTipText(tripsTooltip);
             tripsCheck.setActionCommand("fieldChanged");
             tripsCheck.addActionListener(this);
             
-            JLabel resetHitsLabel = new JLabel("Reset Hits");
-            resetHitsLabel.setToolTipText(resetHitsTooltip);
-            resetHitsCheck = new JCheckBox("", toHold.resetHits);
+            resetHitsCheck = new JCheckBox("Reset Hits", toHold.resetHits);
             resetHitsCheck.setToolTipText(resetHitsTooltip);
             resetHitsCheck.setActionCommand("fieldChanged");
             resetHitsCheck.addActionListener(this);
@@ -366,16 +371,19 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             blockedSoundsButton.setToolTipText(blockedSoundsTooltip);
             blockedSoundsButton.setActionCommand("blockedSoundsButton");
             blockedSoundsButton.addActionListener(this);
+            
+            hitstopInterface = new JPanel(new GridLayout(2, 2, gridHorizontalGap, gridVerticalGap));
+            hitstopInterface.setBorder(new TitledBorder("Hitstops"));
+            
+            hitstopInterface.add(ownHitstopOverride);
+            hitstopInterface.add(ownHitstopSpinner);
+            hitstopInterface.add(victimHitstopOverride);
+            hitstopInterface.add(victimHitstopSpinner);
 
-            terrainInterface = new JPanel(new GridLayout(7, gridColumns, gridHorizontalGap, gridVerticalGap));
-            terrainInterface.setSize(gridWidth, gridRowHeight * 7);
+            terrainInterface = new JPanel(new GridLayout(5, gridColumns, gridHorizontalGap, gridVerticalGap));
             terrainInterface.setBorder(new TitledBorder("Attack Box Attributes"));
             terrainInterface.add(damageLabel);
             terrainInterface.add(damageSpinner);
-            terrainInterface.add(ownHitstopLabel);
-            terrainInterface.add(ownHitstopSpinner);
-            terrainInterface.add(victimHitstopLabel);
-            terrainInterface.add(victimHitstopSpinner);
             terrainInterface.add(hitstunLabel);
             terrainInterface.add(hitstunSpinner);
             terrainInterface.add(blockabilityLabel);
@@ -386,21 +394,20 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             terrainInterface.add(forceXSpinner);
             terrainInterface.add(forceYLabel);
             terrainInterface.add(forceYSpinner);
-            terrainInterface.add(tripsLabel);
             terrainInterface.add(tripsCheck);
-            terrainInterface.add(resetHitsLabel);
             terrainInterface.add(resetHitsCheck);
-            terrainInterface.add(directionBlockLabel);
             terrainInterface.add(directionBlockCheck);
-            terrainInterface.add(reverseBlockLabel);
             terrainInterface.add(reverseBlockCheck);
-            terrainInterface.add(new JLabel(""));
             terrainInterface.add(hitSoundsButton);
-            terrainInterface.add(new JLabel(""));
             terrainInterface.add(blockedSoundsButton);
+            terrainInterface.add(new JLabel(""));
             setTerrainInterfaceEnabled();
 
             holdAttributesPane.add(terrainInterface);
+            holdAttributesPane.add(hitstopInterface);
+            
+            victimHitstopSpinner.setEnabled(toHold.victimHitstopOverride);
+   		 	ownHitstopSpinner.setEnabled(toHold.ownHitstopOverride);
         }
         
         if(hold.IsPhysicsObjectHold()) {
@@ -663,6 +670,11 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             {
                 components[i].setEnabled(changeAttackBoxAttributesCheck.isSelected());
             }
+            components = hitstopInterface.getComponents();
+            for(int i = 0; i < components.length; i++)
+            {
+                components[i].setEnabled(changeAttackBoxAttributesCheck.isSelected());
+            }
         }
     }
     
@@ -738,7 +750,9 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             ((TerrainObjectHold)hold).changeAttackBoxAttributes = changeAttackBoxAttributesCheck.isSelected();
             ((TerrainObjectHold)hold).damage = (int)damageSpinner.getValue();
             ((TerrainObjectHold)hold).ownHitstop = (int)ownHitstopSpinner.getValue();
+            ((TerrainObjectHold)hold).ownHitstopOverride = ownHitstopOverride.isSelected();
             ((TerrainObjectHold)hold).victimHitstop = (int)victimHitstopSpinner.getValue();
+            ((TerrainObjectHold)hold).victimHitstopOverride = victimHitstopOverride.isSelected();
             ((TerrainObjectHold)hold).hitstun = (int)hitstunSpinner.getValue();
             ((TerrainObjectHold)hold).blockstun = (int)blockstunSpinner.getValue();
             ((TerrainObjectHold)hold).force.x = (float)forceXSpinner.getValue();
@@ -865,6 +879,14 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
 		velocityXSpinner.setEnabled(overwriteVelocityCheck.isSelected());
 		velocityYSpinner.setEnabled(overwriteVelocityCheck.isSelected());
 	}
+
+	private void ownHitstopOverrideChanged() {
+		 ownHitstopSpinner.setEnabled(ownHitstopOverride.isSelected());
+	}
+
+	private void victimHitstopOverrideChanged() {
+		victimHitstopSpinner.setEnabled(victimHitstopOverride.isSelected());
+	}
     
     @Override
     public void actionPerformed(ActionEvent e)
@@ -884,6 +906,8 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             case "changeFighterAttributesChanged": changeFighterAttributesChanged(); break;
             case "hitSoundsButton": hitSoundsButtonPressed(); break;
             case "blockedSoundsButton": blockedSoundsButtonPressed(); break;
+            case "ownHitstopOverrideChanged": ownHitstopOverrideChanged(); break;
+            case "victimHitstopOverrideChanged": victimHitstopOverrideChanged(); break;
         }
     }
 

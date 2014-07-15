@@ -1128,7 +1128,9 @@ public class EditorWindow extends JFrame implements ActionListener {
                     //get terrain object hold attributes
                     if(holdAttributes.getNamedItem("blockability") != null) toHold.blockability = Blockability.valueOf(holdAttributes.getNamedItem("blockability").getNodeValue());
                     if(holdAttributes.getNamedItem("ownHitstop") != null) toHold.ownHitstop = Integer.parseInt(holdAttributes.getNamedItem("ownHitstop").getNodeValue());
+                    if(holdAttributes.getNamedItem("ownHitstopOverride") != null) toHold.ownHitstopOverride = Boolean.parseBoolean(holdAttributes.getNamedItem("ownHitstopOverride").getNodeValue());
                     if(holdAttributes.getNamedItem("victimHitstop") != null) toHold.victimHitstop = Integer.parseInt(holdAttributes.getNamedItem("victimHitstop").getNodeValue());
+                    if(holdAttributes.getNamedItem("victimHitstopOverride") != null) toHold.victimHitstopOverride = Boolean.parseBoolean(holdAttributes.getNamedItem("victimHitstopOverride").getNodeValue());
                     if(holdAttributes.getNamedItem("blockstun") != null) toHold.blockstun = Integer.parseInt(holdAttributes.getNamedItem("blockstun").getNodeValue());
                     if(holdAttributes.getNamedItem("changeAttackBoxAttributes") != null) toHold.changeAttackBoxAttributes = Boolean.parseBoolean(holdAttributes.getNamedItem("changeAttackBoxAttributes").getNodeValue());
                     if(holdAttributes.getNamedItem("damage") != null) toHold.damage = Integer.parseInt(holdAttributes.getNamedItem("damage").getNodeValue());
@@ -1816,7 +1818,9 @@ public class EditorWindow extends JFrame implements ActionListener {
                     
                     hold.setAttribute("blockability", "" + th.blockability);
                     hold.setAttribute("ownHitstop", "" + th.ownHitstop);
+                    hold.setAttribute("ownHitstopOverride", "" + th.ownHitstopOverride);
                     hold.setAttribute("victimHitstop", "" + th.victimHitstop);
+                    hold.setAttribute("victimHitstopOverride", "" + th.victimHitstopOverride);
                     hold.setAttribute("blockstun", "" + th.blockstun);
                     hold.setAttribute("changeAttackBoxAttributes", "" + th.changeAttackBoxAttributes);
                     hold.setAttribute("damage", "" + th.damage);
