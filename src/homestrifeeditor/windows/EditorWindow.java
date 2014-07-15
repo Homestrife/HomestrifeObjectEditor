@@ -104,6 +104,8 @@ public class EditorWindow extends JFrame implements ActionListener {
     public static JFileChooser fileChooser;
     
     private String changeLogText = "<html><h2>Noteworthy Changes:</h2>" +
+			"15 July, 2014:" +
+			"<ul><li>Add a bunch of new TerrainObject hold data</li></ul>" +
 			"7 May, 2014:" +
 			"<ul><li>Saves using only forward slashes</li></ul>" +
 			"30 April, 2014:" +
@@ -2297,7 +2299,7 @@ public class EditorWindow extends JFrame implements ActionListener {
             case "eventHolds": createEventHoldsWindow(); break;
             case "palettes": createPalettesWindow(); break;
             case "helpContent": helpContent(); break;
-            case "about": about();
+            case "about": about(); break;
             case "changeLog": changeLog(); break;
         }
     }
