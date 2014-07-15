@@ -10,6 +10,8 @@ import homestrifeeditor.objects.holds.PhysicsObjectHold;
 import homestrifeeditor.objects.holds.TerrainObjectHold;
 import homestrifeeditor.objects.holds.properties.Blockability;
 import homestrifeeditor.objects.holds.properties.Cancel;
+import homestrifeeditor.objects.holds.properties.HitLevel;
+import homestrifeeditor.objects.holds.properties.Invulnerability;
 import homestrifeeditor.windows.panes.HoldListPane;
 import homestrifeeditor.windows.renderers.HoldComboBoxRenderer;
 
@@ -49,9 +51,9 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
 	
 	private static int windowWidth = 800;
     private static int windowHeightGeneral = 250;
-    private static int windowHeightTerrain = 510;
-    private static int windowHeightPhysics = 665;
-    private static int windowHeightFighter = 900;
+    private static int windowHeightTerrain = 610;
+    private static int windowHeightPhysics = 765;
+    private static int windowHeightFighter = 1000;
     private static int windowBorderBuffer = 10;
     
     private static int gridWidth = 650;
@@ -88,17 +90,23 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
     private JCheckBox resetHitsCheck;        private static String resetHitsTooltip = "<html>If checked, further attack boxes in this animation will strike<br>objects that have already been struck.</html>";
     
     private JComboBox<?> blockabilityCombo;    private static String blockabilityTooltip = "<html>Unblockable: This object's attack boxes cannot be blocked.<br>High: This object's attack boxes must be blocked while standing or jumping.<br>Low: This object's attack boxes must be blocked while crouching or jumping.<br>Mid: This object's attack boxes can be blocked while crouching, standing, or jumping.</html>";
+    private JComboBox<?> hitLevelCombo;    private static String hitLevelTooltip = "<html>Ask Darlos</html>";
     private JCheckBox directionBlockCheck;  private static String directionBlockTooltip = "<html>If checked, another figher must be facing in the opposite<br>direction that this object is facing in order to block this<br>object's attack boxes.<br>Normally, whether this object's attack boxes must be blocked while<br>facing left or right is determined by which side of the defending<br>fighter this object is on, regardless of which way this object is facing.</html>";
     private JCheckBox reverseBlockCheck;    private static String reverseBlockTooltip = "<html>If checked, another fighter must face the direction opposite<br>of what they would normally need to in order to block this object's attack boxes.</html>";
     private JButton hitSoundsButton;        private static String hitSoundsTooltip = "<html>Add/Edit sounds that occur upon an attack box collision</html>";
     private JButton blockedSoundsButton;        private static String blockedSoundsTooltip = "<html>Add/Edit sounds that occur upon an attack being blocked</html>";
 
-    private JPanel hitstopInterface;
     private JSpinner ownHitstopSpinner;     private static String ownHitstopTooltip = "<html>How many frames this object is frozen when it strikes<br>something else. This is usually the same amount as victim hitstop.</html>";
     private JSpinner victimHitstopSpinner;  private static String victimHitstopTooltip = "<html>How many frames another object is frozen when struck<br>by this object. This is usually the same amount as own hitstop.</html>";
     private JCheckBox ownHitstopOverride;	private static String ownHitstopOverrideTooltip = "<html>If checked, the own hitstop value overrides a universal hitstop value.</html>";
     private JCheckBox victimHitstopOverride;private static String victimHitstopOverrideTooltip = "<html>If checked, the victim hitstop value overrides a universal hitstop value.</html>";
    
+    private JCheckBox changeHurtBoxAttributesCheck; private static String changeHurtBoxAttributesTooltip = "<html>If this is unchecked, this hold will inherit the hurt<br/>attributes of any hold that has this hold as its<br/>next hold.</html>";
+    private JComboBox<?> invulnerabilityCombo; 	private static String invulnerabilityTooltip = "<html>I dunno ask Darlos</html>";
+    private JSpinner superArmorHitsSpinner;		private static String superArmorHitsTooltip = "<html>I dunno ask Darlos</html>";
+    private JSpinner superArmorDamageSpinner;		private static String superArmorDamageTooltip = "<html>I dunno ask Darlos</html>";
+    private JSpinner superArmorDamageScalingSpinner;		private static String superArmorDamageScalingTooltip = "<html>I dunno ask Darlos</html>";
+    
     private JCheckBox changePhysicsCheck;   private static String changePhysicsTooltip = "<html>If this is unchecked, this hold will not modify the object's physics attributes</html>";
     private JCheckBox ignoreGravityCheck;   //private static String ignoreGravityTooltip = "<html>If this is unchecked, this hold will not modify the object's physics attributes</html>";
 
@@ -121,8 +129,10 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
     private JComboBox<Cancel> heavyDownCancelCombo;
     private JComboBox<Cancel> heavyBackwardCancelCombo;
     private JComboBox<Cancel> heavyQCFCancelCombo;
-    
+
     private JPanel terrainInterface;
+    private JPanel hitstopInterface;
+    private JPanel hurtBoxInterface;
     private JPanel physicsInterface;
     private JPanel fighterAttributesInterface;
     private JPanel fighterInterface;
@@ -283,6 +293,14 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             blockabilityCombo.setSelectedItem(toHold.blockability);
             blockabilityCombo.setActionCommand("fieldChanged");
             blockabilityCombo.addItemListener(this);
+            
+            JLabel hitLevelLabel = new JLabel("Hit Level");
+            hitLevelLabel.setToolTipText(hitLevelTooltip);
+            hitLevelCombo = new JComboBox<Object>(HitLevel.values());
+            hitLevelCombo.setToolTipText(hitLevelTooltip);
+            hitLevelCombo.setSelectedItem(toHold.hitLevel);
+            hitLevelCombo.setActionCommand("fieldChanged");
+            hitLevelCombo.addItemListener(this);
 
             directionBlockCheck = new JCheckBox("Direction Block", toHold.horizontalDirectionBasedBlock);
             directionBlockCheck.setToolTipText(directionBlockTooltip);
@@ -388,6 +406,8 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             terrainInterface.add(hitstunSpinner);
             terrainInterface.add(blockabilityLabel);
             terrainInterface.add(blockabilityCombo);
+            terrainInterface.add(hitLevelLabel);
+            terrainInterface.add(hitLevelCombo);
             terrainInterface.add(blockstunLabel);
             terrainInterface.add(blockstunSpinner);
             terrainInterface.add(forceXLabel);
@@ -400,7 +420,6 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             terrainInterface.add(reverseBlockCheck);
             terrainInterface.add(hitSoundsButton);
             terrainInterface.add(blockedSoundsButton);
-            terrainInterface.add(new JLabel(""));
             setTerrainInterfaceEnabled();
 
             holdAttributesPane.add(terrainInterface);
@@ -408,6 +427,59 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             
             victimHitstopSpinner.setEnabled(toHold.victimHitstopOverride);
    		 	ownHitstopSpinner.setEnabled(toHold.ownHitstopOverride);
+   		 	
+   		 	// Hurt box stuffs
+   		 	
+            hurtBoxInterface = new JPanel(new GridLayout(2, gridColumns, gridHorizontalGap, gridVerticalGap));
+            hurtBoxInterface.setBorder(new TitledBorder("Hurt Box Attributes"));
+            
+            changeHurtBoxAttributesCheck = new JCheckBox("Change hurt box attributes this hold", toHold.changeHurtBoxAttributes);
+            changeHurtBoxAttributesCheck.setToolTipText(changeHurtBoxAttributesTooltip);
+            changeHurtBoxAttributesCheck.setActionCommand("changeHurtBoxAttributesChanged");
+            changeHurtBoxAttributesCheck.addActionListener(this);
+            
+            JPanel changeHurtBoxAttributesInterface = new JPanel(new GridLayout(1, gridColumns, gridHorizontalGap, gridVerticalGap));
+            changeHurtBoxAttributesInterface.setSize(gridWidth, gridRowHeight);
+            changeHurtBoxAttributesInterface.add(changeHurtBoxAttributesCheck);
+            holdAttributesPane.add(changeHurtBoxAttributesInterface);
+
+            JLabel invulnerabilityComboLabel = new JLabel("Invulnerability");
+            invulnerabilityComboLabel.setToolTipText(invulnerabilityTooltip);
+            invulnerabilityCombo = new JComboBox<Object>(Invulnerability.values());
+            invulnerabilityCombo.setToolTipText(invulnerabilityTooltip);
+            invulnerabilityCombo.setSelectedItem(toHold.invulnerability);
+            invulnerabilityCombo.setActionCommand("fieldChanged");
+            invulnerabilityCombo.addItemListener(this);
+            
+            JLabel superArmorHitsLabel = new JLabel("Super Armor Hits");
+            superArmorHitsLabel.setToolTipText(superArmorHitsTooltip);
+            superArmorHitsSpinner = new JSpinner(new SpinnerNumberModel(toHold.superArmorHits, 0, 99999, 1));
+            superArmorHitsSpinner.setToolTipText(superArmorHitsTooltip);
+            superArmorHitsSpinner.addChangeListener(this);
+            
+            JLabel superArmorDamageLabel = new JLabel("Super Armor Damage");
+            superArmorDamageLabel.setToolTipText(superArmorDamageTooltip);
+            superArmorDamageSpinner = new JSpinner(new SpinnerNumberModel(toHold.superArmorDamage, 0, 99999, 1));
+            superArmorDamageSpinner.setToolTipText(superArmorDamageTooltip);
+            superArmorDamageSpinner.addChangeListener(this);
+            
+            JLabel superArmorDamageScalingLabel = new JLabel("Super Armor Damage Scaling");
+            superArmorDamageScalingLabel.setToolTipText(superArmorDamageScalingTooltip);
+            superArmorDamageScalingSpinner = new JSpinner(new SpinnerNumberModel(toHold.superArmorDamageScaling, 0.0, 1.0, .1));
+            superArmorDamageScalingSpinner.setToolTipText(superArmorDamageScalingTooltip);
+            superArmorDamageScalingSpinner.addChangeListener(this);
+
+            hurtBoxInterface.add(invulnerabilityComboLabel);
+            hurtBoxInterface.add(invulnerabilityCombo);
+            hurtBoxInterface.add(superArmorHitsLabel);
+            hurtBoxInterface.add(superArmorHitsSpinner);
+            hurtBoxInterface.add(superArmorDamageLabel);
+            hurtBoxInterface.add(superArmorDamageSpinner);
+            hurtBoxInterface.add(superArmorDamageScalingLabel);
+            hurtBoxInterface.add(superArmorDamageScalingSpinner);
+            
+            holdAttributesPane.add(hurtBoxInterface);
+            setHurtBoxInterfaceEnabled();
         }
         
         if(hold.IsPhysicsObjectHold()) {
@@ -678,6 +750,21 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         }
     }
     
+    private void setHurtBoxInterfaceEnabled() {
+        if(hold.IsTerrainObjectHold())
+        {
+            TerrainObjectHold toHold = (TerrainObjectHold)hold;
+            
+            hurtBoxInterface.setEnabled(changeHurtBoxAttributesCheck.isSelected());
+            
+            Component[] components = hurtBoxInterface.getComponents();
+            for(int i = 0; i < components.length; i++)
+            {
+                components[i].setEnabled(changeHurtBoxAttributesCheck.isSelected());
+            }
+        }
+	}
+    
     private void setPhysicsInterfaceEnabled()
     {
         if(hold.IsPhysicsObjectHold())
@@ -760,8 +847,15 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             ((TerrainObjectHold)hold).trips = tripsCheck.isSelected();
             ((TerrainObjectHold)hold).resetHits = resetHitsCheck.isSelected();
             ((TerrainObjectHold)hold).blockability = (Blockability)blockabilityCombo.getSelectedItem();
+            ((TerrainObjectHold)hold).hitLevel = (HitLevel)hitLevelCombo.getSelectedItem();
             ((TerrainObjectHold)hold).horizontalDirectionBasedBlock = directionBlockCheck.isSelected();
             ((TerrainObjectHold)hold).reversedHorizontalBlock = reverseBlockCheck.isSelected();
+            
+            ((TerrainObjectHold)hold).changeHurtBoxAttributes = changeHurtBoxAttributesCheck.isSelected();
+            ((TerrainObjectHold)hold).superArmorHits = (int)superArmorHitsSpinner.getValue();
+            ((TerrainObjectHold)hold).superArmorDamage = (int)superArmorDamageSpinner.getValue();
+            ((TerrainObjectHold)hold).superArmorDamageScaling = new Float((double)superArmorDamageScalingSpinner.getValue());
+            ((TerrainObjectHold)hold).invulnerability = (Invulnerability)invulnerabilityCombo.getSelectedItem();
         }
         
         if(hold.IsPhysicsObjectHold()) {
@@ -846,8 +940,13 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         setTerrainInterfaceEnabled();
         fieldChanged();
     }
-    
-    private void changePhysicsChanged() {
+
+	private void changeHurtBoxAttributesChanged() {
+        setHurtBoxInterfaceEnabled();
+        fieldChanged();
+	}
+
+	private void changePhysicsChanged() {
 		setPhysicsInterfaceEnabled();
 		fieldChanged();
 	}
@@ -901,6 +1000,7 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             case "fieldChanged": fieldChanged(); break;
             case "overwriteVelocityChanged": overwriteVelocityChanged(); break;
             case "changeAttackBoxAttributesChanged": changeAttackBoxAttributesChanged(); break;
+            case "changeHurtBoxAttributesChanged": changeHurtBoxAttributesChanged(); break;
             case "changePhysicsChanged": changePhysicsChanged();
             case "changeCancelsChanged": changeCancelsChanged(); break;
             case "changeFighterAttributesChanged": changeFighterAttributesChanged(); break;

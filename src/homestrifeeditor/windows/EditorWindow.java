@@ -20,6 +20,8 @@ import homestrifeeditor.objects.holds.properties.HSAudio;
 import homestrifeeditor.objects.holds.properties.HSPalette;
 import homestrifeeditor.objects.holds.properties.HSTexture;
 import homestrifeeditor.objects.holds.properties.HSSpawnObject;
+import homestrifeeditor.objects.holds.properties.HitLevel;
+import homestrifeeditor.objects.holds.properties.Invulnerability;
 import homestrifeeditor.windows.panes.HoldListPane;
 import homestrifeeditor.windows.panes.TextureHitboxPane;
 
@@ -1126,7 +1128,12 @@ public class EditorWindow extends JFrame implements ActionListener {
                     TerrainObjectHold toHold = (TerrainObjectHold)loadHold;
                     
                     //get terrain object hold attributes
-                    if(holdAttributes.getNamedItem("blockability") != null) toHold.blockability = Blockability.valueOf(holdAttributes.getNamedItem("blockability").getNodeValue());
+                    try {
+                    	if(holdAttributes.getNamedItem("blockability") != null) toHold.blockability = Blockability.valueOf(holdAttributes.getNamedItem("blockability").getNodeValue());
+                    } catch(IllegalArgumentException e) {
+                    	// If this happens, default to BLOCKABLE (it has an old blockable value, so we disregard the saved)
+                    	toHold.blockability = Blockability.BLOCKABLE;
+                    }
                     if(holdAttributes.getNamedItem("ownHitstop") != null) toHold.ownHitstop = Integer.parseInt(holdAttributes.getNamedItem("ownHitstop").getNodeValue());
                     if(holdAttributes.getNamedItem("ownHitstopOverride") != null) toHold.ownHitstopOverride = Boolean.parseBoolean(holdAttributes.getNamedItem("ownHitstopOverride").getNodeValue());
                     if(holdAttributes.getNamedItem("victimHitstop") != null) toHold.victimHitstop = Integer.parseInt(holdAttributes.getNamedItem("victimHitstop").getNodeValue());
@@ -1141,7 +1148,13 @@ public class EditorWindow extends JFrame implements ActionListener {
                     if(holdAttributes.getNamedItem("reversedHorizontalBlock") != null) toHold.reversedHorizontalBlock = Boolean.parseBoolean(holdAttributes.getNamedItem("reversedHorizontalBlock").getNodeValue());
                     if(holdAttributes.getNamedItem("trips") != null) toHold.trips = Boolean.parseBoolean(holdAttributes.getNamedItem("trips").getNodeValue());
                     if(holdAttributes.getNamedItem("resetHits") != null) toHold.resetHits = Boolean.parseBoolean(holdAttributes.getNamedItem("resetHits").getNodeValue());
-                    
+                    if(holdAttributes.getNamedItem("changeHurtBoxAttributes") != null) toHold.changeHurtBoxAttributes = Boolean.parseBoolean(holdAttributes.getNamedItem("changeHurtBoxAttributes").getNodeValue());
+                	if(holdAttributes.getNamedItem("invulnerability") != null) toHold.invulnerability = Invulnerability.valueOf(holdAttributes.getNamedItem("invulnerability").getNodeValue());                    
+                	if(holdAttributes.getNamedItem("hitLevel") != null) toHold.hitLevel = HitLevel.valueOf(holdAttributes.getNamedItem("hitLevel").getNodeValue());
+                    if(holdAttributes.getNamedItem("superArmorHits") != null) toHold.superArmorHits = Integer.parseInt(holdAttributes.getNamedItem("superArmorHits").getNodeValue());
+                    if(holdAttributes.getNamedItem("superArmorDamage") != null) toHold.superArmorDamage = Integer.parseInt(holdAttributes.getNamedItem("superArmorDamage").getNodeValue());
+                    if(holdAttributes.getNamedItem("superArmorDamageScaling") != null) toHold.superArmorDamageScaling = Float.parseFloat(holdAttributes.getNamedItem("superArmorDamageScaling").getNodeValue());
+                	
                     //get attack boxes
                     if(attackBoxes != null)
                     {
@@ -1831,6 +1844,12 @@ public class EditorWindow extends JFrame implements ActionListener {
                     hold.setAttribute("reversedHorizontalBlock", "" + th.reversedHorizontalBlock);
                     hold.setAttribute("trips", "" + th.trips);
                     hold.setAttribute("resetHits", "" + th.resetHits);
+                    hold.setAttribute("changeHurtBoxAttributes", "" + th.changeHurtBoxAttributes);
+                    hold.setAttribute("invulnerability", "" + th.invulnerability);
+                    hold.setAttribute("hitLevel", "" + th.hitLevel);
+                    hold.setAttribute("superArmorHits", "" + th.superArmorHits);
+                    hold.setAttribute("superArmorDamage", "" + th.superArmorDamage);
+                    hold.setAttribute("superArmorDamageScaling", "" + th.superArmorDamageScaling);
                     
                     //get attack boxes
                     if(!th.attackBoxes.isEmpty())

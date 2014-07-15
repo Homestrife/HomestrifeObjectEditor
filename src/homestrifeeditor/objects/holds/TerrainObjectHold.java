@@ -8,6 +8,8 @@ import homestrifeeditor.objects.holds.properties.HSBox;
 import homestrifeeditor.objects.holds.properties.Blockability;
 import homestrifeeditor.objects.holds.properties.HSAudio;
 import homestrifeeditor.objects.holds.properties.HSVect2D;
+import homestrifeeditor.objects.holds.properties.HitLevel;
+import homestrifeeditor.objects.holds.properties.Invulnerability;
 
 import java.util.ArrayList;
 
@@ -34,6 +36,12 @@ public class TerrainObjectHold extends HSObjectHold {
     public HSVect2D force;
     public boolean trips;
     public boolean resetHits;
+	public boolean changeHurtBoxAttributes;
+	public Invulnerability invulnerability;
+	public HitLevel hitLevel;
+	public int superArmorHits;
+	public int superArmorDamage;
+	public float superArmorDamageScaling;
     
     public TerrainObjectHold()
     {
@@ -44,7 +52,8 @@ public class TerrainObjectHold extends HSObjectHold {
         hitAudioList = new ArrayList<HSAudio>();
         blockedAudioList = new ArrayList<HSAudio>();
         changeAttackBoxAttributes = false;
-        blockability = Blockability.MID;
+        changeHurtBoxAttributes = false;
+        blockability = Blockability.BLOCKABLE;
         horizontalDirectionBasedBlock = false;
         reversedHorizontalBlock = false;
         damage = 0;
@@ -57,6 +66,11 @@ public class TerrainObjectHold extends HSObjectHold {
         force = new HSVect2D();
         trips = false;
         resetHits = false;
+        invulnerability = Invulnerability.INVULN_NONE;
+        hitLevel = HitLevel.HIT_MID;
+        superArmorHits = 0;
+        superArmorDamage = 0;
+        superArmorDamageScaling = 0.0f;
     }
     
     @Override

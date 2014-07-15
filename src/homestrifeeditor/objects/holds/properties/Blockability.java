@@ -10,7 +10,5 @@ package homestrifeeditor.objects.holds.properties;
  */
 public enum Blockability {
     UNBLOCKABLE,
-    HIGH,
-    LOW,
-    MID
+    BLOCKABLE
 }
