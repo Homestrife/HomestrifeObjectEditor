@@ -31,6 +31,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
@@ -49,14 +50,11 @@ import javax.swing.tree.TreePath;
 public class HoldAttributesWindow extends JFrame implements ActionListener, ChangeListener, DocumentListener, ItemListener {
 	private static final long serialVersionUID = 1L;
 	
-	private static int windowWidth = 800;
-    private static int windowHeightGeneral = 250;
-    private static int windowHeightTerrain = 610;
-    private static int windowHeightPhysics = 765;
-    private static int windowHeightFighter = 1000;
+	private static int windowWidth = 1200;
+    private static int windowHeight = 500;
     private static int windowBorderBuffer = 10;
     
-    private static int gridWidth = 650;
+    private static int gridWidth = 500;
     private static int gridRowHeight = 45;
     private static int gridColumns = 4;
     private static int gridHorizontalGap = 10;
@@ -148,7 +146,7 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         holdPath = path;
         
         setTitle("Hold Attributes - " + hold.name);
-        setSize(windowWidth, windowHeightGeneral);
+        setSize(windowWidth, windowHeight);
         setLocationRelativeTo(null);
         this.setResizable(false);
        
@@ -241,7 +239,6 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         velocityYSpinner.addChangeListener(this);
         
         JPanel graphicInterface = new JPanel(new GridLayout(5, gridColumns, gridHorizontalGap, gridVerticalGap));
-        graphicInterface.setSize(gridWidth, gridRowHeight * 6);
         graphicInterface.setBorder(new TitledBorder("General Attributes"));
         graphicInterface.add(nameLabel);
         graphicInterface.add(nameField);
@@ -249,12 +246,8 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         graphicInterface.add(durationSpinner);
         graphicInterface.add(nextHoldLabel);
         graphicInterface.add(nextHoldCombo);
-        graphicInterface.add(new JLabel(""));
         graphicInterface.add(holdSoundsButton);
-        graphicInterface.add(new JLabel(""));
         graphicInterface.add(spawnObjectsButton);
-        graphicInterface.add(new JLabel(""));
-        graphicInterface.add(new JLabel(""));
         graphicInterface.add(repositionLabel);
         graphicInterface.add(repositionXSpinner);
         graphicInterface.add(repositionYSpinner);
@@ -270,9 +263,7 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         holdAttributesPane.add(graphicInterface);
         
         if(hold.IsTerrainObjectHold())
-        {
-            setSize(windowWidth, windowHeightTerrain);
-            
+        {            
             TerrainObjectHold toHold = (TerrainObjectHold)hold;
             
             changeAttackBoxAttributesCheck = new JCheckBox("Change attack box attributes this hold", toHold.changeAttackBoxAttributes);
@@ -281,7 +272,6 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             changeAttackBoxAttributesCheck.addActionListener(this);
             
             JPanel changeAttackBoxAttributesInterface = new JPanel(new GridLayout(1, gridColumns, gridHorizontalGap, gridVerticalGap));
-            changeAttackBoxAttributesInterface.setSize(gridWidth, gridRowHeight);
             changeAttackBoxAttributesInterface.add(changeAttackBoxAttributesCheck);
 
             holdAttributesPane.add(changeAttackBoxAttributesInterface);
@@ -439,7 +429,6 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             changeHurtBoxAttributesCheck.addActionListener(this);
             
             JPanel changeHurtBoxAttributesInterface = new JPanel(new GridLayout(1, gridColumns, gridHorizontalGap, gridVerticalGap));
-            changeHurtBoxAttributesInterface.setSize(gridWidth, gridRowHeight);
             changeHurtBoxAttributesInterface.add(changeHurtBoxAttributesCheck);
             holdAttributesPane.add(changeHurtBoxAttributesInterface);
 
@@ -483,7 +472,6 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         }
         
         if(hold.IsPhysicsObjectHold()) {
-            setSize(windowWidth, windowHeightPhysics);
             PhysicsObjectHold pHold = (PhysicsObjectHold)hold;
 
             changePhysicsCheck = new JCheckBox("Change Physics Attributes This Hold", pHold.changePhysics);
@@ -492,7 +480,6 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             changePhysicsCheck.addActionListener(this);
             
             JPanel changePhysicsInterface = new JPanel(new GridLayout(1, gridColumns, gridHorizontalGap, gridVerticalGap));
-            changePhysicsInterface.setSize(gridWidth, gridRowHeight);
             changePhysicsInterface.add(changePhysicsCheck);
             
             holdAttributesPane.add(changePhysicsInterface);
@@ -503,7 +490,6 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             ignoreGravityCheck.addActionListener(this); 
             
             physicsInterface = new JPanel(new GridLayout(1, gridColumns, gridHorizontalGap, gridVerticalGap));
-            physicsInterface.setSize(gridWidth, gridRowHeight * 7);
             physicsInterface.setBorder(new TitledBorder("Physics Attributes"));
             physicsInterface.add(ignoreGravityCheck);
             setPhysicsInterfaceEnabled();
@@ -512,9 +498,7 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         }
         
         if(hold.IsFighterHold())
-        {
-            setSize(windowWidth, windowHeightFighter);
-            
+        {            
             FighterHold fHold = (FighterHold)hold;
             
             changeFighterAttributesCheck = new JCheckBox("Change fighter attributes this hold", fHold.changeFighterAttributes);
@@ -523,7 +507,6 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             changeFighterAttributesCheck.addActionListener(this);
             
             JPanel changeFighterAttributesInterface = new JPanel(new GridLayout(1, gridColumns, gridHorizontalGap, gridVerticalGap));
-            changeFighterAttributesInterface.setSize(gridWidth, gridRowHeight);
             changeFighterAttributesInterface.add(changeFighterAttributesCheck);
             
             holdAttributesPane.add(changeFighterAttributesInterface);
@@ -718,15 +701,21 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         applyButton.setActionCommand("applyButton");
         applyButton.addActionListener(this);
         applyButton.setEnabled(false);
+
+        JScrollPane eventHoldScrollPane = new JScrollPane(holdAttributesPane); 
         
         JPanel buttonPane = new JPanel(new FlowLayout(FlowLayout.TRAILING));
         buttonPane.add(okButton);
         buttonPane.add(closeButton);
         buttonPane.add(applyButton);
         
-        holdAttributesPane.add(buttonPane);
+        JPanel interfacePane = new JPanel();
+        interfacePane.setLayout(new BoxLayout(interfacePane, BoxLayout.Y_AXIS));
+        interfacePane.setBorder(new EmptyBorder(windowBorderBuffer, windowBorderBuffer, windowBorderBuffer, windowBorderBuffer));
         
-        add(holdAttributesPane);
+        interfacePane.add(eventHoldScrollPane);
+        interfacePane.add(buttonPane);
+        add(interfacePane);
     }
     
     private void setTerrainInterfaceEnabled()
