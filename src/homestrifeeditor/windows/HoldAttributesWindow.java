@@ -742,11 +742,6 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
             {
                 components[i].setEnabled(changeAttackBoxAttributesCheck.isSelected());
             }
-            components = hitstopInterface.getComponents();
-            for(int i = 0; i < components.length; i++)
-            {
-                components[i].setEnabled(changeAttackBoxAttributesCheck.isSelected());
-            }
         }
     }
     
