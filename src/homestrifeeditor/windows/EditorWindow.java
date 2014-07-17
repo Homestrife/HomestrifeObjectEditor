@@ -104,6 +104,8 @@ public class EditorWindow extends JFrame implements ActionListener {
     public static JFileChooser fileChooser;
     
     private String changeLogText = "<html><h2>Noteworthy Changes:</h2>" +
+			"16 July, 2014:" +
+			"<ul><li>Can now scroll and resize Hold Attributes window</li></ul>" +
 			"15 July, 2014:" +
 			"<ul><li>Add a bunch of new TerrainObject hold data</li></ul>" +
 			"7 May, 2014:" +
