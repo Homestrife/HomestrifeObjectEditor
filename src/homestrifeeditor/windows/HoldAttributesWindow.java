@@ -147,8 +147,7 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         
         setTitle("Hold Attributes - " + hold.name);
         setSize(windowWidth, windowHeight);
-        setLocationRelativeTo(null);
-        this.setResizable(false);
+        setLocationRelativeTo(parent);
        
         createWindowContents();
     }
