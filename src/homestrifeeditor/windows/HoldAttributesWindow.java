@@ -701,7 +701,8 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         applyButton.addActionListener(this);
         applyButton.setEnabled(false);
 
-        JScrollPane eventHoldScrollPane = new JScrollPane(holdAttributesPane); 
+        JScrollPane holdAttributesScrollPane = new JScrollPane(holdAttributesPane);
+        holdAttributesScrollPane.getVerticalScrollBar().setUnitIncrement(10);
         
         JPanel buttonPane = new JPanel(new FlowLayout(FlowLayout.TRAILING));
         buttonPane.add(okButton);
@@ -712,7 +713,7 @@ public class HoldAttributesWindow extends JFrame implements ActionListener, Chan
         interfacePane.setLayout(new BoxLayout(interfacePane, BoxLayout.Y_AXIS));
         interfacePane.setBorder(new EmptyBorder(windowBorderBuffer, windowBorderBuffer, windowBorderBuffer, windowBorderBuffer));
         
-        interfacePane.add(eventHoldScrollPane);
+        interfacePane.add(holdAttributesScrollPane);
         interfacePane.add(buttonPane);
         add(interfacePane);
     }

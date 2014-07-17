@@ -715,6 +715,7 @@ public class EventHoldsWindow extends JFrame implements ActionListener, ItemList
         }
         
         JScrollPane eventHoldScrollPane = new JScrollPane(eventHoldPane);
+        eventHoldScrollPane.getVerticalScrollBar().setUnitIncrement(10);
         
         JButton okButton = new JButton("OK");
         okButton.setActionCommand("okButton");
